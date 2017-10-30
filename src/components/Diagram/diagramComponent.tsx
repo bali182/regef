@@ -23,6 +23,7 @@ export class Diagram extends React.Component<DiagramProps, {}> {
   }
 
   @bind onWheel(e: React.WheelEvent<any>) {
+    e.preventDefault() // TODO detect if scroll happened on scrollbar
     const component = this._childRef
     const currentZoom = this.props.config.getZoomLevel(component)
     const maxZoom = this.props.config.getMaxZoomLevel(component)

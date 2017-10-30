@@ -51,7 +51,7 @@ class MyDiagram extends React.Component<any, State> {
   buildTransform() {
     const { zoomLevel, offsetX, offsetY } = this.state
     return {
-      transform: `translate(${offsetX}px, ${offsetY}px) scale(${zoomLevel / 100})`
+      transform: `translate(${offsetX}px, ${offsetY}px) scale(${zoomLevel / 100})`,
     }
   }
 
@@ -78,9 +78,9 @@ const baseStyle = {
   width: 500,
   height: 500,
   border: '1px solid red',
-  overflow: 'scroll',
+  overflow: 'auto', // no scrolling yet
   backgroundColor: 'yellow',
-  userSelect: 'none'
+  userSelect: 'none',
 }
 
 ReactDOM.render(
