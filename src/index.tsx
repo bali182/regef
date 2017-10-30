@@ -6,7 +6,7 @@ import { diagram, DiagramConfig } from './components/Diagram'
 
 const config: DiagramConfig = {
   getZoomLevel(component) {
-    return (component.state as any).zoomLevel || 100
+    return (component.state as any).zoomLevel
   },
   setZoomLevel(component, { level }) {
     (component as any).setZoom(level)

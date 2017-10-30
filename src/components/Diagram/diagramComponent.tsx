@@ -24,11 +24,15 @@ export class Diagram extends React.Component<DiagramProps, {}> {
 
   @bind onWheel(e: React.WheelEvent<any>) {
     const component = this._childRef
-    const currentZoom = this.props.config.getZoomLevel(component) || 100
+    const currentZoom = this.props.config.getZoomLevel(component)
+    const maxZoom = this.props.config.getMaxZoomLevel(component)
+    const minZoom = this.props.config.getMinZoomLevel(component)
     const deltaY = -e.deltaY
     const delta = (e.ctrlKey && deltaY % 1 !== 0) ? (deltaY / 3) : (deltaY / 10)
-    const level = Math.max(currentZoom + delta, 5) // TODO make min/max zoom level configurable
-    this.props.config.setZoomLevel(component, { level, delta })
+    const level = Math.min(Math.max(currentZoom + delta, minZoom), maxZoom)
+    if (level !== currentZoom) {
+      this.props.config.setZoomLevel(component, { level, delta })
+    }
   }
 
   @bind onMouseDown(e: React.MouseEvent<HTMLElement>) {
