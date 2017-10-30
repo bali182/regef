@@ -10,6 +10,7 @@ const config: DiagramConfig = {
   },
   setZoomLevel(component, { level }) {
     (component as any).setZoom(level)
+    console.log(level)
   },
   getOffsetX(component) {
     return (component as any).state.offsetX
@@ -19,7 +20,6 @@ const config: DiagramConfig = {
   },
   setOffset(component, { x, y }) {
     (component as any).setOffset(x, y)
-    console.log(x, y)
   }
 }
 
@@ -56,14 +56,10 @@ class MyDiagram extends React.Component<any, State> {
   }
 
   render() {
-    const { onWheel, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, children, style } = this.props
+    const { eventHandlers, children, style } = this.props
     const transform = this.buildTransform()
     return <div
-      onWheel={onWheel}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseLeave={onMouseLeave}
+      {...eventHandlers}
       style={style}>
       {Children.map(children, (child: any) => {
         if (typeof child !== 'string') {
@@ -83,7 +79,8 @@ const baseStyle = {
   height: 500,
   border: '1px solid red',
   overflow: 'scroll',
-  backgroundColor: 'yellow'
+  backgroundColor: 'yellow',
+  userSelect: 'none'
 }
 
 ReactDOM.render(
