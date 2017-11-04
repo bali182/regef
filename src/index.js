@@ -4,6 +4,9 @@ import { render } from 'react-dom'
 import { diagram } from './components/Diagram'
 
 const config = {
+  getId() {
+    return 'diagram'
+  },
   getZoomLevel({ state: { zoomLevel } }) {
     return zoomLevel
   },
@@ -42,6 +45,7 @@ class MyDiagram extends React.Component {
   buildTransform() {
     const { zoomLevel, offsetX, offsetY } = this.state
     return {
+      transformOrigin: 'top left',
       transform: `translate(${offsetX}px, ${offsetY}px) scale(${zoomLevel / 100})`,
     }
   }

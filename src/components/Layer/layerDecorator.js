@@ -1,18 +1,18 @@
 import React from 'react'
-import Diagram from './diagramComponent'
+import Layer from './layerComponent'
 import DefaultConfig from './defaultConfig'
 
 const diagram = (inputConfig = {}) => (Wrapped) => {
   const config = { ...DefaultConfig, ...inputConfig }
-  class DecoratedDiagram extends React.Component {
+  class DecoratedLayer extends React.Component {
     render() {
       const { children, ...rest } = this.props
-      return (<Diagram ChildComponent={Wrapped} config={config} {...rest}>
+      return (<Layer ChildComponent={Wrapped} config={config} {...rest}>
         {children}
-      </Diagram>)
+      </Layer>)
     }
   }
-  return DecoratedDiagram
+  return DecoratedLayer
 }
 
 export default diagram

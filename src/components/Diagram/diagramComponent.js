@@ -1,9 +1,13 @@
 import React from 'react'
+import { object } from 'prop-types'
+import { DIAGRAM_TYPE } from '../../constants'
 import bind from '../../utils/bind'
+import DiagramManager from '../DiagramManager'
 
 class Diagram extends React.Component {
   constructor() {
     super()
+    this._manager = new DiagramManager()
     this._childRef = null
     this._deltaX = null
     this._deltaY = null
@@ -14,8 +18,13 @@ class Diagram extends React.Component {
     }
   }
 
+  getChildContext() {
+    return { diagramManager: this._manager }
+  }
+
   componentDidMount() {
     this._document = window.document
+    this._manager.register(this.props.config.getId(), DIAGRAM_TYPE, this)
   }
 
   @bind onWheel(e) {
@@ -83,6 +92,10 @@ class Diagram extends React.Component {
       {children}
     </ChildComponent>)
   }
+}
+
+Diagram.childContextTypes = {
+  diagramManager: object,
 }
 
 export default Diagram

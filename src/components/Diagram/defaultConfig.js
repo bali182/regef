@@ -1,11 +1,9 @@
-import { noop, constant } from '../../utils/functions'
+import { noop, constant, mandatory } from '../../utils/functions'
 
 const DefaultConfig = {
-  // setters
   setZoomLevel: noop,
   setOffset: noop,
-
-  // getters
+  getId: mandatory('getId'),
   getZoomLevel: constant(100),
   getMinZoomLevel: constant(10),
   getMaxZoomLevel: constant(300),
