@@ -1,37 +1,28 @@
-import * as React from 'react'
-import { Children, cloneElement } from 'react'
-import * as ReactDOM from 'react-dom'
+import React, { Children, cloneElement } from 'react'
+import { render } from 'react-dom'
 
-import { diagram, DiagramConfig } from './components/Diagram'
+import { diagram } from './components/Diagram'
 
-const config: DiagramConfig = {
-  getZoomLevel(component) {
-    return (component.state as any).zoomLevel
+const config = {
+  getZoomLevel({ state: { zoomLevel } }) {
+    return zoomLevel
   },
-  setZoomLevel(component, { level }) {
-    (component as any).setZoom(level)
-    console.log(level)
+  getOffsetX({ state: { offsetX } }) {
+    return offsetX
   },
-  getOffsetX(component) {
-    return (component as any).state.offsetX
-  },
-  getOffsetY(component) {
-    return (component as any).state.offsetY
+  getOffsetY({ state: { offsetY } }) {
+    return offsetY
   },
   setOffset(component, { x, y }) {
-    (component as any).setOffset(x, y)
-  }
-}
-
-type State = {
-  zoomLevel: number,
-  offsetX: number,
-  offsetY: number
+    component.setOffset(Math.max(x, 0), Math.max(y, 0))
+  },
+  setZoomLevel(component, { level }) {
+    component.setZoom(level)
+  },
 }
 
 @diagram(config)
-class MyDiagram extends React.Component<any, State> {
-
+class MyDiagram extends React.Component {
   constructor() {
     super()
     this.state = {
@@ -41,10 +32,10 @@ class MyDiagram extends React.Component<any, State> {
     }
   }
 
-  setOffset(offsetX: number, offsetY: number) {
+  setOffset(offsetX, offsetY) {
     this.setState({ offsetX, offsetY })
   }
-  setZoom(zoomLevel: number) {
+  setZoom(zoomLevel) {
     this.setState({ zoomLevel })
   }
 
@@ -58,10 +49,11 @@ class MyDiagram extends React.Component<any, State> {
   render() {
     const { eventHandlers, children, style } = this.props
     const transform = this.buildTransform()
-    return <div
+    return (<div
       {...eventHandlers}
-      style={style}>
-      {Children.map(children, (child: any) => {
+      style={style}
+    >
+      {Children.map(children, (child) => {
         if (typeof child !== 'string') {
           const { props } = child
           const newStyle = { ...props.style, ...transform }
@@ -70,7 +62,7 @@ class MyDiagram extends React.Component<any, State> {
         }
         return child
       })}
-    </div>
+    </div>)
   }
 }
 
@@ -78,12 +70,12 @@ const baseStyle = {
   width: 500,
   height: 500,
   border: '1px solid red',
-  overflow: 'auto', // no scrolling yet
+  overflow: 'auto',
   backgroundColor: 'yellow',
   userSelect: 'none',
 }
 
-ReactDOM.render(
+render(
   <MyDiagram style={baseStyle}>
     <div style={{ minWidth: '100%', minHeight: '100%' }}>
       <div style={{ backgroundColor: 'red' }}>red</div>
@@ -91,5 +83,5 @@ ReactDOM.render(
       <div style={{ backgroundColor: 'blue' }}>blue</div>
     </div>
   </MyDiagram>,
-  document.getElementById('app')
+  document.getElementById('app'),
 )

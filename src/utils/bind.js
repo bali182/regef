@@ -1,12 +1,14 @@
 
-export function bind<T extends Function>(target: any, key: string, descriptor: TypedPropertyDescriptor<T>): TypedPropertyDescriptor<T> {
+const has = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
+
+function bind(target, key, descriptor) {
   let fn = descriptor.value
   let definingProperty = false
 
   return {
     configurable: true,
     get() {
-      if (definingProperty || this === target.prototype || this.hasOwnProperty(key) || typeof fn !== 'function') {
+      if (definingProperty || this === target.prototype || has(this, key) || typeof fn !== 'function') {
         return fn
       }
       const boundFn = fn.bind(this)
@@ -19,13 +21,15 @@ export function bind<T extends Function>(target: any, key: string, descriptor: T
         set(value) {
           fn = value
           delete this[key]
-        }
+        },
       })
       definingProperty = false
       return boundFn
     },
-    set(value: T) {
+    set(value) {
       fn = value
-    }
+    },
   }
 }
+
+export default bind

@@ -3,19 +3,39 @@ const path = require('path')
 const HtmlPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: "./src/index.js",
   output: {
     filename: "bundle.js",
     path: __dirname + "/dist"
   },
   devtool: "source-map",
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".json"]
+    extensions: [".js", ".json"]
   },
   module: {
     rules: [
-      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
-      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          plugins: ['transform-decorators-legacy'],
+          presets: ['es2015', 'react', 'stage-0'],
+          babelrc: false,
+        },
+      },
+      {
+        test: /\.json$/,
+        loader: 'json-loader',
+      },
+      {
+        test: /\.(jpe?g|gif|png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+        loader: 'file-loader',
+      },
+      {
+        test: /\.(xml)$/,
+        loader: 'raw-loader',
+      },
     ]
   },
   plugins: [
