@@ -2,6 +2,7 @@ import React from 'react'
 import { object } from 'prop-types'
 import { DIAGRAM_TYPE } from '../constants'
 import bind from '../utils/bind'
+import createDataIdUpdater from '../utils/updateDataId'
 import DiagramManager from '../DiagramManager'
 
 class Diagram extends React.Component {
@@ -18,6 +19,13 @@ class Diagram extends React.Component {
       onWheel: this.onWheel,
       onMouseDown: this.onMouseDown,
     }
+    this.updateDataId = createDataIdUpdater(
+      this,
+      () => this._events,
+      (_events) => {
+        this._events = _events
+      },
+    )
   }
 
   getChildContext() {
@@ -102,7 +110,8 @@ class Diagram extends React.Component {
 
   render() {
     const { children, config, ChildComponent, ...rest } = this.props
-    return (<ChildComponent ref={this.saveRef} regef={this._events} {...rest}>
+    const regef = this.updateDataId(this.props.config.getId())
+    return (<ChildComponent ref={this.saveRef} regef={regef} {...rest}>
       {children}
     </ChildComponent>)
   }

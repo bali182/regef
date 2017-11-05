@@ -43,6 +43,7 @@ class MyDiagram extends React.Component {
   buildTransform() {
     const { zoomLevel, offsetX, offsetY } = this.state
     return {
+      width: 'max-content',
       transformOrigin: 'top left',
       transform: `translate(${offsetX}px, ${offsetY}px) scale(${zoomLevel / 100})`,
     }

@@ -4,7 +4,7 @@ import { REGEF_TYPE, LAYER_TYPE } from '../constants'
 import Layer from './layerComponent'
 import DefaultConfig from './defaultConfig'
 
-const diagram = (inputConfig = {}) => (Wrapped) => {
+const layer = (inputConfig = {}) => (Wrapped) => {
   const config = { ...DefaultConfig, ...inputConfig }
 
   class DecoratedLayer extends React.Component {
@@ -21,4 +21,4 @@ const diagram = (inputConfig = {}) => (Wrapped) => {
   return DecoratedLayer
 }
 
-export default diagram
+export default layer

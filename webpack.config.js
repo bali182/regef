@@ -9,7 +9,7 @@ module.exports = {
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ['.js', '.json']
+    extensions: ['.js', '.json'],
   },
   module: {
     rules: [
@@ -38,6 +38,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlPlugin({ template: 'index.html' }),
+    new HtmlPlugin({ template: 'examples/index.html' }),
   ],
 }
