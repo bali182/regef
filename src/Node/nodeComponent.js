@@ -1,10 +1,10 @@
 import React from 'react'
 import { object } from 'prop-types'
 
-import { LAYER_TYPE } from '../constants'
+import { NODE_TYPE } from '../constants'
 import createDataIdUpdater from '../utils/updateDataId'
 
-class Layer extends React.Component {
+class Node extends React.Component {
   constructor() {
     super()
     this._events = {}
@@ -19,12 +19,12 @@ class Layer extends React.Component {
 
   componentDidMount() {
     const { diagramManager } = this.context
-    diagramManager.register(this.props.config.getId(this), LAYER_TYPE, this)
+    diagramManager.register(this.props.config.getId(this), NODE_TYPE, this)
   }
 
   componentWillUnmount() {
     const { diagramManager } = this.context
-    diagramManager.unregister(this.props.config.getId(this), LAYER_TYPE)
+    diagramManager.unregister(this.props.config.getId(this), NODE_TYPE)
   }
 
   render() {
@@ -36,8 +36,9 @@ class Layer extends React.Component {
   }
 }
 
-Layer.contextTypes = {
+Node.contextTypes = {
   diagramManager: object,
 }
 
-export default Layer
+
+export default Node

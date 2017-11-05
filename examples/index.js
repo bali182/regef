@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 
 import MyNodeLayer from './MyNodeLayer'
 import MyDiagram from './MyDiagram'
+import MyNode from './MyNode'
 
 const baseStyle = {
   width: '100vw',
@@ -11,23 +12,12 @@ const baseStyle = {
   backgroundColor: 'yellow',
 }
 
-const itemStyle = (backgroundColor) => ({
-  display: 'inline-block',
-  padding: 10,
-  backgroundColor,
-  userSelect: 'none',
-})
-
-const r = itemStyle('red')
-const g = itemStyle('green')
-const b = itemStyle('blue')
-
 render(
   <MyDiagram style={baseStyle}>
     <MyNodeLayer>
-      <div style={r}>red</div>
-      <div style={g}>green</div>
-      <div style={b}>blue</div>
+      <MyNode color="red" id="red" />
+      <MyNode color="green" id="green" />
+      <MyNode color="blue" id="blue" />
     </MyNodeLayer>
   </MyDiagram>,
   document.getElementById('app'),

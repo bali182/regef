@@ -11,10 +11,10 @@ const config = {
 class MyNodeLayer extends React.Component {
   render() {
     const { regef, children, style, ...rest } = this.props
-    const vdom = (<div style={style} {...regef} {...rest} >
+    const fullStyle = { ...style, position: 'relative' }
+    return (<div style={fullStyle} {...regef} {...rest} >
       {children}
     </div>)
-    return vdom
   }
 }
 
