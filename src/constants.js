@@ -1,6 +1,5 @@
 
 export const DATA_ID = 'data-regef-id'
-export const DATA_CONTAINER_ID = 'data-regef-container-id'
 export const DATA_TYPE = 'data-regef-type'
 
 export const DIAGRAM_TYPE = 'diagram'

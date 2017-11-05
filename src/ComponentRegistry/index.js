@@ -1,7 +1,7 @@
 import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE } from '../constants'
-import { assertComponent, assertId, assertType, fillComponentStore, getComponent } from './utils'
+import { assertComponent, assertId, assertType, fillComponentStore } from './utils'
 
-class DiagramManager {
+class ComponentRegistry {
   constructor() {
     this.components = fillComponentStore()
   }
@@ -20,16 +20,21 @@ class DiagramManager {
     delete this.components[type][id]
   }
 
+  get(id, type) {
+    assertType(type)
+    return this.components[type][id] || null
+  }
+
   getDiagram(id) {
-    return getComponent(this.components, id, DIAGRAM_TYPE)
+    return this.get(id, DIAGRAM_TYPE)
   }
 
   getLayer(id) {
-    return getComponent(this.components, id, LAYER_TYPE)
+    return this.get(id, LAYER_TYPE)
   }
 
   getNode(id) {
-    return getComponent(this.components, id, NODE_TYPE)
+    return this.get(id, NODE_TYPE)
   }
 }
-export default DiagramManager
+export default ComponentRegistry

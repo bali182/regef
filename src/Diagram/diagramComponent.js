@@ -1,14 +1,16 @@
 import React from 'react'
 import { object } from 'prop-types'
-import { DIAGRAM_TYPE } from '../constants'
+import { DIAGRAM_TYPE, DATA_TYPE } from '../constants'
 import bind from '../utils/bind'
 import createDataIdUpdater from '../utils/updateDataId'
-import DiagramManager from '../DiagramManager'
+import ComponentRegistry from '../ComponentRegistry'
+import EventManager from '../EventManager'
 
 class Diagram extends React.Component {
   constructor() {
     super()
-    this._manager = new DiagramManager()
+    this._registry = new ComponentRegistry()
+    this._eventManager = new EventManager(this._registry)
     this._childRef = null
     this._domRef = null
     this._deltaX = null
@@ -18,6 +20,7 @@ class Diagram extends React.Component {
       ref: this.saveDomRef,
       onWheel: this.onWheel,
       onMouseDown: this.onMouseDown,
+      [DATA_TYPE]: DIAGRAM_TYPE,
     }
     this.updateDataId = createDataIdUpdater(
       this,
@@ -29,17 +32,17 @@ class Diagram extends React.Component {
   }
 
   getChildContext() {
-    return { diagramManager: this._manager }
+    return { registry: this._registry }
   }
 
   componentDidMount() {
     this._document = window.document
-    this._manager.register(this.props.config.getId(), DIAGRAM_TYPE, this)
+    this._registry.register(this.props.config.getId(), DIAGRAM_TYPE, this)
   }
 
   componentWillUnmount() {
     this.removeDocumentListeners()
-    this._manager.unregister(this.props.config.getId(), DIAGRAM_TYPE)
+    this._registry.unregister(this.props.config.getId(), DIAGRAM_TYPE)
     this._document = null
     this._childRef = null
     this._domRef = null
@@ -60,6 +63,8 @@ class Diagram extends React.Component {
   }
 
   @bind onMouseDown(e) {
+    this._eventManager.onMouseDown(e)
+
     const { clientX, clientY } = e
     const offsetX = this.props.config.getOffsetX(this._childRef)
     const offsetY = this.props.config.getOffsetY(this._childRef)
@@ -118,7 +123,7 @@ class Diagram extends React.Component {
 }
 
 Diagram.childContextTypes = {
-  diagramManager: object,
+  registry: object,
 }
 
 export default Diagram

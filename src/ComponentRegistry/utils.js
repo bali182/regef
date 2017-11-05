@@ -25,9 +25,4 @@ export const assertId = (id) => {
   }
 }
 
-export const getComponent = (components, id, type) => {
-  assertType(type)
-  return components[type][id] || null
-}
-
 export const configOf = (component) => component.props.config

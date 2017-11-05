@@ -18,6 +18,7 @@ render(
       <MyNode color="red" id="red" />
       <MyNode color="green" id="green" />
       <MyNode color="blue" id="blue" />
+      <div>Hello</div>
     </MyNodeLayer>
   </MyDiagram>,
   document.getElementById('app'),

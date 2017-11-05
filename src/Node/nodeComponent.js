@@ -1,13 +1,15 @@
 import React from 'react'
 import { object } from 'prop-types'
 
-import { NODE_TYPE } from '../constants'
+import { NODE_TYPE, DATA_TYPE } from '../constants'
 import createDataIdUpdater from '../utils/updateDataId'
 
 class Node extends React.Component {
   constructor() {
     super()
-    this._events = {}
+    this._events = {
+      [DATA_TYPE]: NODE_TYPE,
+    }
     this.updateDataId = createDataIdUpdater(
       this,
       () => this._events,
@@ -18,13 +20,13 @@ class Node extends React.Component {
   }
 
   componentDidMount() {
-    const { diagramManager } = this.context
-    diagramManager.register(this.props.config.getId(this), NODE_TYPE, this)
+    const { registry } = this.context
+    registry.register(this.props.config.getId(this), NODE_TYPE, this)
   }
 
   componentWillUnmount() {
-    const { diagramManager } = this.context
-    diagramManager.unregister(this.props.config.getId(this), NODE_TYPE)
+    const { registry } = this.context
+    registry.unregister(this.props.config.getId(this), NODE_TYPE)
   }
 
   render() {
@@ -37,7 +39,7 @@ class Node extends React.Component {
 }
 
 Node.contextTypes = {
-  diagramManager: object,
+  registry: object,
 }
 
 
