@@ -1,7 +1,5 @@
 import React, { Children, cloneElement } from 'react'
-import { render } from 'react-dom'
-
-import { diagram } from './components/Diagram'
+import { diagram } from '../src/Diagram'
 
 const config = {
   getId() {
@@ -51,10 +49,10 @@ class MyDiagram extends React.Component {
   }
 
   render() {
-    const { eventHandlers, children, style } = this.props
+    const { regef, children, style } = this.props
     const transform = this.buildTransform()
     return (<div
-      {...eventHandlers}
+      {...regef}
       style={style}
     >
       {Children.map(children, (child) => {
@@ -70,22 +68,4 @@ class MyDiagram extends React.Component {
   }
 }
 
-const baseStyle = {
-  width: 500,
-  height: 500,
-  border: '1px solid red',
-  overflow: 'auto',
-  backgroundColor: 'yellow',
-  userSelect: 'none',
-}
-
-render(
-  <MyDiagram style={baseStyle}>
-    <div style={{ minWidth: '100%', minHeight: '100%' }}>
-      <div style={{ backgroundColor: 'red' }}>red</div>
-      <div style={{ backgroundColor: 'green' }}>green</div>
-      <div style={{ backgroundColor: 'blue' }}>blue</div>
-    </div>
-  </MyDiagram>,
-  document.getElementById('app'),
-)
+export default MyDiagram

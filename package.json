@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
-    "lint": "eslint src -c .eslintrc.json"
+    "lint": "eslint src examples -c .eslintrc.json"
   },
   "repository": {
     "type": "git",

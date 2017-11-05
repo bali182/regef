@@ -1,5 +1,5 @@
-import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE, CONNECTION_TYPE, PORT_TYPE } from '../../constants'
-import { fillObject, constant } from '../../utils/functions'
+import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE, CONNECTION_TYPE, PORT_TYPE } from '../constants'
+import { fillObject, constant } from '../utils/functions'
 
 export const ALL_TYPES = [DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE, CONNECTION_TYPE, PORT_TYPE]
 

@@ -1,9 +1,12 @@
 import React from 'react'
+import { REGEF_TYPE, LAYER_TYPE } from '../constants'
+
 import Layer from './layerComponent'
 import DefaultConfig from './defaultConfig'
 
 const diagram = (inputConfig = {}) => (Wrapped) => {
   const config = { ...DefaultConfig, ...inputConfig }
+
   class DecoratedLayer extends React.Component {
     render() {
       const { children, ...rest } = this.props
@@ -12,6 +15,9 @@ const diagram = (inputConfig = {}) => (Wrapped) => {
       </Layer>)
     }
   }
+
+  DecoratedLayer[REGEF_TYPE] = LAYER_TYPE
+
   return DecoratedLayer
 }
 

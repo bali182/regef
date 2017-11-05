@@ -1,7 +1,7 @@
 import React from 'react'
 import { object } from 'prop-types'
-import { DIAGRAM_TYPE } from '../../constants'
-import bind from '../../utils/bind'
+import { DIAGRAM_TYPE } from '../constants'
+import bind from '../utils/bind'
 import DiagramManager from '../DiagramManager'
 
 class Diagram extends React.Component {
@@ -9,10 +9,12 @@ class Diagram extends React.Component {
     super()
     this._manager = new DiagramManager()
     this._childRef = null
+    this._domRef = null
     this._deltaX = null
     this._deltaY = null
     this._document = null
     this._events = {
+      ref: this.saveDomRef,
       onWheel: this.onWheel,
       onMouseDown: this.onMouseDown,
     }
@@ -25,6 +27,14 @@ class Diagram extends React.Component {
   componentDidMount() {
     this._document = window.document
     this._manager.register(this.props.config.getId(), DIAGRAM_TYPE, this)
+  }
+
+  componentWillUnmount() {
+    this.removeDocumentListeners()
+    this._manager.unregister(this.props.config.getId(), DIAGRAM_TYPE)
+    this._document = null
+    this._childRef = null
+    this._domRef = null
   }
 
   @bind onWheel(e) {
@@ -63,6 +73,10 @@ class Diagram extends React.Component {
     this.removeDocumentListeners()
   }
 
+  @bind saveDomRef(domRef) {
+    this._domRef = domRef
+  }
+
   @bind saveRef(childRef) {
     this._childRef = childRef
   }
@@ -88,7 +102,7 @@ class Diagram extends React.Component {
 
   render() {
     const { children, config, ChildComponent, ...rest } = this.props
-    return (<ChildComponent ref={this.saveRef} eventHandlers={this._events} {...rest}>
+    return (<ChildComponent ref={this.saveRef} regef={this._events} {...rest}>
       {children}
     </ChildComponent>)
   }

@@ -1,4 +1,4 @@
-import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE } from '../../constants'
+import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE } from '../constants'
 import { assertComponent, assertId, assertType, fillComponentStore, getComponent } from './utils'
 
 class DiagramManager {

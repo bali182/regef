@@ -1,4 +1,4 @@
-import { noop, constant, mandatory } from '../../utils/functions'
+import { noop, constant, mandatory } from '../utils/functions'
 
 const DefaultConfig = {
   setZoomLevel: noop,
