@@ -4,18 +4,18 @@ import { DIAGRAM_TYPE, DATA_TYPE } from '../constants'
 import bind from '../utils/bind'
 import createDataIdUpdater from '../utils/updateDataId'
 import ComponentRegistry from '../ComponentRegistry'
-import EventManager from '../EventManager'
+import createHandler from '../EventManager'
 
 class Diagram extends React.Component {
   constructor() {
     super()
     this._registry = new ComponentRegistry()
-    this._eventManager = new EventManager(this._registry)
     this._childRef = null
     this._domRef = null
     this._deltaX = null
     this._deltaY = null
     this._document = null
+    this._handler = null
     this._events = {
       ref: this.saveDomRef,
       onWheel: this.onWheel,
@@ -63,26 +63,16 @@ class Diagram extends React.Component {
   }
 
   @bind onMouseDown(e) {
-    this._eventManager.onMouseDown(e)
-
-    const { clientX, clientY } = e
-    const offsetX = this.props.config.getOffsetX(this._childRef)
-    const offsetY = this.props.config.getOffsetY(this._childRef)
-    this._deltaX = clientX - offsetX
-    this._deltaY = clientY - offsetY
+    this._handler = createHandler(e, this._registry)
+    this._handler.onStart(e)
     this.addDocumentListeners()
   }
   @bind onMouseMove(e) {
-    const { _deltaX, _deltaY } = this
-    if (_deltaX !== null && _deltaY !== null) {
-      const { clientX, clientY } = e
-      const x = clientX - _deltaX
-      const y = clientY - _deltaY
-      this.props.config.setOffset(this._childRef, { x, y })
-    }
+    this._handler.onChange(e)
   }
-  @bind onMouseUp() {
-    this.clearDeltas()
+  @bind onMouseUp(e) {
+    this._handler.onEnd(e)
+    this._handler = null
     this.removeDocumentListeners()
   }
 

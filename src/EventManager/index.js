@@ -1,13 +1,17 @@
-import testVisitor from './testVisitor'
+import createVisitior from './createVisitor'
+import PanHandler from './handlers/PanHandler'
+import NoopHandler from './handlers/Handler'
 
-class EventManager {
-  constructor(registry) {
-    this.registry = registry
-  }
+const createHandlerVisitor = createVisitior({
+  node(e, registry) {
+    return new NoopHandler(registry)
+  },
+  diagram(e, registry) {
+    return new PanHandler(registry)
+  },
+  any(e, registry) {
+    return new NoopHandler(registry)
+  },
+})
 
-  onMouseDown(e) {
-    testVisitor(e, this.registry)
-  }
-}
-
-export default EventManager
+export default createHandlerVisitor
