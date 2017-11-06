@@ -1,5 +1,7 @@
-import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE } from '../constants'
+import { DIAGRAM_TYPE, LAYER_TYPE, NODE_TYPE, DATA_ID, DATA_TYPE } from '../constants'
 import { assertComponent, assertId, assertType, fillComponentStore } from './utils'
+
+const DOM_SELECTOR_ID = `[${DATA_ID}]`
 
 class ComponentRegistry {
   constructor() {
@@ -18,6 +20,25 @@ class ComponentRegistry {
   unregister(id, type) {
     assertType(type)
     delete this.components[type][id]
+  }
+
+  getByDomElement(element) {
+    if (!element || !element.closest) {
+      return null
+    }
+    return this.getDirectByDomElement(element.closest(DOM_SELECTOR_ID))
+  }
+
+  getDirectByDomElement(element) {
+    if (!element || !element.getAttribute) {
+      return null
+    }
+    const id = element.getAttribute(DATA_ID)
+    const type = element.getAttribute(DATA_TYPE)
+    if (!id || !type) {
+      return null
+    }
+    return this.get(id, type)
   }
 
   get(id, type) {

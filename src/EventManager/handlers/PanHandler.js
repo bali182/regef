@@ -1,5 +1,4 @@
 import Handler from './Handler'
-import { getComponent } from '../getComponent'
 
 class PanHandler extends Handler {
   constructor(registry) {
@@ -9,7 +8,7 @@ class PanHandler extends Handler {
     this.component = null
   }
   onStart(e) {
-    const componentData = getComponent(e, this.registry)
+    const componentData = this.registry.getByDomElement(e.target)
     if (componentData !== null && componentData.component) {
       const { component } = componentData
       const { clientX, clientY } = e
