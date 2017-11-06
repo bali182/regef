@@ -6,26 +6,27 @@ class PanHandler extends Handler {
     super(registry)
     this.deltaX = null
     this.deltaY = null
-    this.diagramComponent = null
+    this.component = null
   }
   onStart(e) {
-    const { component: c } = getComponent(e, this.registry)
-    if (c) {
+    const componentData = getComponent(e, this.registry)
+    if (componentData !== null && componentData.component) {
+      const { component } = componentData
       const { clientX, clientY } = e
-      const offsetX = c.props.config.getOffsetX(c._childRef)
-      const offsetY = c.props.config.getOffsetY(c._childRef)
+      const offsetX = component.props.config.getOffsetX(component._childRef)
+      const offsetY = component.props.config.getOffsetY(component._childRef)
       this.deltaX = clientX - offsetX
       this.deltaY = clientY - offsetY
+      this.component = component
     }
-    this.diagramComponent = c
   }
   onChange(e) {
-    const { deltaX, deltaY, diagramComponent: c } = this
-    if (deltaX !== null && deltaY !== null && c !== null) {
+    const { deltaX, deltaY, component } = this
+    if (component !== null && deltaX !== null && deltaY !== null) {
       const { clientX, clientY } = e
       const x = clientX - deltaX
       const y = clientY - deltaY
-      c.props.config.setOffset(c._childRef, { x, y })
+      component.props.config.setOffset(component._childRef, { x, y })
     }
   }
   onEnd(e) {
