@@ -21,7 +21,7 @@ class EditPolicy {
     return null
   }
 
-  getCommand(request) {
+  getCommand() {
     return null
   }
 }

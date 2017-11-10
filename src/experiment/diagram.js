@@ -14,6 +14,8 @@ class Diagram extends React.Component {
     document.addEventListener('mousedown', this.onMouseDown)
     document.addEventListener('mousemove', this.onMouseMove)
     document.addEventListener('mouseup', this.onMouseUp)
+    document.addEventListener('keydown', this.onKeyDown)
+    document.addEventListener('keyup', this.onKeyUp)
 
     this.registry.setDiagram(this)
   }
@@ -29,6 +31,8 @@ class Diagram extends React.Component {
     document.removeEventListener('mousedown', this.onMouseDown)
     document.removeEventListener('mousemove', this.onMouseMove)
     document.removeEventListener('mouseup', this.onMouseUp)
+    document.removeEventListener('keydown', this.onKeyDown)
+    document.removeEventListener('keyup', this.onKeyUp)
 
     this.registry.setDiagram(null)
   }
@@ -39,22 +43,24 @@ class Diagram extends React.Component {
     }
   }
 
+  @bind onKeyDown(e) {
+    this.execute(this.props.tool.onKeyDown(e))
+  }
+
+  @bind onKeyUp(e) {
+    this.execute(this.props.tool.onKeyUp(e))
+  }
+
   @bind onMouseDown(e) {
-    if (this.props.tool) {
-      this.execute(this.props.tool.onMouseDown(e))
-    }
+    this.execute(this.props.tool.onMouseDown(e))
   }
 
   @bind onMouseMove(e) {
-    if (this.props.tool) {
-      this.execute(this.props.tool.onMouseMove(e))
-    }
+    this.execute(this.props.tool.onMouseMove(e))
   }
 
   @bind onMouseUp(e) {
-    if (this.props.tool) {
-      this.execute(this.props.tool.onMouseUp(e))
-    }
+    this.execute(this.props.tool.onMouseUp(e))
   }
 
   render() {
