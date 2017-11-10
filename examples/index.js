@@ -1,25 +1,21 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import MyNodeLayer from './MyNodeLayer'
-import MyDiagram from './MyDiagram'
-import MyNode from './MyNode'
+import Diagram from '../src/experiment/diagram'
+import Tool from '../src/experiment/tool'
 
 const baseStyle = {
-  width: '100vw',
-  height: '100vh',
-  overflow: 'auto',
+  width: '50vw',
+  height: '50vh',
+  overflow: 'hidden',
   backgroundColor: 'yellow',
 }
 
 render(
-  <MyDiagram style={baseStyle}>
-    <MyNodeLayer>
-      <MyNode color="red" id="red" />
-      <MyNode color="green" id="green" />
-      <MyNode color="blue" id="blue" />
-      <div>Hello</div>
-    </MyNodeLayer>
-  </MyDiagram>,
+  <Diagram tool={new Tool()}>
+    <div style={baseStyle}>
+      Hi
+    </div>
+  </Diagram>,
   document.getElementById('app'),
 )

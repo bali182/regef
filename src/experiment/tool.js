@@ -1,33 +1,39 @@
 export default class Tool {
   constructor() {
     this.__registry = null
-    this.__component = null
+    this.__target = null
+    this.__request = null
   }
   setComponentRegistry(registry) {
     this.__registry = registry
   }
-  setComponent(component) {
-    this.__component = component
+  setTarget(component) {
+    this.__target = component
   }
-  getComponent() {
-    return this.__component
+  getTarget() {
+    return this.__target
   }
   getComponentRegistry() {
     return this.__registry
   }
-  onKeyDown() {
+  onKeyDown(e) {
+    console.log('keydown', e)
     return null
   }
-  onKeyUp() {
+  onKeyUp(e) {
+    console.log('keyup', e)
     return null
   }
-  onMouseDown() {
+  onMouseDown(e) {
+    console.log('mousedown', e)
     return null
   }
-  onMouseMove() {
+  onMouseMove(e) {
+    console.log('mousemove', e)
     return null
   }
-  onMouseUp() {
+  onMouseUp(e) {
+    console.log('mouseup', e)
     return null
   }
 }
