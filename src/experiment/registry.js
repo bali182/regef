@@ -1,3 +1,4 @@
+import { findDOMNode } from 'react-dom'
 import { DATA_ID } from '../constants'
 
 const DOM_SELECTOR_ID = `[${DATA_ID}]`
@@ -13,6 +14,10 @@ class ComponentRegistry {
   getDiagram() {
     return this.diagram
   }
+  getDiagramDom() {
+    // eslint-disable-next-line react/no-find-dom-node
+    return findDOMNode(this.diagram)
+  }
   register(id, component) {
     this.components[id] = component
   }
@@ -21,6 +26,9 @@ class ComponentRegistry {
   }
   get(id) {
     return this.components[id] || null
+  }
+  has(id) {
+    return Boolean(this.components[id])
   }
   getByDomElement(element) {
     if (!element || !element.closest) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { layer } from '../src/Layer'
+import { layer } from '../../src/Layer'
 
 const config = {
   getId(component) {

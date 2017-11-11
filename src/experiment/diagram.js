@@ -11,6 +11,11 @@ class Diagram extends React.Component {
   }
 
   componentDidMount() {
+    const { tool } = this.props
+    if (tool) {
+      tool.setComponentRegistry(this.registry)
+    }
+
     document.addEventListener('mousedown', this.onMouseDown)
     document.addEventListener('mousemove', this.onMouseMove)
     document.addEventListener('mouseup', this.onMouseUp)
@@ -22,6 +27,7 @@ class Diagram extends React.Component {
 
   componentWillReceiveProps({ tool: newTool }) {
     const { tool: currentTool } = this.props
+    console.log(newTool, currentTool)
     if (newTool !== currentTool) {
       newTool.setComponentRegistry(this.registry)
     }
@@ -63,9 +69,18 @@ class Diagram extends React.Component {
     this.execute(this.props.tool.onMouseUp(e))
   }
 
+  getChildContext() {
+    return { registry: this.registry }
+  }
+
   render() {
     return Children.only(this.props.children)
   }
 }
+
+Diagram.childContextTypes = {
+  registry: () => null,
+}
+
 
 export default Diagram

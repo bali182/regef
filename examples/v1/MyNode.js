@@ -1,5 +1,5 @@
 import React from 'react'
-import { node } from '../src/Node'
+import { node } from '../../src/Node'
 
 const config = {
   getId(component) {

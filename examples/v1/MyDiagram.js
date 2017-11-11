@@ -1,5 +1,5 @@
 import React, { Children, cloneElement } from 'react'
-import { diagram } from '../src/Diagram'
+import { diagram } from '../../src/Diagram'
 
 const config = {
   getId() {
