@@ -45,27 +45,29 @@ export const findPrimaryTarget = (element, root, registry) => {
   return findClosestValidParent(element, root, registry)
 }
 
-export const buildMouseDownData = (e, registry) => {
-  const { target: eventTarget, clientX, clientY } = e
-
-  const root = registry.getDiagramDom()
-
-  const targetDom = findPrimaryTarget(eventTarget, root, registry)
-  const parentDom = findClosestValidParent(targetDom, root, registry)
-
-  const targetComponent = findDOMNode(targetDom)
-  const parentComponent = findDOMNode(parentDom)
-
-  const { top, left } = targetDom.getBoundingClientRect()
+export const buildInitialEventDeltas = (e, element) => {
+  const { clientX, clientY } = e
+  const { top, left } = element.getBoundingClientRect()
   const deltaX = clientX - left
   const deltaY = clientY - top
-
   return {
-    targetComponent,
-    parentComponent,
-    targetDom,
-    parentDom,
     deltaX,
     deltaY,
   }
+}
+
+export const buildEventCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
+  x: clientX - deltaX,
+  y: clientY - deltaY,
+})
+
+export const getTargetedParent = (e, dragged, root, registry) => {
+  const targetDom = findPrimaryTarget(e.target, root, registry)
+  return targetDom === dragged
+    ? findClosestValidParent(targetDom, root, registry)
+    : targetDom
+}
+
+const getCommands = (request, target, registry) => {
+
 }

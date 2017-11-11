@@ -1,38 +1,39 @@
 import Tool from './tool'
-import { buildMouseDownData } from './toolUtils'
+import { findPrimaryTarget, findClosestValidParent, buildInitialEventDeltas, buildEventCoordinates } from './toolUtils'
 
 class DefaultTool extends Tool {
   constructor() {
     super()
-    this.__request = null
-    this.__mouseDownData = null
-    this.__mouseMoveData = null
+    this.dragged = null
+    this.dragTarget = null
+    this.eventDeltas = null
+    this.coordinates = null
+
+    this.isMouseDown = false
   }
 
   onMouseDown(e) {
-    this.__mouseDownData = buildMouseDownData(e, this.getComponentRegistry())
-    console.log(this.__mouseDownData)
+    const registry = this.getComponentRegistry()
+    const root = registry.getDiagramDom()
+
+    this.dragged = findPrimaryTarget(event.target, root, registry)
+    this.dragTarget = findClosestValidParent(this.dragged, root, registry)
+    this.eventDeltas = buildInitialEventDeltas(e, this.dragged)
+
+    this.isMouseDown = true
     return null
   }
 
   onMouseMove(e) {
-    if (this.__mouseDownData === null) {
+    if (this.isMouseDown) {
       return null
     }
-    const { clientX, clientY } = e
-    const x = clientX - this.__mouseDownData.deltaX
-    const y = clientY - this.__mouseDownData.deltaY
-    this.__mouseMoveData = {
-      x,
-      y,
-    }
-    console.log(this.__mouseMoveData)
+    this.coordinates = buildEventCoordinates(e, this.eventDeltas)
     return null
   }
 
   onMouseUp(e) {
-    this.__mouseDownData = null
-    this.__mouseMoveData = null
+    this.isMouseDown = false
     return null
   }
 }

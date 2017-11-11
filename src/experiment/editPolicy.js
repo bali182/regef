@@ -24,6 +24,13 @@ class EditPolicy {
   getCommand() {
     return null
   }
+
+  requestFeedback() {
+
+  }
+
+  eraseFeedback() {
+  }
 }
 
 export default EditPolicy

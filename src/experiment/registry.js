@@ -31,12 +31,6 @@ class ComponentRegistry {
     return Boolean(this.components[id])
   }
   getByDomElement(element) {
-    if (!element || !element.closest) {
-      return null
-    }
-    return this.getDirectByDomElement(element.closest(DOM_SELECTOR_ID))
-  }
-  getDirectByDomElement(element) {
     if (!element || !element.getAttribute) {
       return null
     }
