@@ -1,9 +1,8 @@
 import React, { Children, cloneElement } from 'react'
 
 import ComponentRegistry from './registry'
-import bind from '../utils/bind'
-import { UNEXECUTABLE_COMMAND } from './constants'
-import { REGEF_TYPE } from '../constants'
+import bind from './utils/bind'
+import { REGEF_TYPE } from './constants'
 
 const isNodeType = (child) => child
   && typeof child === 'object'
@@ -47,7 +46,7 @@ class Diagram extends React.Component {
   }
 
   execute(command) {
-    if (command !== null && command !== UNEXECUTABLE_COMMAND) {
+    if (command !== null) {
       command()
     }
   }

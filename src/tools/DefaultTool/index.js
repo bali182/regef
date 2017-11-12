@@ -1,5 +1,5 @@
-import Tool from './tool'
-import { MOVE, MOVE_CHILD, ADD_CHILD, REMOVE_CHILD } from './request'
+import Tool from '../Tool'
+import { MOVE, MOVE_CHILD, ADD_CHILD, REMOVE_CHILD } from '../../request'
 import {
   findPrimaryTarget,
   findClosestValidParent,

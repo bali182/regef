@@ -1,4 +1,4 @@
-import EditPolicy from '../../src/experiment/editPolicy'
+import EditPolicy from '../../src/editPolicy'
 
 class MyEditPolicy extends EditPolicy {
   getCommand(request) {

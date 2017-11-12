@@ -1,7 +1,7 @@
 import React from 'react'
-import { DATA_ID, REGEF_TYPE } from '../constants'
+import { DATA_ID, REGEF_TYPE } from './constants'
 import id from './id'
-import bind from '../utils/bind'
+import bind from './utils/bind'
 
 const node = (policy) => (Wrapped) => {
   class DecoratedNode extends React.Component {

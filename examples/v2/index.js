@@ -1,8 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import Diagram from '../../src/experiment/diagram'
-import DefaultTool from '../../src/experiment/defaultTool'
+import Diagram from '../../src/diagram'
+import DefaultTool from '../../src/tools/DefaultTool'
 import { MyNode, MyRootNode, MyCompositeNode } from './MyNode'
 
 render(

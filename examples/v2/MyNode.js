@@ -1,5 +1,5 @@
 import React from 'react'
-import node from '../../src/experiment/node'
+import node from '../../src/node'
 
 import MyNodeEditPolicy from './MyNodeEditPolicy'
 

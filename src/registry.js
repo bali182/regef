@@ -1,5 +1,5 @@
 import { findDOMNode } from 'react-dom'
-import { DATA_ID } from '../constants'
+import { DATA_ID } from './constants'
 
 class ComponentRegistry {
   constructor() {
