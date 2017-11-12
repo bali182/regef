@@ -1,20 +1,18 @@
 import { findDOMNode } from 'react-dom'
 import { DATA_ID } from '../constants'
 
-const DOM_SELECTOR_ID = `[${DATA_ID}]`
-
 class ComponentRegistry {
   constructor() {
     this.components = {}
     this.diagram = null
   }
-  setDiagram(diagram) {
+  setRoot(diagram) {
     this.diagram = diagram
   }
-  getDiagram() {
+  getRoot() {
     return this.diagram
   }
-  getDiagramDom() {
+  getRootDom() {
     // eslint-disable-next-line react/no-find-dom-node
     return findDOMNode(this.diagram)
   }

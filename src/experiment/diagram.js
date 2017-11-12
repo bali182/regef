@@ -1,8 +1,14 @@
-import React, { Children } from 'react'
+import React, { Children, cloneElement } from 'react'
 
 import ComponentRegistry from './registry'
 import bind from '../utils/bind'
 import { UNEXECUTABLE_COMMAND } from './constants'
+import { REGEF_TYPE } from '../constants'
+
+const isNodeType = (child) => child
+  && typeof child === 'object'
+  && typeof child.type === 'function'
+  && child.type[REGEF_TYPE] === true
 
 class Diagram extends React.Component {
   constructor() {
@@ -21,13 +27,10 @@ class Diagram extends React.Component {
     document.addEventListener('mouseup', this.onMouseUp)
     document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('keyup', this.onKeyUp)
-
-    this.registry.setDiagram(this)
   }
 
   componentWillReceiveProps({ tool: newTool }) {
     const { tool: currentTool } = this.props
-    console.log(newTool, currentTool)
     if (newTool !== currentTool) {
       newTool.setComponentRegistry(this.registry)
     }
@@ -40,13 +43,17 @@ class Diagram extends React.Component {
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('keyup', this.onKeyUp)
 
-    this.registry.setDiagram(null)
+    this.registry.setDiagra(null)
   }
 
   execute(command) {
     if (command !== null && command !== UNEXECUTABLE_COMMAND) {
       command()
     }
+  }
+
+  @bind saveRootRef(ref) {
+    this.registry.setRoot(ref)
   }
 
   @bind onKeyDown(e) {
@@ -74,7 +81,11 @@ class Diagram extends React.Component {
   }
 
   render() {
-    return Children.only(this.props.children)
+    const child = Children.only(this.props.children)
+    if (!isNodeType(child)) {
+      throw new Error('Diagram root element must be a valid node!')
+    }
+    return cloneElement(child, { ref: this.saveRootRef })
   }
 }
 

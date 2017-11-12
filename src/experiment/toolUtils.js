@@ -1,4 +1,3 @@
-import { findDOMNode } from 'react-dom'
 import { DATA_ID } from '../constants'
 
 export const isValidTarget = (element, root, registry) => {
@@ -61,13 +60,22 @@ export const buildEventCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) 
   y: clientY - deltaY,
 })
 
-export const getTargetedParent = (e, dragged, root, registry) => {
+export const findTargetedParent = (e, dragged, root, registry) => {
   const targetDom = findPrimaryTarget(e.target, root, registry)
-  return targetDom === dragged
+  return targetDom === dragged || dragged.contains(targetDom)
     ? findClosestValidParent(targetDom, root, registry)
     : targetDom
 }
 
-const getCommands = (request, target, registry) => {
+export const getEditPolicy = (component) => {
+  if (!component || !component.getEditPolicy) {
+    return null
+  }
+  const policy = component.getEditPolicy()
+  return policy || null
+}
 
+export const getCommand = (request, component) => {
+  const policy = getEditPolicy(component)
+  return policy ? policy.getCommand(request) : null
 }

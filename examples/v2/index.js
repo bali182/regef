@@ -3,20 +3,11 @@ import { render } from 'react-dom'
 
 import Diagram from '../../src/experiment/diagram'
 import DefaultTool from '../../src/experiment/defaultTool'
-import { MyNode, MyCompositeNode } from './MyNode'
-
-const baseStyle = {
-  marginTop: '25vh',
-  marginLeft: '25vw',
-  width: '50vw',
-  height: '50vh',
-  overflow: 'hidden',
-  backgroundColor: 'yellow',
-}
+import { MyNode, MyRootNode, MyCompositeNode } from './MyNode'
 
 render(
   <Diagram tool={new DefaultTool()}>
-    <div style={baseStyle}>
+    <MyRootNode>
       <MyCompositeNode>
         <MyNode text="1" />
         <MyNode text="2" />
@@ -30,7 +21,7 @@ render(
           <MyNode text="7" />
         </div>
       </MyCompositeNode>
-    </div>
+    </MyRootNode>
   </Diagram>,
   document.getElementById('app'),
 )

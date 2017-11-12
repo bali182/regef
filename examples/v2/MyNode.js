@@ -3,6 +3,25 @@ import node from '../../src/experiment/node'
 
 import MyNodeEditPolicy from './MyNodeEditPolicy'
 
+const rootNodeStyle = {
+  marginTop: '25vh',
+  marginLeft: '25vw',
+  width: '50vw',
+  height: '50vh',
+  overflow: 'hidden',
+  backgroundColor: 'yellow',
+}
+
+@node(new MyNodeEditPolicy())
+export class MyRootNode extends React.Component {
+  render() {
+    const { regef, children } = this.props
+    return (<div style={rootNodeStyle} {...regef}>
+      {children}
+    </div>)
+  }
+}
+
 const nodeStyle = {
   display: 'inline-block',
   borderRadius: 4,
@@ -12,6 +31,7 @@ const nodeStyle = {
   cursor: 'default',
 }
 
+// eslint-disable-next-line react/no-multi-comp
 @node(new MyNodeEditPolicy())
 export class MyNode extends React.Component {
   render() {
