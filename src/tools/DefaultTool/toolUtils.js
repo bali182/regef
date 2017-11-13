@@ -83,7 +83,7 @@ export const getEditPolicy = (component) => {
   return policy || null
 }
 
-export const getCommand = (request, component) => {
+export const getCommandSafe = (request, component) => {
   const policy = getEditPolicy(component)
   return policy ? policy.getCommand(request) : null
 }

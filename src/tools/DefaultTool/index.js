@@ -1,5 +1,5 @@
 import Tool from '../Tool'
-import { MOVE, MOVE_CHILD, ADD_CHILD, REMOVE_CHILD } from '../../request'
+import { MOVE_CHILD, ADD_CHILD, REMOVE_CHILD } from '../../request'
 import {
   findPrimaryTarget,
   findClosestValidParent,
@@ -7,6 +7,8 @@ import {
   buildInitialEventDeltas,
   buildEventCoordinates,
   isElementRelevant,
+  findAllTargets,
+  getCommandSafe,
 } from './toolUtils'
 import { compose } from '../../command'
 
@@ -24,29 +26,32 @@ class DefaultTool extends Tool {
     this.isMouseDown = false
   }
 
-  getMoveCommand() {
-    const { draggedDom, coordinates: { x, y } } = this
-    const childComponent = this.getComponentRegistry().getByDomElement(draggedDom)
-    const moveRequest = {
-      type: MOVE,
-      x,
-      y,
-    }
-    return childComponent.getEditPolicy().getCommand(moveRequest)
-  }
-
-  getMoveChildCommand() {
+  getMoveChildRequest() {
     const { draggedDom, targetParentDom, coordinates: { x, y } } = this
-    const childComponent = this.getComponentRegistry().getByDomElement(draggedDom)
-    const parentComponent = this.getComponentRegistry().getByDomElement(targetParentDom)
-    const moveChildRequest = {
+    const registry = this.getComponentRegistry()
+    const childComponent = registry.getByDomElement(draggedDom)
+    const parentComponent = registry.getByDomElement(targetParentDom)
+
+    return {
       type: MOVE_CHILD,
       target: childComponent.getUserComponent(),
-      targetDom: draggedDom,
+      targetDOM: draggedDom,
+      receiver: parentComponent.getUserComponent(),
+      receiverDOM: targetParentDom,
       x,
       y,
     }
-    return parentComponent.getEditPolicy().getCommand(moveChildRequest)
+  }
+
+  getCommand(request) {
+    const registry = this.getComponentRegistry()
+    const root = registry.getRootDom()
+    const targets = findAllTargets(this.draggedDom, root, registry)
+    const commands = targets.map((target) => {
+      const component = registry.getByDomElement(target)
+      return getCommandSafe(request, component)
+    })
+    return compose(commands)
   }
 
   getAddChildCommand() {
@@ -114,9 +119,9 @@ class DefaultTool extends Tool {
     if (draggedDom === root) {
       // console.log('pan or selection')
     } else if (originalParentDom === targetParentDom) {
-      const move = this.getMoveCommand()
-      const moveChild = this.getMoveChildCommand()
-      return compose([move, moveChild])
+      const request = this.getMoveChildRequest()
+      const command = this.getCommand(request)
+      return command
     } else if (originalParentDom !== targetParentDom) {
       const addCommand = this.getAddChildCommand()
       const removeCommand = this.getRemoveChildCommand()
