@@ -6,6 +6,7 @@ import {
   findTargetedParent,
   buildInitialEventDeltas,
   buildEventCoordinates,
+  isElementRelevant,
 } from './toolUtils'
 import { compose } from '../../command'
 
@@ -79,6 +80,10 @@ class DefaultTool extends Tool {
   onMouseDown(e) {
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
+
+    if (!isElementRelevant(event.target, root)) {
+      return null
+    }
 
     this.draggedDom = findPrimaryTarget(event.target, root, registry)
     this.originalParentDom = findClosestValidParent(this.draggedDom, root, registry)

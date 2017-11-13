@@ -13,6 +13,14 @@ export const isValidTarget = (element, root, registry) => {
   return true
 }
 
+export const isElementRelevant = (element, root) => {
+  if (element === root) {
+    return true
+  }
+  // eslint-disable-next-line
+  return Boolean(element.compareDocumentPosition(root) & Node.DOCUMENT_POSITION_CONTAINS)
+}
+
 export const findClosestValidParent = (element, root, registry) => {
   let pointer = element.parentNode
   while (pointer !== root && pointer !== null) {
