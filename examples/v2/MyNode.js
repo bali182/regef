@@ -7,7 +7,7 @@ const rootNodeStyle = {
   marginTop: '25vh',
   marginLeft: '25vw',
   width: '50vw',
-  height: '50vh',
+  minHeight: '50vh',
   overflow: 'hidden',
   backgroundColor: 'yellow',
 }
@@ -46,7 +46,7 @@ const compositeNodeStyle = {
   display: 'inline-block',
   borderRadius: 4,
   backgroundColor: 'green',
-  padding: 10,
+  padding: 15,
   userSelect: 'none',
   cursor: 'default',
 }

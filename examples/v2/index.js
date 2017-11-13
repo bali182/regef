@@ -8,7 +8,7 @@ import { MyNode, MyRootNode, MyCompositeNode } from './MyNode'
 const externalNodeStyle = {
   marginLeft: '25vw',
   width: '50vw',
-  height: '10vh',
+  minHeight: '10vh',
   overflow: 'hidden',
   backgroundColor: 'blue',
   color: 'white',
@@ -25,7 +25,7 @@ render(
         </MyCompositeNode>
         <MyNode text="4" />
         <MyCompositeNode>
-          <div style={{ padding: 10, backgroundColor: 'yellow' }}>
+          <div style={{ padding: 15, backgroundColor: 'blue' }}>
             <MyNode text="5" />
             <MyNode text="6" />
             <MyNode text="7" />

@@ -1,27 +1,18 @@
-const composeCommandsArray = (commands) => () => {
-  for (let i = 0; i < commands.length; i += 1) {
-    commands[i]()
-  }
-}
+const noop = () => { }
 
 const isExecutable = (command) => command !== null
 
-export const compose = (...commands) => {
-  let commandsArray = null
-  if (commands.length === 1 && Array.isArray(commands[0])) {
-    commandsArray = commands[0]
-  } else {
-    commandsArray = commands
-  }
-  return composeCommandsArray(commandsArray.filter(isExecutable))
-}
-
-export const first = (...commands) => {
-  for (let i = 0; i < commands.length; i += 1) {
-    const command = commands[i]
-    if (isExecutable(command)) {
-      return command
+const composeCommandsArray = (commands) => {
+  switch (commands.length) {
+    case 0: return noop
+    case 1: return commands[0]
+    default: return () => {
+      for (let i = 0; i < commands.length; i += 1) {
+        const command = commands[i]
+        command()
+      }
     }
   }
-  return null
 }
+
+export const compose = (commands) => composeCommandsArray(commands.filter(isExecutable))

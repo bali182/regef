@@ -98,10 +98,14 @@ class DefaultTool extends Tool {
       return null
     }
 
-    const { originalParentDom, draggedDom, eventDeltas } = this
-
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
+
+    if (!isElementRelevant(e.target, root)) {
+      return null
+    }
+
+    const { originalParentDom, draggedDom, eventDeltas } = this
     this.coordinates = buildEventCoordinates(e, eventDeltas)
     this.targetParentDom = findTargetedParent(e, draggedDom, root, registry)
 
@@ -112,11 +116,11 @@ class DefaultTool extends Tool {
     } else if (originalParentDom === targetParentDom) {
       const move = this.getMoveCommand()
       const moveChild = this.getMoveChildCommand()
-      return compose(move, moveChild)
+      return compose([move, moveChild])
     } else if (originalParentDom !== targetParentDom) {
       const addCommand = this.getAddChildCommand()
       const removeCommand = this.getRemoveChildCommand()
-      return compose(removeCommand, addCommand)
+      return compose([removeCommand, addCommand])
     } else {
       console.log('wtf')
     }
