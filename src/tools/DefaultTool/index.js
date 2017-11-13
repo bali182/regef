@@ -7,6 +7,7 @@ import {
   buildInitialEventDeltas,
   buildEventCoordinates,
 } from './toolUtils'
+import { compose } from '../../command'
 
 
 class DefaultTool extends Tool {
@@ -105,10 +106,12 @@ class DefaultTool extends Tool {
       // console.log('pan or selection')
     } else if (originalParentDom === targetParentDom) {
       const move = this.getMoveCommand()
-      return move === null ? this.getMoveChildCommand() : move
+      const moveChild = this.getMoveChildCommand()
+      return compose(move, moveChild)
     } else if (originalParentDom !== targetParentDom) {
       const addCommand = this.getAddChildCommand()
       const removeCommand = this.getRemoveChildCommand()
+      return compose(removeCommand, addCommand)
     } else {
       console.log('wtf')
     }
