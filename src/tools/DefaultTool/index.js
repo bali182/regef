@@ -12,7 +12,6 @@ import {
 } from './toolUtils'
 import { compose } from '../../command'
 
-
 class DefaultTool extends Tool {
   constructor() {
     super()
@@ -54,32 +53,34 @@ class DefaultTool extends Tool {
     return compose(commands)
   }
 
-  getAddChildCommand() {
+  getAddChildRequest() {
     const { draggedDom, targetParentDom, coordinates: { x, y } } = this
     const childComponent = this.getComponentRegistry().getByDomElement(draggedDom)
     const parentComponent = this.getComponentRegistry().getByDomElement(targetParentDom)
-    const moveChildRequest = {
+    return {
       type: ADD_CHILD,
       target: childComponent.getUserComponent(),
-      targetDom: draggedDom,
+      targetDOM: draggedDom,
+      receiver: parentComponent.getUserComponent(),
+      receiverDOM: targetParentDom,
       x,
       y,
     }
-    return parentComponent.getEditPolicy().getCommand(moveChildRequest)
   }
 
-  getRemoveChildCommand() {
+  getRemoveChildRequest() {
     const { draggedDom, originalParentDom, coordinates: { x, y } } = this
     const childComponent = this.getComponentRegistry().getByDomElement(draggedDom)
     const parentComponent = this.getComponentRegistry().getByDomElement(originalParentDom)
-    const moveChildRequest = {
+    return {
       type: REMOVE_CHILD,
       target: childComponent.getUserComponent(),
-      targetDom: draggedDom,
+      targetDOM: draggedDom,
+      receiver: parentComponent.getUserComponent(),
+      receiverDOM: originalParentDom,
       x,
       y,
     }
-    return parentComponent.getEditPolicy().getCommand(moveChildRequest)
   }
 
   onMouseDown(e) {
@@ -123,9 +124,10 @@ class DefaultTool extends Tool {
       const command = this.getCommand(request)
       return command
     } else if (originalParentDom !== targetParentDom) {
-      const addCommand = this.getAddChildCommand()
-      const removeCommand = this.getRemoveChildCommand()
-      return compose([removeCommand, addCommand])
+      const add = this.getAddChildRequest()
+      const remove = this.getRemoveChildRequest()
+      const commands = [add, remove].map((request) => this.getCommand(request))
+      return compose(commands)
     } else {
       console.log('wtf')
     }

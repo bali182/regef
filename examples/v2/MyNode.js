@@ -12,7 +12,7 @@ const rootNodeStyle = {
   backgroundColor: 'yellow',
 }
 
-@node(new MyNodeEditPolicy())
+@node(MyNodeEditPolicy)
 export class MyRootNode extends React.Component {
   render() {
     const { regef, children } = this.props
@@ -32,7 +32,7 @@ const nodeStyle = {
 }
 
 // eslint-disable-next-line react/no-multi-comp
-@node(new MyNodeEditPolicy())
+@node(MyNodeEditPolicy)
 export class MyNode extends React.Component {
   render() {
     const { regef } = this.props
@@ -52,7 +52,7 @@ const compositeNodeStyle = {
 }
 
 // eslint-disable-next-line react/no-multi-comp
-@node(new MyNodeEditPolicy())
+@node(MyNodeEditPolicy)
 export class MyCompositeNode extends React.Component {
   render() {
     const { regef, children } = this.props

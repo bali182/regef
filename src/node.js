@@ -3,11 +3,11 @@ import { DATA_ID, REGEF_TYPE } from './constants'
 import id from './id'
 import bind from './utils/bind'
 
-const node = (policy) => (Wrapped) => {
+const node = (Policy) => (Wrapped) => {
   class DecoratedNode extends React.Component {
     constructor() {
       super()
-      this.__policy = policy
+      this.__policy = new Policy()
       this.__id = id()
       this.__ref = null
       this.__regef = {
@@ -21,7 +21,7 @@ const node = (policy) => (Wrapped) => {
 
     @bind saveChildRef(ref) {
       this.__ref = ref
-      policy.setComponent(ref)
+      this.__policy.setComponent(ref)
     }
 
     componentDidMount() {
@@ -30,7 +30,7 @@ const node = (policy) => (Wrapped) => {
 
     componentWillUnmount() {
       this.context.registry.unregister(this.__id, this)
-      policy.setComponent(null)
+      this.__policy.setComponent(null)
     }
 
     getEditPolicy() {
