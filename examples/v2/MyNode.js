@@ -12,7 +12,7 @@ const rootNodeStyle = {
   backgroundColor: 'yellow',
 }
 
-@node(MyNodeEditPolicy)
+@node()
 export class MyRootNode extends React.Component {
   render() {
     const { regef, children } = this.props
@@ -32,12 +32,12 @@ const nodeStyle = {
 }
 
 // eslint-disable-next-line react/no-multi-comp
-@node(MyNodeEditPolicy)
+@node()
 export class MyNode extends React.Component {
   render() {
-    const { regef } = this.props
+    const { regef, id } = this.props
     return (<div style={nodeStyle} {...regef}>
-      {this.props.text}
+      {id}
     </div>)
   }
 }
@@ -54,10 +54,26 @@ const compositeNodeStyle = {
 // eslint-disable-next-line react/no-multi-comp
 @node(MyNodeEditPolicy)
 export class MyCompositeNode extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      items: [],
+    }
+  }
+
+  componentWillMount() {
+    this.setState({ items: this.props.items })
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.setState({ items: newProps.items })
+  }
+
   render() {
-    const { regef, children } = this.props
+    const { regef } = this.props
+    const { items } = this.state
     return (<div style={compositeNodeStyle} {...regef}>
-      {children}
+      {items.map((id) => <MyNode key={id} id={id} />)}
     </div>)
   }
 }

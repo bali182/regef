@@ -42,10 +42,10 @@ class DefaultTool extends Tool {
     }
   }
 
-  getCommand(request) {
+  getCommand(request, dom) {
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
-    const targets = findAllTargets(this.draggedDom, root, registry)
+    const targets = findAllTargets(dom, root, registry)
     const commands = targets.map((target) => {
       const component = registry.getByDomElement(target)
       return getCommandSafe(request, component)
@@ -121,13 +121,14 @@ class DefaultTool extends Tool {
       // console.log('pan or selection')
     } else if (originalParentDom === targetParentDom) {
       const request = this.getMoveChildRequest()
-      const command = this.getCommand(request)
+      const command = this.getCommand(request, this.targetParentDom)
       return command
     } else if (originalParentDom !== targetParentDom) {
-      const add = this.getAddChildRequest()
-      const remove = this.getRemoveChildRequest()
-      const commands = [add, remove].map((request) => this.getCommand(request))
-      return compose(commands)
+      const addReq = this.getAddChildRequest()
+      const removeReq = this.getRemoveChildRequest()
+      const add = this.getCommand(addReq, this.targetParentDom)
+      const remove = this.getCommand(removeReq, this.originalParentDom)
+      return compose([add, remove])
     } else {
       console.log('wtf')
     }

@@ -18,19 +18,9 @@ render(
   <div>
     <Diagram tool={new DefaultTool()}>
       <MyRootNode>
-        <MyCompositeNode>
-          <MyNode text="1" />
-          <MyNode text="2" />
-          <MyNode text="3" />
-        </MyCompositeNode>
-        <MyNode text="4" />
-        <MyCompositeNode>
-          <div style={{ padding: 15, backgroundColor: 'blue' }}>
-            <MyNode text="5" />
-            <MyNode text="6" />
-            <MyNode text="7" />
-          </div>
-        </MyCompositeNode>
+        <MyCompositeNode items={['a', 'b']} />
+        <MyNode id="c" />
+        <MyCompositeNode items={['d', 'e', 'f', 'g']} />
       </MyRootNode>
     </Diagram>
     <div style={externalNodeStyle}>
