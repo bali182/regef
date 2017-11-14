@@ -2,12 +2,13 @@ import React from 'react'
 import { DATA_ID, REGEF_TYPE } from './constants'
 import id from './id'
 import bind from './utils/bind'
+import { compose } from './command'
 
-const node = (Policy) => (Wrapped) => {
+const node = (...Policies) => (Wrapped) => {
   class DecoratedNode extends React.Component {
     constructor() {
       super()
-      this.__policy = new Policy()
+      this.__policies = Policies.map((Policy) => new Policy())
       this.__id = id()
       this.__ref = null
       this.__regef = {
@@ -21,7 +22,7 @@ const node = (Policy) => (Wrapped) => {
 
     @bind saveChildRef(ref) {
       this.__ref = ref
-      this.__policy.setComponent(ref)
+      this.__policies.forEach((policy) => policy.setComponent(ref))
     }
 
     componentDidMount() {
@@ -30,11 +31,15 @@ const node = (Policy) => (Wrapped) => {
 
     componentWillUnmount() {
       this.context.registry.unregister(this.__id, this)
-      this.__policy.setComponent(null)
+      this.__policies.forEach((policy) => policy.setComponent(null))
     }
 
-    getEditPolicy() {
-      return this.__policy
+    getEditPolicies() {
+      return this.__policies
+    }
+
+    getCommand(request) {
+      return compose(this.__policies.map((policy) => policy.getCommand(request)))
     }
 
     render() {
