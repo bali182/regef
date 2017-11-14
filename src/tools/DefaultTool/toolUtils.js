@@ -75,14 +75,6 @@ export const findTargetedParent = (e, dragged, root, registry) => {
     : targetDom
 }
 
-export const getEditPolicy = (component) => {
-  if (!component || !component.getEditPolicy) {
-    return null
-  }
-  const policy = component.getEditPolicy()
-  return policy || null
-}
-
 export const getCommandSafe = (request, component) => {
   if (!component || !component.getCommand) {
     return null
