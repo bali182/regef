@@ -19,8 +19,8 @@ render(
     <Diagram tool={new DefaultTool()}>
       <MyRootNode>
         <MyCompositeNode items={['a', 'b']} />
-        <MyNode id="c" />
         <MyCompositeNode items={['d', 'e', 'f', 'g']} />
+        <MyCompositeNode items={['h', 'i', 'j']} />
       </MyRootNode>
     </Diagram>
     <div style={externalNodeStyle}>

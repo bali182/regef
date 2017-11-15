@@ -23,12 +23,16 @@ export class MyRootNode extends React.Component {
 }
 
 const nodeStyle = {
-  display: 'inline-block',
+  display: 'table-cell',
+  verticalAlign: 'middle',
+  textAlign: 'center',
   borderRadius: 4,
   backgroundColor: 'red',
   padding: 10,
   userSelect: 'none',
   cursor: 'default',
+  width: 50,
+  height: 50,
 }
 
 // eslint-disable-next-line react/no-multi-comp
@@ -44,6 +48,7 @@ export class MyNode extends React.Component {
 
 const compositeNodeStyle = {
   display: 'inline-block',
+  marginRight: 5,
   borderRadius: 4,
   backgroundColor: 'green',
   padding: 15,

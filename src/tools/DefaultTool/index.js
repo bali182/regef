@@ -1,5 +1,5 @@
 import Tool from '../Tool'
-import { MOVE_CHILD, ADD_CHILD, REMOVE_CHILD } from '../../request'
+import { MOVE_CHILD, ADD_CHILD } from '../../request'
 import {
   findPrimaryTarget,
   findClosestValidParent,
@@ -54,30 +54,18 @@ class DefaultTool extends Tool {
   }
 
   getAddChildRequest() {
-    const { draggedDom, targetParentDom, coordinates: { x, y } } = this
-    const childComponent = this.getComponentRegistry().getByDomElement(draggedDom)
-    const parentComponent = this.getComponentRegistry().getByDomElement(targetParentDom)
+    const { draggedDom, targetParentDom, originalParentDom, coordinates: { x, y } } = this
+    const comp = this.getComponentRegistry().getByDomElement(draggedDom)
+    const targetComp = this.getComponentRegistry().getByDomElement(targetParentDom)
+    const sourceComp = this.getComponentRegistry().getByDomElement(originalParentDom)
     return {
       type: ADD_CHILD,
-      target: childComponent.getUserComponent(),
-      targetDOM: draggedDom,
-      receiver: parentComponent.getUserComponent(),
-      receiverDOM: targetParentDom,
-      x,
-      y,
-    }
-  }
-
-  getRemoveChildRequest() {
-    const { draggedDom, originalParentDom, coordinates: { x, y } } = this
-    const childComponent = this.getComponentRegistry().getByDomElement(draggedDom)
-    const parentComponent = this.getComponentRegistry().getByDomElement(originalParentDom)
-    return {
-      type: REMOVE_CHILD,
-      target: childComponent.getUserComponent(),
-      targetDOM: draggedDom,
-      receiver: parentComponent.getUserComponent(),
-      receiverDOM: originalParentDom,
+      component: comp.getUserComponent(),
+      componentDOM: draggedDom,
+      target: targetComp.getUserComponent(),
+      targetrDOM: targetParentDom,
+      source: sourceComp.getUserComponent(),
+      sourceDOM: originalParentDom,
       x,
       y,
     }
@@ -125,10 +113,8 @@ class DefaultTool extends Tool {
       return command
     } else if (originalParentDom !== targetParentDom) {
       const addReq = this.getAddChildRequest()
-      const removeReq = this.getRemoveChildRequest()
-      const add = this.getCommand(addReq, this.targetParentDom)
-      const remove = this.getCommand(removeReq, this.originalParentDom)
-      return compose([add, remove])
+      const command = this.getCommand(addReq, this.targetParentDom)
+      return command
     } else {
       console.log('wtf')
     }
