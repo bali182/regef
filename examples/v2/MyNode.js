@@ -33,6 +33,7 @@ const nodeStyle = {
   cursor: 'default',
   width: 50,
   height: 50,
+  '-moz-user-select': '-moz-none',
 }
 
 // eslint-disable-next-line react/no-multi-comp
@@ -54,6 +55,8 @@ const compositeNodeStyle = {
   padding: 15,
   userSelect: 'none',
   cursor: 'default',
+  minHeight: 70,
+  minWidth: 70,
 }
 
 // eslint-disable-next-line react/no-multi-comp

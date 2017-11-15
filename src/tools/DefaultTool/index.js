@@ -75,11 +75,11 @@ class DefaultTool extends Tool {
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
 
-    if (!isElementRelevant(event.target, root)) {
+    if (!isElementRelevant(e.target, root)) {
       return null
     }
 
-    this.draggedDom = findPrimaryTarget(event.target, root, registry)
+    this.draggedDom = findPrimaryTarget(e.target, root, registry)
     this.originalParentDom = findClosestValidParent(this.draggedDom, root, registry)
     this.eventDeltas = buildInitialEventDeltas(e, this.draggedDom)
 
@@ -94,6 +94,8 @@ class DefaultTool extends Tool {
 
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
+
+    console.log(Object.keys(registry.components).length)
 
     if (!isElementRelevant(e.target, root)) {
       return null
