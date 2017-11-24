@@ -6,11 +6,10 @@ class RootNodeEditPolict extends EditPolicy {
   }
 
   getCommand(request) {
-    const { type } = request
+    const { type, component, x, y } = request
     const receiver = this.getComponent()
     switch (type) {
       case 'add-child': {
-        const { component, x, y } = request
         if (this.isValidChild(component)) {
           return () => {
             receiver.props.addChild({ id: 'root', childId: component.props.id })
@@ -20,10 +19,9 @@ class RootNodeEditPolict extends EditPolicy {
         return null
       }
       case 'move-child': {
-        const { target, x, y } = request
-        if (this.isValidChild(target)) {
+        if (this.isValidChild(component)) {
           return () => {
-            receiver.props.setPosition({ x, y, id: target.props.id })
+            receiver.props.setPosition({ x, y, id: component.props.id })
           }
         }
         return null
