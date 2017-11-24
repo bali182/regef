@@ -20,6 +20,7 @@
     "react/no-find-dom-node": "off",
     "react/prop-types": "off",
     "react/jsx-filename-extension": "off",
-    "react/prefer-stateless-function": "off"
+    "react/prefer-stateless-function": "off",
+    "import/no-extraneous-dependencies": "off"
   }
 }

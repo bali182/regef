@@ -2,21 +2,20 @@ import EditPolicy from '../../src/editPolicy'
 
 class MyEditPolicy extends EditPolicy {
   isValidChild(component) {
-    return component && component.props && component.props.id
+    return component
+      && component.props
+      && component.props.id
+      && component.props.addChild
   }
 
-  isValidSource(component) {
-    return component && component.state && component.state.items
-  }
-
-  getCommand({ component, source, type }) {
-    if (this.isValidChild(component) && this.isValidSource(source)) {
-      const id = component.props.id
+  getCommand({ component, type }) {
+    if (this.isValidChild(component)) {
       const receiver = this.getComponent()
       switch (type) {
         case 'add-child': return () => {
-          receiver.setState({ items: receiver.state.items.concat([id]) })
-          source.setState({ items: source.state.items.filter((e) => id !== e) })
+          const id = receiver.props.id
+          const childId = component.props.id
+          receiver.props.addChild({ id, childId })
         }
         default: return null
       }
