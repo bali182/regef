@@ -43,7 +43,7 @@ class Diagram extends React.Component {
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('keyup', this.onKeyUp)
 
-    this.registry.setDiagra(null)
+    // this.registry.setDiagram(null)
   }
 
   execute(command) {

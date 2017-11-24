@@ -1,8 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
+
 import node from '../../src/node'
 import renderNode from './renderNode'
-
+import { addChild, setPosition } from './actions'
+import RootNodeEditPolicy from './RootNodeEditPolicy'
 
 const rootNodeStyle = {
   marginTop: '25vh',
@@ -19,8 +21,8 @@ const position = ({ x, y }) => ({
   left: x,
 })
 
-@node()
-@connect((nodes) => ({ nodes }))
+@connect((nodes) => ({ nodes }), { addChild, setPosition })
+@node(RootNodeEditPolicy)
 class RootNode extends React.Component {
   render() {
     const { regef } = this.props

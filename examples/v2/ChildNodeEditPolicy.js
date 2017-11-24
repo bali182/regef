@@ -1,11 +1,8 @@
 import EditPolicy from '../../src/editPolicy'
 
-class MyEditPolicy extends EditPolicy {
+class ChildNodeEditPolicy extends EditPolicy {
   isValidChild(component) {
-    return component
-      && component.props
-      && component.props.id
-      && component.props.addChild
+    return component && component.props && component.props.id
   }
 
   getCommand({ component, type }) {
@@ -24,4 +21,4 @@ class MyEditPolicy extends EditPolicy {
   }
 }
 
-export default MyEditPolicy
+export default ChildNodeEditPolicy

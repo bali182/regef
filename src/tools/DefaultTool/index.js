@@ -12,6 +12,8 @@ import {
 } from './toolUtils'
 import { compose } from '../../command'
 
+const COMMAND_TARGET = Symbol('COMMAND_TARGET')
+
 class DefaultTool extends Tool {
   constructor() {
     super()
@@ -30,15 +32,17 @@ class DefaultTool extends Tool {
     const registry = this.getComponentRegistry()
     const childComponent = registry.getByDomElement(draggedDom)
     const parentComponent = registry.getByDomElement(targetParentDom)
+    const { top, left } = targetParentDom.getBoundingClientRect()
 
     return {
+      [COMMAND_TARGET]: parentComponent,
       type: MOVE_CHILD,
       target: childComponent.getUserComponent(),
       targetDOM: draggedDom,
       receiver: parentComponent.getUserComponent(),
       receiverDOM: targetParentDom,
-      x,
-      y,
+      x: x - left,
+      y: y - top,
     }
   }
 
@@ -58,7 +62,10 @@ class DefaultTool extends Tool {
     const comp = this.getComponentRegistry().getByDomElement(draggedDom)
     const targetComp = this.getComponentRegistry().getByDomElement(targetParentDom)
     const sourceComp = this.getComponentRegistry().getByDomElement(originalParentDom)
+    const { top, left } = targetParentDom.getBoundingClientRect()
+
     return {
+      [COMMAND_TARGET]: targetComp,
       type: ADD_CHILD,
       component: comp.getUserComponent(),
       componentDOM: draggedDom,
@@ -66,8 +73,8 @@ class DefaultTool extends Tool {
       targetrDOM: targetParentDom,
       source: sourceComp.getUserComponent(),
       sourceDOM: originalParentDom,
-      x,
-      y,
+      x: x - left,
+      y: y - top,
     }
   }
 
@@ -95,8 +102,6 @@ class DefaultTool extends Tool {
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
 
-    console.log(Object.keys(registry.components).length)
-
     if (!isElementRelevant(e.target, root)) {
       return null
     }
@@ -111,11 +116,11 @@ class DefaultTool extends Tool {
       // console.log('pan or selection')
     } else if (originalParentDom === targetParentDom) {
       const request = this.getMoveChildRequest()
-      const command = this.getCommand(request, this.targetParentDom)
+      const command = getCommandSafe(request, request[COMMAND_TARGET])
       return command
     } else if (originalParentDom !== targetParentDom) {
-      const addReq = this.getAddChildRequest()
-      const command = this.getCommand(addReq, this.targetParentDom)
+      const request = this.getAddChildRequest()
+      const command = getCommandSafe(request, request[COMMAND_TARGET])
       return command
     } else {
       console.log('wtf')
