@@ -7,19 +7,17 @@ import {
   buildInitialEventDeltas,
   buildEventCoordinates,
   isElementRelevant,
-  findAllTargets,
   getCommandSafe,
 } from './toolUtils'
-import { compose } from '../../command'
 
 const COMMAND_TARGET = Symbol('COMMAND_TARGET')
 
 class DefaultTool extends Tool {
   constructor() {
     super()
-    this.draggedDom = null
-    this.originalParentDom = null
-    this.targetParentDom = null
+    this.targetDom = null
+    this.parentDom = null
+    this.newParentDom = null
 
     this.eventDeltas = null
     this.coordinates = null
@@ -28,51 +26,40 @@ class DefaultTool extends Tool {
   }
 
   getMoveChildRequest() {
-    const { draggedDom, targetParentDom, coordinates: { x, y } } = this
+    const { targetDom, newParentDom, coordinates: { x, y } } = this
     const registry = this.getComponentRegistry()
-    const childComponent = registry.getByDomElement(draggedDom)
-    const parentComponent = registry.getByDomElement(targetParentDom)
-    const { top, left } = targetParentDom.getBoundingClientRect()
+    const childComponent = registry.getByDomElement(targetDom)
+    const parentComponent = registry.getByDomElement(newParentDom)
+    const { top, left } = newParentDom.getBoundingClientRect()
 
     return {
       [COMMAND_TARGET]: parentComponent,
       type: MOVE_CHILD,
       component: childComponent.getUserComponent(),
-      componentDOM: draggedDom,
+      componentDOM: targetDom,
       container: parentComponent.getUserComponent(),
-      containerDOM: targetParentDom,
+      containerDOM: newParentDom,
       x: x - left,
       y: y - top,
     }
   }
 
-  getCommand(request, dom) {
-    const registry = this.getComponentRegistry()
-    const root = registry.getRootDom()
-    const targets = findAllTargets(dom, root, registry)
-    const commands = targets.map((target) => {
-      const component = registry.getByDomElement(target)
-      return getCommandSafe(request, component)
-    })
-    return compose(commands)
-  }
-
   getAddChildRequest() {
-    const { draggedDom, targetParentDom, originalParentDom, coordinates: { x, y } } = this
-    const comp = this.getComponentRegistry().getByDomElement(draggedDom)
-    const targetComp = this.getComponentRegistry().getByDomElement(targetParentDom)
-    const sourceComp = this.getComponentRegistry().getByDomElement(originalParentDom)
-    const { top, left } = targetParentDom.getBoundingClientRect()
+    const { targetDom, newParentDom, parentDom, coordinates: { x, y } } = this
+    const comp = this.getComponentRegistry().getByDomElement(targetDom)
+    const targetComp = this.getComponentRegistry().getByDomElement(newParentDom)
+    const sourceComp = this.getComponentRegistry().getByDomElement(parentDom)
+    const { top, left } = newParentDom.getBoundingClientRect()
 
     return {
       [COMMAND_TARGET]: targetComp,
       type: ADD_CHILD,
       component: comp.getUserComponent(),
-      componentDOM: draggedDom,
+      componentDOM: targetDom,
       targetContainer: targetComp.getUserComponent(),
-      targetContainerDOM: targetParentDom,
+      targetContainerDOM: newParentDom,
       container: sourceComp.getUserComponent(),
-      containerDOM: originalParentDom,
+      containerDOM: parentDom,
       x: x - left,
       y: y - top,
     }
@@ -86,9 +73,9 @@ class DefaultTool extends Tool {
       return null
     }
 
-    this.draggedDom = findPrimaryTarget(e.target, root, registry)
-    this.originalParentDom = findClosestValidParent(this.draggedDom, root, registry)
-    this.eventDeltas = buildInitialEventDeltas(e, this.draggedDom)
+    this.targetDom = findPrimaryTarget(e.target, root, registry)
+    this.parentDom = findClosestValidParent(this.targetDom, root, registry)
+    this.eventDeltas = buildInitialEventDeltas(e, this.targetDom)
 
     this.isMouseDown = true
     return null
@@ -106,24 +93,22 @@ class DefaultTool extends Tool {
       return null
     }
 
-    const { originalParentDom, draggedDom, eventDeltas } = this
+    const { parentDom, targetDom, eventDeltas } = this
     this.coordinates = buildEventCoordinates(e, eventDeltas)
-    this.targetParentDom = findTargetedParent(e, draggedDom, root, registry)
+    this.newParentDom = findTargetedParent(e, targetDom, root, registry)
 
-    const { targetParentDom } = this
+    const { newParentDom } = this
 
-    if (draggedDom === root) {
+    if (targetDom === root) {
       // console.log('pan or selection')
-    } else if (originalParentDom === targetParentDom) {
+    } else if (parentDom === newParentDom) {
       const request = this.getMoveChildRequest()
       const command = getCommandSafe(request, request[COMMAND_TARGET])
       return command
-    } else if (originalParentDom !== targetParentDom) {
+    } else if (parentDom !== newParentDom) {
       const request = this.getAddChildRequest()
       const command = getCommandSafe(request, request[COMMAND_TARGET])
       return command
-    } else {
-      console.log('wtf')
     }
 
     return null

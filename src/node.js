@@ -42,6 +42,22 @@ const node = (...Policies) => (Wrapped) => {
       return compose(this.__policies.map((policy) => policy.getCommand(request)))
     }
 
+    requestFeedback(request) {
+      const policies = this.__policies
+      for (let i = 0, len = policies.length; i < len; i += 1) {
+        const policy = policies[i]
+        policy.requestFeedback(request)
+      }
+    }
+
+    eraseFeedback(request) {
+      const policies = this.__policies
+      for (let i = 0, len = policies.length; i < len; i += 1) {
+        const policy = policies[i]
+        policy.eraseFeedback(request)
+      }
+    }
+
     render() {
       const { children, ...rest } = this.props
       return (<Wrapped {...rest} ref={this.saveChildRef} regef={this.__regef}>

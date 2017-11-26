@@ -6,8 +6,6 @@ import renderNode from './renderNode'
 import ChildNodeEditPolicy from './ChildNodeEditPolicy'
 import { addChild, setPosition } from './actions'
 
-const randomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
-
 const noChildrenStyle = {
   display: 'table-cell',
   verticalAlign: 'middle',
