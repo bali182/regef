@@ -1,12 +1,12 @@
 export default class Tool {
   constructor() {
-    this.__registry = null
+    this.registry = null
   }
   setComponentRegistry(registry) {
-    this.__registry = registry
+    this.registry = registry
   }
   getComponentRegistry() {
-    return this.__registry
+    return this.registry
   }
   onKeyDown(e) {
     return null

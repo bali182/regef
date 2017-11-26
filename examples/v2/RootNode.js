@@ -5,6 +5,7 @@ import node from '../../src/node'
 import renderNode from './renderNode'
 import { addChild, setPosition } from './actions'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
+import FeedbackNode from './FeedbackNode'
 
 const rootNodeStyle = {
   marginTop: '25vh',
@@ -24,14 +25,39 @@ const position = ({ x, y }) => ({
 @connect((nodes) => ({ nodes }), { addChild, setPosition })
 @node(RootNodeEditPolicy)
 class RootNode extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      feedback: null,
+    }
+  }
+
+  renderChildren() {
+    const { nodes } = this.props
+    return nodes.root.children.map((id) => {
+      const model = nodes[id]
+      return renderNode(id, { style: position(model) })
+    })
+  }
+
+  renderFeedback() {
+    const { feedback } = this.state
+    if (feedback !== null) {
+      return (<FeedbackNode
+        x={feedback.x || 0}
+        y={feedback.y || 0}
+        width={feedback.width || 50}
+        height={feedback.height || 50}
+      />)
+    }
+    return null
+  }
+
   render() {
     const { regef } = this.props
-    const { nodes } = this.props
     return (<div style={rootNodeStyle} {...regef}>
-      {nodes.root.children.map((id) => {
-        const model = nodes[id]
-        return renderNode(id, { style: position(model) })
-      })}
+      {this.renderChildren()}
+      {this.renderFeedback()}
     </div>)
   }
 }
