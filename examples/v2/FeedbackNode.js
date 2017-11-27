@@ -6,11 +6,10 @@ const feedbackNodeStyle = {
   display: 'table-cell',
   verticalAlign: 'middle',
   borderRadius: 4,
-  userSelect: 'none',
+  pointerEvents: 'none',
   cursor: 'default',
   backgroundColor: '#efefef',
   border: '2px dashed #ccc',
-  MozUserSelect: '-moz-none',
 }
 
 const FeedbackNode = ({ x, y, width, height }) => {

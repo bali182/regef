@@ -10,6 +10,8 @@ class RootNodeEditPolict extends EditPolicy {
       feedback: {
         x: request.componentX,
         y: request.componentY,
+        width: request.componentWidth,
+        height: request.componentHeight,
       },
     })
   }

@@ -60,11 +60,14 @@ class DefaultTool extends Tool {
   updateCoordinates(e) {
     const { x: deltaX, y: deltaY } = buildEventCoordinates(e, this.eventDeltas)
     const { top, left } = this.targetParent.dom.getBoundingClientRect()
+    const { width, height } = this.target.dom.getBoundingClientRect()
     this.coordinates = {
       deltaX,
       deltaY,
       componentX: deltaX - left,
       componentY: deltaY - top,
+      componentWidth: width,
+      componentHeight: height,
     }
   }
 
@@ -172,6 +175,7 @@ class DefaultTool extends Tool {
     if (!this.isMouseDown) {
       return null
     }
+    this.targetParent.component.eraseFeedback(null) // TODO what request would go here?
     this.isMouseDown = false
     return null
   }
