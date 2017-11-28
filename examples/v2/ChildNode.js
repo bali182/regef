@@ -6,6 +6,8 @@ import renderNode from './renderNode'
 import ChildNodeEditPolicy from './ChildNodeEditPolicy'
 import { addChild, setPosition } from './actions'
 
+import FeedbackNode from './FeedbackNode'
+
 const noChildrenStyle = {
   display: 'table-cell',
   verticalAlign: 'middle',
@@ -34,28 +36,34 @@ const withChildrenStyle = {
 @connect((state, { id }) => ({ model: state[id] }), { addChild, setPosition })
 @node(ChildNodeEditPolicy)
 class ChildNode extends React.Component {
-  renderWithoutChildren() {
-    const { regef, id, style, model } = this.props
-    const fullStyle = { ...noChildrenStyle, ...style, backgroundColor: model.color }
-    return (<div style={fullStyle} {...regef}>
-      {id}
-    </div>)
+  constructor() {
+    super()
+    this.state = {
+      feedback: null,
+    }
   }
 
-  renderWithChildren() {
-    const { regef, id, model, style } = this.props
-    const fullStyle = { ...withChildrenStyle, ...style, backgroundColor: model.color }
-    return (<div style={fullStyle} {...regef}>
-      {id} {model.children.map(renderNode)}
-    </div>)
+  renderFeedback() {
+    const { feedback } = this.state
+    if (feedback === null) {
+      return null
+    }
+    return (<FeedbackNode
+      absolute={false}
+      width={feedback.width || 50}
+      height={feedback.height}
+    />)
   }
 
   render() {
-    const { model: { children } } = this.props
-    if (children.length === 0) {
-      return this.renderWithoutChildren()
-    }
-    return this.renderWithChildren()
+    const { model, regef, id, style } = this.props
+    const baseStyle = model.children.length > 0 || this.state.feedback
+      ? withChildrenStyle
+      : noChildrenStyle
+    const fullStyle = { ...baseStyle, ...style, backgroundColor: model.color }
+    return (<div style={fullStyle} {...regef}>
+      {id} {model.children.map(renderNode)} {this.renderFeedback()}
+    </div>)
   }
 }
 

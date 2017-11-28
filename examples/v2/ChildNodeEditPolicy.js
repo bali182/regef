@@ -19,6 +19,21 @@ class ChildNodeEditPolicy extends EditPolicy {
     }
     return null
   }
+
+  requestFeedback(request) {
+    this.getComponent().setState({
+      feedback: {
+        width: request.componentWidth,
+        height: request.componentHeight,
+      },
+    })
+  }
+
+  eraseFeedback() {
+    this.getComponent().setState({
+      feedback: null,
+    })
+  }
 }
 
 export default ChildNodeEditPolicy

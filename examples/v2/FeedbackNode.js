@@ -2,7 +2,6 @@
 import React from 'react'
 
 const feedbackNodeStyle = {
-  position: 'absolute',
   display: 'table-cell',
   verticalAlign: 'middle',
   borderRadius: 4,
@@ -12,8 +11,10 @@ const feedbackNodeStyle = {
   border: '2px dashed #ccc',
 }
 
-const FeedbackNode = ({ x, y, width, height }) => {
-  const fullStyle = { ...feedbackNodeStyle, top: y, left: x, width, height }
+const FeedbackNode = ({ x, y, width, height, absolute = true }) => {
+  const fullStyle = absolute
+    ? { ...feedbackNodeStyle, top: y, left: x, width, height, position: 'absolute' }
+    : { ...feedbackNodeStyle, width, height }
   return (<div style={fullStyle}>
     &nbsp;
   </div>)
