@@ -2,13 +2,13 @@
 import React from 'react'
 
 const feedbackNodeStyle = {
-  display: 'table-cell',
-  verticalAlign: 'middle',
+  boxSizing: 'border-box',
   borderRadius: 4,
   pointerEvents: 'none',
   cursor: 'default',
   backgroundColor: '#efefef',
   border: '2px dashed #ccc',
+  margin: '0px 5px',
 }
 
 const FeedbackNode = ({ x, y, width, height, absolute = true }) => {

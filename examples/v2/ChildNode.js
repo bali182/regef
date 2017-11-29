@@ -9,9 +9,12 @@ import { addChild, setPosition } from './actions'
 import FeedbackNode from './FeedbackNode'
 
 const noChildrenStyle = {
-  display: 'table-cell',
-  verticalAlign: 'middle',
-  textAlign: 'center',
+  display: 'flex',
+  flexDirection: 'center',
+  justifyContent: 'center',
+  alignContent: 'center',
+  alignItems: 'center',
+  margin: '0px 5px',
   borderRadius: 4,
   padding: 10,
   userSelect: 'none',
@@ -22,8 +25,12 @@ const noChildrenStyle = {
 }
 
 const withChildrenStyle = {
-  display: 'inline-block',
-  marginRight: 5,
+  display: 'flex',
+  flexDirection: 'center',
+  justifyContent: 'center',
+  alignContent: 'center',
+  alignItems: 'center',
+  margin: '0px 5px',
   borderRadius: 4,
   padding: 15,
   userSelect: 'none',

@@ -1,4 +1,5 @@
 import EditPolicy from '../../src/editPolicy'
+import default from '../../src/diagram';
 
 class ChildNodeEditPolicy extends EditPolicy {
   isValidChild(component) {
@@ -20,13 +21,18 @@ class ChildNodeEditPolicy extends EditPolicy {
     return null
   }
 
-  requestFeedback(request) {
-    this.getComponent().setState({
-      feedback: {
-        width: request.componentWidth,
-        height: request.componentHeight,
-      },
-    })
+  requestFeedback({ type, componentWidth, componentHeight }) {
+    switch (type) {
+      case 'add-child': {
+        this.getComponent().setState({
+          feedback: {
+            width: componentWidth,
+            height: componentHeight,
+          },
+        })
+      }
+      default:
+    }
   }
 
   eraseFeedback() {
