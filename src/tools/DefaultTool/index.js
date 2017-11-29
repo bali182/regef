@@ -12,6 +12,9 @@ import {
 
 const COMMAND_TARGET = Symbol('COMMAND_TARGET')
 
+// eslint-disable-next-line
+const contains = (parent, child) => Boolean(child.compareDocumentPosition(parent) & Node.DOCUMENT_POSITION_CONTAINS)
+
 class El {
   constructor() {
     this.registry = null
@@ -123,6 +126,18 @@ class DefaultTool extends Tool {
     targetParent.component.requestFeedback(request)
   }
 
+  isMoveChild(e) {
+    const { currentParent, targetParent, target } = this
+    return currentParent.dom === targetParent.dom
+      || target.dom === e.target
+      || target.dom.contains(e.target) // TODO check what's wrong with compareDocumentPosition
+  }
+
+  isAddChild(/* e */) {
+    const { currentParent, targetParent } = this
+    return currentParent.dom !== targetParent.dom
+  }
+
   onMouseDown(e) {
     const registry = this.getComponentRegistry()
     const root = registry.getRootDom()
@@ -156,9 +171,9 @@ class DefaultTool extends Tool {
 
     if (this.target.dom === root) {
       // console.log('pan or selection')
-    } else if (this.currentParent.dom === this.targetParent.dom) {
+    } else if (this.isMoveChild(e)) {
       request = this.getMoveChildRequest()
-    } else if (this.currentParent.dom !== this.targetParent.dom) {
+    } else if (this.isAddChild(e)) {
       request = this.getAddChildRequest()
     }
 

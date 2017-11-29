@@ -5,6 +5,7 @@
     "browser": true
   },
   "rules": {
+    "no-bitwise": "off",
     "semi": [
       "error",
       "never"
