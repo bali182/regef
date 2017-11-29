@@ -1,5 +1,4 @@
 import EditPolicy from '../../src/editPolicy'
-import default from '../../src/diagram';
 
 class ChildNodeEditPolicy extends EditPolicy {
   isValidChild(component) {
@@ -30,6 +29,7 @@ class ChildNodeEditPolicy extends EditPolicy {
             height: componentHeight,
           },
         })
+        break
       }
       default:
     }
