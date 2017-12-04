@@ -10,8 +10,10 @@ class ChildNodeEditPolicy extends EditPolicy {
       const { props: { id: childId } } = component
       const { props: { id, addChild } } = this.getComponent()
       switch (type) {
-        case 'add-child': return () => addChild({ id, childId })
-        default: return null
+        case 'add-child':
+          addChild({ id, childId })
+          break
+        default:
       }
     }
     return null

@@ -28,33 +28,29 @@ class RootNodeEditPolict extends EditPolicy {
     switch (type) {
       case 'add-child': {
         if (this.isValidChild(component)) {
-          return () => {
-            receiver.props.addChild({
-              id: 'root',
-              childId: component.props.id,
-            })
-            receiver.props.setPosition({
-              id: component.props.id,
-              x: componentX,
-              y: componentY,
-            })
-          }
+          receiver.props.addChild({
+            id: 'root',
+            childId: component.props.id,
+          })
+          receiver.props.setPosition({
+            id: component.props.id,
+            x: componentX,
+            y: componentY,
+          })
         }
-        return null
+        break
       }
       case 'move-child': {
         if (this.isValidChild(component)) {
-          return () => {
-            receiver.props.setPosition({
-              id: component.props.id,
-              x: componentX,
-              y: componentY,
-            })
-          }
+          receiver.props.setPosition({
+            id: component.props.id,
+            x: componentX,
+            y: componentY,
+          })
         }
-        return null
+        break
       }
-      default: return null
+      default:
     }
   }
 }

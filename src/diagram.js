@@ -13,7 +13,6 @@ class Diagram extends React.Component {
   constructor() {
     super()
     this.registry = new ComponentRegistry()
-    this.command = null
   }
 
   componentDidMount() {
@@ -46,35 +45,29 @@ class Diagram extends React.Component {
     // this.registry.setDiagram(null)
   }
 
-  execute(command) {
-    if (command !== null) {
-      command()
-    }
-  }
 
   @bind saveRootRef(ref) {
     this.registry.setRoot(ref)
   }
 
   @bind onKeyDown(e) {
-    this.execute(this.props.tool.onKeyDown(e))
+    this.props.tool.onKeyDown(e)
   }
 
   @bind onKeyUp(e) {
-    this.execute(this.props.tool.onKeyUp(e))
+    this.props.tool.onKeyUp(e)
   }
 
   @bind onMouseDown(e) {
-    this.execute(this.props.tool.onMouseDown(e))
+    this.props.tool.onMouseDown(e)
   }
 
   @bind onMouseMove(e) {
-    this.command = this.props.tool.onMouseMove(e)
+    this.props.tool.onMouseMove(e)
   }
 
   @bind onMouseUp(e) {
-    this.execute(this.props.tool.onMouseUp(e))
-    this.execute(this.command)
+    this.props.tool.onMouseUp(e)
   }
 
   getChildContext() {
