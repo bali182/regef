@@ -1,4 +1,4 @@
-import { DATA_ID } from '../../constants'
+import { DATA_ID } from '../constants'
 
 export const isValidTarget = (element, root, registry) => {
   if (element === root) {

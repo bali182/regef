@@ -1,4 +1,4 @@
-import EditPolicy from '../../src/editPolicy'
+import { EditPolicy } from '../../src'
 
 class RootNodeEditPolict extends EditPolicy {
   isValidChild(component) {

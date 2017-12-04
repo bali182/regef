@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import node from '../../src/node'
-import renderNode from './renderNode'
+import { node } from '../../src'
 import { addChild, setPosition } from './actions'
+import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
 

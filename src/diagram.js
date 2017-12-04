@@ -1,6 +1,6 @@
 import React, { Children, cloneElement } from 'react'
 
-import ComponentRegistry from './registry'
+import ComponentRegistry from './ComponentRegistry'
 import bind from './utils/bind'
 import { REGEF_TYPE } from './constants'
 

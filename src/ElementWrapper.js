@@ -6,7 +6,7 @@ class ElementWrapper {
     this.dom = null
   }
 
-  __findComponent(el) {
+  findComponent(el) {
     const { registry } = this
     const component = registry.getByDomElement(el)
     if (component === null && el === registry.getRootDom()) {
@@ -18,7 +18,7 @@ class ElementWrapper {
   setDom(el) {
     if (el !== this.dom) {
       this.dom = el
-      this.component = this.__findComponent(el)
+      this.component = this.findComponent(el)
     }
     return this
   }

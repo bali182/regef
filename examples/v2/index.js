@@ -3,8 +3,7 @@ import { Provider } from 'react-redux'
 import { render } from 'react-dom'
 
 import store from './store'
-import Diagram from '../../src/diagram'
-import DefaultTool from '../../src/tools/DefaultTool'
+import { Diagram, DefaultTool } from '../../src'
 import RootNode from './RootNode'
 
 const externalNodeStyle = {

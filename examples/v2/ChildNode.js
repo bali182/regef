@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import node from '../../src/node'
+import { node } from '../../src'
 
 import renderNode from './renderNode'
 import ChildNodeEditPolicy from './ChildNodeEditPolicy'

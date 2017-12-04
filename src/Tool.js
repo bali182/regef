@@ -8,19 +8,19 @@ export default class Tool {
   getComponentRegistry() {
     return this.registry
   }
-  onKeyDown(e) {
+  onKeyDown(/* e */) {
     return null
   }
-  onKeyUp(e) {
+  onKeyUp(/* e */) {
     return null
   }
-  onMouseDown(e) {
+  onMouseDown(/* e */) {
     return null
   }
-  onMouseMove(e) {
+  onMouseMove(/* e */) {
     return null
   }
-  onMouseUp(e) {
+  onMouseUp(/* e */) {
     return null
   }
 }

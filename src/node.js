@@ -1,8 +1,7 @@
 import React from 'react'
 import { DATA_ID, REGEF_TYPE } from './constants'
-import id from './id'
+import id from './utils/id'
 import bind from './utils/bind'
-import { compose } from './command'
 
 const node = (...Policies) => (Wrapped) => {
   class DecoratedNode extends React.Component {
@@ -39,7 +38,7 @@ const node = (...Policies) => (Wrapped) => {
     }
 
     getCommand(request) {
-      return compose(this.__policies.map((policy) => policy.getCommand(request)))
+      return this.__policies.map((policy) => policy.getCommand(request))
     }
 
     requestFeedback(request) {

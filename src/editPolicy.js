@@ -21,15 +21,13 @@ class EditPolicy {
     return null
   }
 
-  getCommand() {
-    return null
+  getCommand(/* request */) {
   }
 
-  requestFeedback() {
-
+  requestFeedback(/* request */) {
   }
 
-  eraseFeedback() {
+  eraseFeedback(/* request */) {
   }
 }
 

@@ -1,7 +1,6 @@
 import DragTracker from './DragTracker'
 import ElementWrapper from './ElementWrapper'
-import { MOVE_CHILD, ADD_CHILD } from '../../request'
-import { COMMAND_TARGET } from './constants'
+import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET } from './constants'
 
 import {
   findPrimaryTarget,
@@ -10,7 +9,7 @@ import {
   buildInitialEventDeltas,
   buildEventCoordinates,
   isElementRelevant,
-} from './toolUtils'
+} from './utils/toolUtils'
 
 class NodeDragTracker extends DragTracker {
   constructor(registry) {
