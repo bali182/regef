@@ -1,5 +1,5 @@
 import DragTracker from './DragTracker'
-import ElementWrapper from './ElementWrapper'
+import ComponentWrapper from './ComponentWrapper'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET } from './constants'
 
 import {
@@ -14,10 +14,10 @@ import {
 class NodeDragTracker extends DragTracker {
   constructor(registry) {
     super(registry)
-    this.target = new ElementWrapper(registry)
-    this.lastTargetParent = new ElementWrapper(registry)
-    this.targetParent = new ElementWrapper(registry)
-    this.currentParent = new ElementWrapper(registry)
+    this.target = new ComponentWrapper(registry)
+    this.lastTargetParent = new ComponentWrapper(registry)
+    this.targetParent = new ComponentWrapper(registry)
+    this.currentParent = new ComponentWrapper(registry)
     this.coordinates = null
     this.eventDeltas = null
     this.dragging = false

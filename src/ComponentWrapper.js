@@ -1,7 +1,8 @@
-class ElementWrapper {
+import { findDOMNode } from 'react-dom'
+
+class ComponentWrapper {
   constructor(registry = null) {
     this.registry = registry
-
     this.component = null
     this.dom = null
   }
@@ -15,13 +16,19 @@ class ElementWrapper {
     return component
   }
 
-  setDom(el) {
-    if (el !== this.dom) {
-      this.dom = el
-      this.component = this.findComponent(el)
+  setComponent(component) {
+    this.component = component
+    // no way of knowing if the component was re-rendered.
+    this.dom = findDOMNode(component)
+  }
+
+  setDom(dom) {
+    if (dom !== this.dom) {
+      this.dom = dom
+      this.component = this.findComponent(dom)
     }
     return this
   }
 }
 
-export default ElementWrapper
+export default ComponentWrapper
