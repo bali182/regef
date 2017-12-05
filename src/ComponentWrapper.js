@@ -16,6 +16,11 @@ class ComponentWrapper {
     return component
   }
 
+  reset() {
+    this.dom = null
+    this.component = null
+  }
+
   setComponent(component) {
     this.component = component
     // no way of knowing if the component was re-rendered.

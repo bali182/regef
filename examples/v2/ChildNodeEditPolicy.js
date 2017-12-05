@@ -22,7 +22,7 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  eraseFeedback() {
+  eraseAddChildFeedback() {
     this.getComponent().setState({
       feedback: null,
     })

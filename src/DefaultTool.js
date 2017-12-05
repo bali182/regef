@@ -12,6 +12,12 @@ class DefaultTool extends Tool {
     this.nodeDragTracker = new NodeDragTracker(registry)
   }
 
+  onKeyUp(e) {
+    if (e.key === 'Escape' && this.nodeDragTracker.dragging) {
+      this.nodeDragTracker.cancelDrag()
+    }
+  }
+
   onMouseDown(e) {
     this.nodeDragTracker.onMouseDown(e)
   }

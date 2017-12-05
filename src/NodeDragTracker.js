@@ -20,6 +20,7 @@ class NodeDragTracker extends DragTracker {
     this.currentParent = new ComponentWrapper(registry)
     this.coordinates = null
     this.eventDeltas = null
+    this.lastRequest = null
     this.dragging = false
   }
 
@@ -81,12 +82,18 @@ class NodeDragTracker extends DragTracker {
     }
   }
 
-  handleFeedback(request) {
+  handleFeedback(lastRequest, request) {
     const { lastTargetParent, targetParent } = this
-    if (lastTargetParent.dom !== targetParent.dom && lastTargetParent.component !== null) {
-      lastTargetParent.component.eraseFeedback(request)
+    if (
+      lastRequest !== null &&
+      lastTargetParent.dom !== targetParent.dom &&
+      lastTargetParent.component !== null
+    ) {
+      lastTargetParent.component.eraseFeedback(lastRequest)
     }
-    targetParent.component.requestFeedback(request)
+    if (request !== null) {
+      targetParent.component.requestFeedback(request)
+    }
   }
 
   isMoveChild(e) {
@@ -102,10 +109,6 @@ class NodeDragTracker extends DragTracker {
   }
 
   buildDragRequest(e) {
-    if (!this.dragging) {
-      return null
-    }
-
     const root = this.registry.getRootDom()
 
     if (!isElementRelevant(e.target, root)) {
@@ -126,6 +129,21 @@ class NodeDragTracker extends DragTracker {
     return null
   }
 
+  cancelDrag() {
+    if (this.dragging) {
+      if (this.lastRequest !== null && this.targetParent !== null) {
+        this.targetParent.component.eraseFeedback(this.lastRequest)
+      }
+      this.dragging = false
+      this.lastRequest = null
+      this.eventDeltas = null
+      this.coordinates = null
+      this.targetParent.reset()
+      this.target.reset()
+      this.currentParent.reset()
+    }
+  }
+
   onMouseDown(e) {
     const root = this.registry.getRootDom()
 
@@ -138,19 +156,26 @@ class NodeDragTracker extends DragTracker {
   }
 
   onMouseMove(e) {
+    if (!this.dragging) {
+      return
+    }
     const request = this.buildDragRequest(e)
-    if (request) {
-      this.handleFeedback(request)
+    this.handleFeedback(this.lastRequest, request)
+    if (request !== null) {
+      this.lastRequest = request
     }
   }
 
   onMouseUp(e) {
+    if (!this.dragging) {
+      return
+    }
     const request = this.buildDragRequest(e)
     this.dragging = false
-    if (this.targetParent) {
-      this.targetParent.component.eraseFeedback(request)
+    if (this.targetParent !== null && this.lastRequest !== null) {
+      this.targetParent.component.eraseFeedback(this.lastRequest)
     }
-    if (request && request[COMMAND_TARGET]) {
+    if (request !== null && request[COMMAND_TARGET]) {
       request[COMMAND_TARGET].getCommand(request)
     }
   }
