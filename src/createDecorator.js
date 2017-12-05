@@ -1,15 +1,17 @@
 import React from 'react'
+
 import { DATA_ID, REGEF_TYPE } from './constants'
 import id from './utils/id'
 import bind from './utils/bind'
 
-const node = (...Policies) => (Wrapped) => {
-  class DecoratedNode extends React.Component {
+const createDecorator = (type) => (...Policies) => (Wrapped) => {
+  class DecoratedComponent extends React.Component {
     constructor() {
       super()
       this.policies = Policies.map((Policy) => new Policy())
       this.id = id()
       this.childRef = null
+      this.type = type
       this.domData = {
         [DATA_ID]: this.id,
       }
@@ -65,13 +67,13 @@ const node = (...Policies) => (Wrapped) => {
     }
   }
 
-  DecoratedNode[REGEF_TYPE] = true
+  DecoratedComponent[REGEF_TYPE] = type
 
-  DecoratedNode.contextTypes = {
+  DecoratedComponent.contextTypes = {
     registry: () => null,
   }
 
-  return DecoratedNode
+  return DecoratedComponent
 }
 
-export default node
+export default createDecorator

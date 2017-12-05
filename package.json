@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
+    "build": "webpack",
     "lint": "eslint src examples -c .eslintrc.json",
     "stats": "sloc src"
   },

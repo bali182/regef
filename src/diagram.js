@@ -83,7 +83,8 @@ class Diagram extends React.Component {
 
   render() {
     const child = Children.only(this.props.children)
-    if (!child || typeof child !== 'object' || typeof child.type !== 'function' || child.type[REGEF_TYPE] !== true) {
+    // TODO better check if it's node
+    if (!child || typeof child !== 'object' || !child.type) {
       throw new Error('Diagram root element must be a valid node!')
     }
     return cloneElement(child, { ref: this.saveRootRef })

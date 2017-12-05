@@ -1,7 +1,7 @@
 import DragTracker from './DragTracker'
 import ComponentWrapper from './ComponentWrapper'
 import DomHelper from './utils/DomHelper'
-import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET } from './constants'
+import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE } from './constants'
 import { buildDeltas, buildCoordinates } from './utils/event'
 
 class NodeDragTracker extends DragTracker {
@@ -137,8 +137,13 @@ class NodeDragTracker extends DragTracker {
   }
 
   onMouseDown(e) {
-    if (this.domHelper.isInsideDiagram(e.target)) {
-      this.target.setDom(this.domHelper.findClosestElement(e.target))
+    if (!this.domHelper.isInsideDiagram(e.target)) {
+      return
+    }
+    const target = this.domHelper.findClosestElement(e.target)
+    const comp = this.registry.getByDomElement(target)
+    if (this.registry.getRootDom() === target || (comp !== null && comp.type === NODE_TYPE)) {
+      this.target.setDom(target)
       this.currentParent.setDom(this.domHelper.findClosestParent(this.target.dom))
       this.eventDeltas = buildDeltas(e, this.target.dom)
       this.dragging = true
