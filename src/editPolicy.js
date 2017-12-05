@@ -15,7 +15,6 @@ class EditPolicy {
 
   getDomNode() {
     if (this.component !== null) {
-      // eslint-disable-next-line react/no-find-dom-node
       return findDOMNode(this.component)
     }
     return null
