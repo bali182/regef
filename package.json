@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
-    "lint": "eslint src examples -c .eslintrc.json"
+    "lint": "eslint src examples -c .eslintrc.json",
+    "stats": "sloc src"
   },
   "repository": {
     "type": "git",
@@ -44,6 +45,7 @@
     "react-redux": "^5.0.6",
     "react-test-renderer": "^16.0.0",
     "redux": "^3.7.2",
+    "sloc": "^0.2.0",
     "source-map-loader": "^0.2.3",
     "typings": "^2.1.1",
     "webpack": "^3.6.0",
