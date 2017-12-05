@@ -68,11 +68,12 @@ export const buildEventCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) 
   y: clientY - deltaY,
 })
 
-export const findTargetedParent = (e, dragged, root, registry) => {
+export const findTargetedParent = (e, target, currentParent, root, registry) => {
   const targetDom = findPrimaryTarget(e.target, root, registry)
-  return targetDom === dragged || dragged.contains(targetDom)
-    ? findClosestValidParent(targetDom, root, registry)
-    : targetDom
+  if (targetDom === target || target.contains(targetDom)) {
+    return currentParent
+  }
+  return targetDom
 }
 
 export const getCommandSafe = (request, component) => {

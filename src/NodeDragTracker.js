@@ -42,6 +42,7 @@ class NodeDragTracker extends DragTracker {
     const newTargetParentDom = findTargetedParent(
       e,
       this.target.dom,
+      this.currentParent.dom,
       this.registry.getRootDom(),
       this.registry,
     )
