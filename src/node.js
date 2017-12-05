@@ -7,42 +7,42 @@ const node = (...Policies) => (Wrapped) => {
   class DecoratedNode extends React.Component {
     constructor() {
       super()
-      this.__policies = Policies.map((Policy) => new Policy())
-      this.__id = id()
-      this.__ref = null
-      this.__regef = {
-        [DATA_ID]: this.__id,
+      this.policies = Policies.map((Policy) => new Policy())
+      this.id = id()
+      this.childRef = null
+      this.domData = {
+        [DATA_ID]: this.id,
       }
     }
 
     getUserComponent() {
-      return this.__ref
+      return this.childRef
     }
 
     @bind saveChildRef(ref) {
-      this.__ref = ref
-      this.__policies.forEach((policy) => policy.setComponent(ref))
+      this.childRef = ref
+      this.policies.forEach((policy) => policy.setComponent(ref))
     }
 
     componentDidMount() {
-      this.context.registry.register(this.__id, this)
+      this.context.registry.register(this.id, this)
     }
 
     componentWillUnmount() {
-      this.context.registry.unregister(this.__id, this)
-      this.__policies.forEach((policy) => policy.setComponent(null))
+      this.context.registry.unregister(this.id, this)
+      this.policies.forEach((policy) => policy.setComponent(null))
     }
 
     getEditPolicies() {
-      return this.__policies
+      return this.policies
     }
 
     getCommand(request) {
-      return this.__policies.map((policy) => policy.getCommand(request))
+      return this.policies.map((policy) => policy.getCommand(request))
     }
 
     requestFeedback(request) {
-      const policies = this.__policies
+      const policies = this.policies
       for (let i = 0, len = policies.length; i < len; i += 1) {
         const policy = policies[i]
         policy.requestFeedback(request)
@@ -50,7 +50,7 @@ const node = (...Policies) => (Wrapped) => {
     }
 
     eraseFeedback(request) {
-      const policies = this.__policies
+      const policies = this.policies
       for (let i = 0, len = policies.length; i < len; i += 1) {
         const policy = policies[i]
         policy.eraseFeedback(request)
@@ -59,7 +59,7 @@ const node = (...Policies) => (Wrapped) => {
 
     render() {
       const { children, ...rest } = this.props
-      return (<Wrapped {...rest} ref={this.saveChildRef} regef={this.__regef}>
+      return (<Wrapped {...rest} ref={this.saveChildRef} regef={this.domData}>
         {children}
       </Wrapped>)
     }

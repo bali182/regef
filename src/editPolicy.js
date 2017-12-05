@@ -2,21 +2,21 @@ import { findDOMNode } from 'react-dom'
 
 class EditPolicy {
   constructor() {
-    this.__component = null
+    this.component = null
   }
 
   setComponent(component) {
-    this.__component = component
+    this.component = component
   }
 
   getComponent() {
-    return this.__component
+    return this.component
   }
 
   getDomNode() {
-    if (this.__component !== null) {
+    if (this.component !== null) {
       // eslint-disable-next-line react/no-find-dom-node
-      return findDOMNode(this.__component)
+      return findDOMNode(this.component)
     }
     return null
   }
