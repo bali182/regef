@@ -4,17 +4,17 @@ import { DATA_ID } from './constants'
 class ComponentRegistry {
   constructor() {
     this.components = {}
-    this.diagram = null
+    this.root = null
   }
   setRoot(diagram) {
-    this.diagram = diagram
+    this.root = diagram
+    this.rootDom = findDOMNode(this.root)
   }
   getRoot() {
-    return this.diagram
+    return this.root
   }
   getRootDom() {
-    // eslint-disable-next-line react/no-find-dom-node
-    return findDOMNode(this.diagram)
+    return this.rootDom
   }
   register(id, component) {
     this.components[id] = component

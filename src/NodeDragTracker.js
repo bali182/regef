@@ -1,19 +1,13 @@
 import DragTracker from './DragTracker'
 import ComponentWrapper from './ComponentWrapper'
+import DomHelper from './utils/DomHelper'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET } from './constants'
-
-import {
-  findPrimaryTarget,
-  findClosestValidParent,
-  findTargetedParent,
-  buildInitialEventDeltas,
-  buildEventCoordinates,
-  isElementRelevant,
-} from './utils/toolUtils'
+import { buildDeltas, buildCoordinates } from './utils/event'
 
 class NodeDragTracker extends DragTracker {
   constructor(registry) {
     super(registry)
+    this.domHelper = new DomHelper(registry)
     this.target = new ComponentWrapper(registry)
     this.lastTargetParent = new ComponentWrapper(registry)
     this.targetParent = new ComponentWrapper(registry)
@@ -24,8 +18,17 @@ class NodeDragTracker extends DragTracker {
     this.dragging = false
   }
 
+  findTargetedParent(e) {
+    const { domHelper, target, currentParent } = this
+    const eventTargetDom = domHelper.findClosestElement(e.target)
+    if (eventTargetDom === target.dom || target.dom.contains(eventTargetDom)) {
+      return currentParent.dom
+    }
+    return eventTargetDom
+  }
+
   updateCoordinates(e) {
-    const { x: deltaX, y: deltaY } = buildEventCoordinates(e, this.eventDeltas)
+    const { x: deltaX, y: deltaY } = buildCoordinates(e, this.eventDeltas)
     const { top, left } = this.targetParent.dom.getBoundingClientRect()
     const { width, height } = this.target.dom.getBoundingClientRect()
     this.coordinates = {
@@ -39,13 +42,7 @@ class NodeDragTracker extends DragTracker {
   }
 
   updateParents(e) {
-    const newTargetParentDom = findTargetedParent(
-      e,
-      this.target.dom,
-      this.currentParent.dom,
-      this.registry.getRootDom(),
-      this.registry,
-    )
+    const newTargetParentDom = this.findTargetedParent(e)
     const targetParentDom = this.targetParent.dom
     if (targetParentDom !== newTargetParentDom) {
       this.lastTargetParent.setDom(targetParentDom)
@@ -97,29 +94,23 @@ class NodeDragTracker extends DragTracker {
     }
   }
 
-  isMoveChild(e) {
-    const { currentParent, targetParent, target } = this
-    return currentParent.dom === targetParent.dom
-      || target.dom === e.target
-      || target.dom.contains(e.target) // TODO check what's wrong with compareDocumentPosition
+  isMoveChild() {
+    return this.currentParent.dom === this.targetParent.dom
   }
 
-  isAddChild(/* e */) {
-    const { currentParent, targetParent } = this
-    return currentParent.dom !== targetParent.dom
+  isAddChild() {
+    return this.currentParent.dom !== this.targetParent.dom
   }
 
   buildDragRequest(e) {
-    const root = this.registry.getRootDom()
-
-    if (!isElementRelevant(e.target, root)) {
+    if (!this.domHelper.isInsideDiagram(e.target)) {
       return null
     }
 
     this.updateParents(e)
     this.updateCoordinates(e)
 
-    if (this.target.dom === root) {
+    if (this.target.dom === this.registry.getRootDom()) {
       // TODO pan or selection
     } else if (this.isMoveChild(e)) {
       return this.getMoveChildRequest()
@@ -146,12 +137,10 @@ class NodeDragTracker extends DragTracker {
   }
 
   onMouseDown(e) {
-    const root = this.registry.getRootDom()
-
-    if (isElementRelevant(e.target, root)) {
-      this.target.setDom(findPrimaryTarget(e.target, root, this.registry))
-      this.currentParent.setDom(findClosestValidParent(this.target.dom, root, this.registry))
-      this.eventDeltas = buildInitialEventDeltas(e, this.target.dom)
+    if (this.domHelper.isInsideDiagram(e.target)) {
+      this.target.setDom(this.domHelper.findClosestElement(e.target))
+      this.currentParent.setDom(this.domHelper.findClosestParent(this.target.dom))
+      this.eventDeltas = buildDeltas(e, this.target.dom)
       this.dragging = true
     }
   }
