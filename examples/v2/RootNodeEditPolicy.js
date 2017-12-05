@@ -1,6 +1,6 @@
-import { EditPolicy } from '../../src'
+import { DispatchingEditPolicy } from '../../src'
 
-class RootNodeEditPolict extends EditPolicy {
+class RootNodeEditPolict extends DispatchingEditPolicy {
   isValidChild(component) {
     return component && component.props && component.props.id
   }
@@ -22,35 +22,29 @@ class RootNodeEditPolict extends EditPolicy {
     })
   }
 
-  getCommand(request) {
-    const { type, component, componentX, componentY } = request
-    const receiver = this.getComponent()
-    switch (type) {
-      case 'add-child': {
-        if (this.isValidChild(component)) {
-          receiver.props.addChild({
-            id: 'root',
-            childId: component.props.id,
-          })
-          receiver.props.setPosition({
-            id: component.props.id,
-            x: componentX,
-            y: componentY,
-          })
-        }
-        break
-      }
-      case 'move-child': {
-        if (this.isValidChild(component)) {
-          receiver.props.setPosition({
-            id: component.props.id,
-            x: componentX,
-            y: componentY,
-          })
-        }
-        break
-      }
-      default:
+  addChild({ component, componentX, componentY }) {
+    if (this.isValidChild(component)) {
+      const receiver = this.getComponent()
+      receiver.props.addChild({
+        id: 'root',
+        childId: component.props.id,
+      })
+      receiver.props.setPosition({
+        id: component.props.id,
+        x: componentX,
+        y: componentY,
+      })
+    }
+  }
+
+  moveChild({ component, componentX, componentY }) {
+    if (this.isValidChild(component)) {
+      const receiver = this.getComponent()
+      receiver.props.setPosition({
+        id: component.props.id,
+        x: componentX,
+        y: componentY,
+      })
     }
   }
 }

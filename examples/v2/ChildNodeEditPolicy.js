@@ -1,37 +1,25 @@
-import { EditPolicy } from '../../src/'
+import { DispatchingEditPolicy } from '../../src/'
 
-class ChildNodeEditPolicy extends EditPolicy {
+class ChildNodeEditPolicy extends DispatchingEditPolicy {
   isValidChild(component) {
     return component && component.props && component.props.id
   }
 
-  getCommand({ component, type }) {
+  addChild({ component }) {
     if (this.isValidChild(component)) {
       const { props: { id: childId } } = component
       const { props: { id, addChild } } = this.getComponent()
-      switch (type) {
-        case 'add-child':
-          addChild({ id, childId })
-          break
-        default:
-      }
+      addChild({ id, childId })
     }
-    return null
   }
 
-  requestFeedback({ type, componentWidth, componentHeight }) {
-    switch (type) {
-      case 'add-child': {
-        this.getComponent().setState({
-          feedback: {
-            width: componentWidth,
-            height: componentHeight,
-          },
-        })
-        break
-      }
-      default:
-    }
+  requestAddChildFeedback({ componentWidth, componentHeight }) {
+    this.getComponent().setState({
+      feedback: {
+        width: componentWidth,
+        height: componentHeight,
+      },
+    })
   }
 
   eraseFeedback() {
