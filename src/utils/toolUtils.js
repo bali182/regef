@@ -32,19 +32,6 @@ export const findClosestValidParent = (element, root, registry) => {
   return root
 }
 
-export const findAllTargets = (element, root, registry) => {
-  const targets = []
-  let pointer = element
-  while (pointer !== root && pointer !== null) {
-    if (isValidTarget(pointer, root, registry)) {
-      targets.push(pointer)
-    }
-    pointer = pointer.parentNode
-  }
-  targets.push(root)
-  return targets
-}
-
 export const findPrimaryTarget = (element, root, registry) => {
   if (isValidTarget(element, root, registry)) {
     return element
@@ -74,11 +61,4 @@ export const findTargetedParent = (e, target, currentParent, root, registry) => 
     return currentParent
   }
   return targetDom
-}
-
-export const getCommandSafe = (request, component) => {
-  if (!component || !component.getCommand) {
-    return null
-  }
-  return component.getCommand(request)
 }
