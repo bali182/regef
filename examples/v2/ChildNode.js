@@ -4,19 +4,19 @@ import { node } from '../../src'
 
 import renderNode from './renderNode'
 import ChildNodeEditPolicy from './ChildNodeEditPolicy'
+import Port from './Port'
 import { addChild, setPosition } from './actions'
 
 import FeedbackNode from './FeedbackNode'
 
 const noChildrenStyle = {
   display: 'flex',
-  flexDirection: 'center',
+  flexDirection: 'row',
   justifyContent: 'center',
   alignContent: 'center',
   alignItems: 'center',
-  margin: '0px 5px',
+  margin: '0px 10px',
   borderRadius: 4,
-  padding: 10,
   userSelect: 'none',
   cursor: 'default',
   width: 50,
@@ -26,17 +26,28 @@ const noChildrenStyle = {
 
 const withChildrenStyle = {
   display: 'flex',
-  flexDirection: 'center',
+  flexDirection: 'row',
   justifyContent: 'center',
   alignContent: 'center',
   alignItems: 'center',
-  margin: '0px 5px',
+  margin: '0px 10px',
   borderRadius: 4,
-  padding: 15,
   userSelect: 'none',
   cursor: 'default',
   minHeight: 70,
   minWidth: 70,
+}
+
+const portContainer = {
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  height: '100%',
+  padding: '10px 20px 10px 10px',
 }
 
 // eslint-disable-next-line react/no-multi-comp
@@ -69,7 +80,10 @@ class ChildNode extends React.Component {
       : noChildrenStyle
     const fullStyle = { ...baseStyle, ...style, backgroundColor: model.color }
     return (<div style={fullStyle} {...regef}>
-      {id} {model.children.map(renderNode)} {this.renderFeedback()}
+      <div style={portContainer}>
+        {id} {model.children.map(renderNode)} {this.renderFeedback()}
+        <Port />
+      </div>
     </div>)
   }
 }

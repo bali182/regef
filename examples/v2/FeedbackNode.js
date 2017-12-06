@@ -8,7 +8,7 @@ const feedbackNodeStyle = {
   cursor: 'default',
   backgroundColor: '#efefef',
   border: '2px dashed #ccc',
-  margin: '0px 5px',
+  margin: '0px 10px',
 }
 
 const FeedbackNode = ({ x, y, width, height, absolute = true }) => {
