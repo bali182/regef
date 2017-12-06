@@ -8,13 +8,16 @@ import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
 
 const rootNodeStyle = {
-  marginTop: '25vh',
-  marginLeft: '25vw',
-  width: '50vw',
-  minHeight: '50vh',
+  flexGrow: 1,
+  flexShrink: 1,
+  flexBasis: 1,
+  minWidth: 0,
+  minHeight: '100%',
   overflow: 'hidden',
-  backgroundColor: 'yellow',
+  backgroundColor: 'white',
   position: 'relative',
+  boxSizing: 'border-box',
+  border: '1px solid #ccc',
 }
 const position = ({ x, y }) => ({
   position: 'absolute',

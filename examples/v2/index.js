@@ -6,24 +6,24 @@ import store from './store'
 import { Diagram, DefaultTool } from '../../src'
 import RootNode from './RootNode'
 
-const externalNodeStyle = {
+const rootStyle = {
+  marginTop: '25vh',
   marginLeft: '25vw',
   width: '50vw',
-  minHeight: '10vh',
+  minHeight: '50vh',
   overflow: 'hidden',
-  backgroundColor: 'blue',
-  color: 'white',
+  backgroundColor: 'yellow',
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'row',
 }
 
 render(
   <Provider store={store}>
-    <div>
+    <div style={rootStyle}>
       <Diagram tool={new DefaultTool()}>
         <RootNode />
       </Diagram>
-      <div style={externalNodeStyle}>
-        External DOM tree
-      </div>
     </div>
   </Provider>,
   document.getElementById('app'),

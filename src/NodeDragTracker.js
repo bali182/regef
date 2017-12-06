@@ -31,7 +31,6 @@ class NodeDragTracker extends DragTracker {
     this.coordinates = null
     this.eventDeltas = null
     this.lastRequest = null
-    this.dragging = false
   }
 
   findTargetedParent(e) {
@@ -137,12 +136,12 @@ class NodeDragTracker extends DragTracker {
     return null
   }
 
-  cancelDrag() {
-    if (this.dragging) {
+  cancel() {
+    if (this.progress) {
       if (this.lastRequest !== null && this.targetParent !== null) {
         this.targetParent.component.eraseFeedback(this.lastRequest)
       }
-      this.dragging = false
+      this.progress = false
       this.lastRequest = null
       this.eventDeltas = null
       this.coordinates = null
@@ -163,12 +162,12 @@ class NodeDragTracker extends DragTracker {
       this.target.setDom(target)
       this.currentParent.setDom(parent)
       this.eventDeltas = buildDeltas(e, this.target.dom)
-      this.dragging = true
+      this.progress = true
     }
   }
 
   onMouseMove(e) {
-    if (!this.dragging) {
+    if (!this.progress) {
       return
     }
     const request = this.buildDragRequest(e)
@@ -179,11 +178,11 @@ class NodeDragTracker extends DragTracker {
   }
 
   onMouseUp(e) {
-    if (!this.dragging) {
+    if (!this.progress) {
       return
     }
     const request = this.buildDragRequest(e)
-    this.dragging = false
+    this.progress = false
     if (this.targetParent !== null && this.lastRequest !== null) {
       this.targetParent.component.eraseFeedback(this.lastRequest)
     }
