@@ -1,7 +1,9 @@
 import DragTracker from './DragTracker'
 import ComponentWrapper from './ComponentWrapper'
 import DomHelper from './DomHelper'
-import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE } from './constants'
+import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE } from './constants'
+
+const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
 export const buildDeltas = ({ clientX, clientY }, element) => {
   const { top, left } = element.getBoundingClientRect()
@@ -34,11 +36,11 @@ class NodeDragTracker extends DragTracker {
 
   findTargetedParent(e) {
     const { domHelper, target, currentParent } = this
-    const eventTargetDom = domHelper.findClosestElement(e.target)
-    if (eventTargetDom === target.dom || target.dom.contains(eventTargetDom)) {
+    const eventDom = domHelper.findClosestElement(e.target, ACCEPTED_TYPES)
+    if (eventDom === null || eventDom === target.dom || target.dom.contains(eventDom)) {
       return currentParent.dom
     }
-    return eventTargetDom
+    return eventDom
   }
 
   updateCoordinates(e) {
@@ -154,11 +156,12 @@ class NodeDragTracker extends DragTracker {
     if (!this.domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.domHelper.findClosestElement(e.target)
-    const comp = this.domHelper.findComponent(target)
-    if (this.registry.getRootDom() === target || (comp !== null && comp.type === NODE_TYPE)) {
+    const target = this.domHelper.findClosestElement(e.target, ACCEPTED_TYPES)
+    if (target !== null) {
+      const parent = this.domHelper.findClosestElement(target.parentNode, ACCEPTED_TYPES)
+        || this.registry.getRootDom()
       this.target.setDom(target)
-      this.currentParent.setDom(this.domHelper.findClosestParent(this.target.dom))
+      this.currentParent.setDom(parent)
       this.eventDeltas = buildDeltas(e, this.target.dom)
       this.dragging = true
     }
