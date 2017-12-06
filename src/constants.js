@@ -15,6 +15,8 @@ export const INSERT = 'insert'
 export const MOVE_CHILD = 'move-child'
 export const ADD_CHILD = 'add-child'
 export const REMOVE_CHILD = 'remove-child'
+export const START_CONNECTION = 'start-connection'
+export const END_CONNECTION = 'end-connection'
 
 // Request hidden target key
 export const COMMAND_TARGET = Symbol('command-target')

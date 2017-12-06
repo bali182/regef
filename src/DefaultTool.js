@@ -16,9 +16,12 @@ class DefaultTool extends Tool {
     ]
   }
 
-  onKeyUp(e) {
-    if (e.key === 'Escape') {
-      this.dragTrackers.forEach((tracker) => tracker.cancel())
+  onKeyUp({ key }) {
+    switch (key) {
+      case 'Escape':
+        this.dragTrackers.forEach((tracker) => tracker.cancel())
+        break
+      default:
     }
   }
 

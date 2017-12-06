@@ -1,22 +1,7 @@
 import DragTracker from './DragTracker'
 import ComponentWrapper from './ComponentWrapper'
 import DomHelper from './DomHelper'
-import { COMMAND_TARGET, PORT_TYPE } from './constants'
-
-export const buildDeltas = ({ clientX, clientY }, element) => {
-  const { top, left } = element.getBoundingClientRect()
-  const deltaX = clientX - left
-  const deltaY = clientY - top
-  return {
-    deltaX,
-    deltaY,
-  }
-}
-
-export const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
-  x: clientX - deltaX,
-  y: clientY - deltaY,
-})
+import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 
 class ConnectDragTracker extends DragTracker {
   constructor(registry) {
@@ -25,7 +10,6 @@ class ConnectDragTracker extends DragTracker {
     this.source = new ComponentWrapper(registry, this.domHelper)
     this.target = new ComponentWrapper(registry, this.domHelper)
     this.coordinates = null
-    this.eventDeltas = null
     this.lastRequest = null
   }
 
@@ -36,15 +20,60 @@ class ConnectDragTracker extends DragTracker {
     }
   }
 
-  onMouseDown(e) {
+  getStartConnectionRequest() {
+    return {
+      type: START_CONNECTION,
+      source: this.source.component,
+      sourceDOM: this.source.dom,
+      ...this.coordinates,
+    }
+  }
+
+  getEndConnectionRequest() {
+    return {
+      type: END_CONNECTION,
+      source: this.source.component,
+      sourceDOM: this.source.dom,
+      target: this.target.component,
+      targetDOM: this.target.dom,
+      ...this.coordinates,
+    }
+  }
+
+  buildCoordinates({ clientX, clientY }) {
+    const { top, left } = this.registry.getRootDom().getBoundingClientRect()
+    const x = clientX - left
+    const y = clientY - top
+    return { x, y }
+  }
+
+  buildEndConnectRequest(e) {
     if (!this.domHelper.isInsideDiagram(e.target)) {
-      return
+      return null
+    }
+
+    this.target.setDom(this.domHelper.findClosestElement(e.target))
+    this.coordinates = this.buildCoordinates(e)
+    return this.getEndConnectionRequest()
+  }
+
+  buildStartConnectionRequest(e) {
+    if (!this.domHelper.isInsideDiagram(e.target)) {
+      return null
     }
     const source = this.domHelper.findClosestElement(e.target, PORT_TYPE)
     if (source !== null) {
       this.source.setDom(source)
-      this.eventDeltas = buildDeltas(e, source)
-      this.dragging = true
+      this.coordinates = this.buildCoordinates(e)
+      return this.getStartConnectionRequest()
+    }
+    return null
+  }
+
+  onMouseDown(e) {
+    const req = this.buildStartConnectionRequest(e)
+    if (req !== null) {
+      this.progress = true
     }
   }
 
@@ -52,12 +81,14 @@ class ConnectDragTracker extends DragTracker {
     if (!this.progress) {
       return
     }
+    const req = this.buildEndConnectRequest(e)
   }
 
   onMouseUp(e) {
     if (!this.progress) {
       return
     }
+    const req = this.buildEndConnectRequest(e)
     this.progress = false
   }
 }
