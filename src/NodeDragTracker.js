@@ -22,10 +22,10 @@ class NodeDragTracker extends DragTracker {
   constructor(registry) {
     super(registry)
     this.domHelper = new DomHelper(registry)
-    this.target = new ComponentWrapper(registry)
-    this.lastTargetParent = new ComponentWrapper(registry)
-    this.targetParent = new ComponentWrapper(registry)
-    this.currentParent = new ComponentWrapper(registry)
+    this.target = new ComponentWrapper(registry, this.domHelper)
+    this.lastTargetParent = new ComponentWrapper(registry, this.domHelper)
+    this.targetParent = new ComponentWrapper(registry, this.domHelper)
+    this.currentParent = new ComponentWrapper(registry, this.domHelper)
     this.coordinates = null
     this.eventDeltas = null
     this.lastRequest = null
@@ -155,7 +155,7 @@ class NodeDragTracker extends DragTracker {
       return
     }
     const target = this.domHelper.findClosestElement(e.target)
-    const comp = this.registry.getByDomElement(target)
+    const comp = this.domHelper.findComponent(target)
     if (this.registry.getRootDom() === target || (comp !== null && comp.type === NODE_TYPE)) {
       this.target.setDom(target)
       this.currentParent.setDom(this.domHelper.findClosestParent(this.target.dom))

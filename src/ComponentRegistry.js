@@ -1,5 +1,4 @@
 import { findDOMNode } from 'react-dom'
-import { DATA_ID } from './constants'
 
 class ComponentRegistry {
   constructor() {
@@ -27,13 +26,6 @@ class ComponentRegistry {
   }
   has(id) {
     return Boolean(this.components[id])
-  }
-  getByDomElement(element) {
-    if (!element || !element.getAttribute) {
-      return null
-    }
-    const id = element.getAttribute(DATA_ID)
-    return id ? this.get(id) : null
   }
 }
 export default ComponentRegistry

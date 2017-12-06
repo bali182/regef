@@ -22,14 +22,6 @@ class DomHelper {
     return this.findClosestElement(element.parentNode)
   }
 
-  findTargetedParent(element, currentParent, root, registry) {
-    const targetDom = findPrimaryTarget(e.target, root, registry)
-    if (targetDom === target || target.contains(targetDom)) {
-      return currentParent
-    }
-    return targetDom
-  }
-
   isInsideDiagram(element) {
     return this.registry.getRootDom().contains(element)
   }
@@ -46,6 +38,17 @@ class DomHelper {
       return false
     }
     return true
+  }
+
+  findComponent(element) {
+    if (element === this.registry.getRootDom()) {
+      return this.registry.getRoot()
+    }
+    if (!element || !element.getAttribute) {
+      return null
+    }
+    const id = element.getAttribute(DATA_ID)
+    return id ? this.registry.get(id) : null
   }
 }
 

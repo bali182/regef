@@ -1,19 +1,11 @@
 import { findDOMNode } from 'react-dom'
 
 class ComponentWrapper {
-  constructor(registry = null) {
+  constructor(registry, domHelper) {
     this.registry = registry
+    this.domHelper = domHelper
     this.component = null
     this.dom = null
-  }
-
-  findComponent(el) {
-    const { registry } = this
-    const component = registry.getByDomElement(el)
-    if (component === null && el === registry.getRootDom()) {
-      return registry.getRoot()
-    }
-    return component
   }
 
   reset() {
@@ -23,14 +15,14 @@ class ComponentWrapper {
 
   setComponent(component) {
     this.component = component
-    // no way of knowing if the component was re-rendered.
+    // No way of knowing if the dom element was re-created, so no point of equality check.
     this.dom = findDOMNode(component)
   }
 
   setDom(dom) {
     if (dom !== this.dom) {
       this.dom = dom
-      this.component = this.findComponent(dom)
+      this.component = this.domHelper.findComponent(dom)
     }
     return this
   }
