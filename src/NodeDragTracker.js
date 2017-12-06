@@ -1,8 +1,22 @@
 import DragTracker from './DragTracker'
 import ComponentWrapper from './ComponentWrapper'
-import DomHelper from './utils/DomHelper'
+import DomHelper from './DomHelper'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE } from './constants'
-import { buildDeltas, buildCoordinates } from './utils/event'
+
+export const buildDeltas = ({ clientX, clientY }, element) => {
+  const { top, left } = element.getBoundingClientRect()
+  const deltaX = clientX - left
+  const deltaY = clientY - top
+  return {
+    deltaX,
+    deltaY,
+  }
+}
+
+export const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
+  x: clientX - deltaX,
+  y: clientY - deltaY,
+})
 
 class NodeDragTracker extends DragTracker {
   constructor(registry) {

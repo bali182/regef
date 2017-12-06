@@ -1,4 +1,4 @@
-import { DATA_ID } from '../constants'
+import { DATA_ID } from './constants'
 
 class DomHelper {
   constructor(registry) {

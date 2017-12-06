@@ -1,12 +1,14 @@
-import React, { Children, cloneElement } from 'react'
+import React, { Children } from 'react'
 
+import IdGenerator from './IdGenerator'
 import ComponentRegistry from './ComponentRegistry'
-import bind from './utils/bind'
+import bind from './bind'
 
 class Diagram extends React.Component {
-  constructor() {
-    super()
+  constructor(props, context) {
+    super(props, context)
     this.registry = new ComponentRegistry()
+    this.idGenerator = new IdGenerator()
   }
 
   componentDidMount() {
@@ -41,11 +43,6 @@ class Diagram extends React.Component {
     }
   }
 
-
-  @bind saveRootRef(ref) {
-    this.registry.setRoot(ref)
-  }
-
   @bind onKeyDown(e) {
     if (this.props.tool) {
       this.props.tool.onKeyDown(e)
@@ -77,21 +74,22 @@ class Diagram extends React.Component {
   }
 
   getChildContext() {
-    return { registry: this.registry }
+    return {
+      regef: {
+        registry: this.registry,
+        idGenerator: this.idGenerator,
+      },
+    }
   }
 
   render() {
-    const child = Children.only(this.props.children)
-    // TODO better check if it's node
-    if (!child || typeof child !== 'object' || !child.type) {
-      throw new Error('Diagram root element must be a valid node!')
-    }
-    return cloneElement(child, { ref: this.saveRootRef })
+    // TODO check if it's node a root node, which is difficult because of other decorators
+    return Children.only(this.props.children)
   }
 }
 
 Diagram.childContextTypes = {
-  registry: () => null,
+  regef: () => null,
 }
 
 

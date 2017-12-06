@@ -1,15 +1,16 @@
 import React from 'react'
 
-import { DATA_ID, REGEF_TYPE } from './constants'
-import id from './utils/id'
-import bind from './utils/bind'
+import { DATA_ID } from './constants'
+import bind from './bind'
 
-const createDecorator = (type) => (...Policies) => (Wrapped) => {
+const createDecorator = ({ type, activate, deactivate }) => (...Policies) => (Wrapped) => {
   class DecoratedComponent extends React.Component {
-    constructor() {
-      super()
+    constructor(props, context) {
+      super(props, context)
+      const { registry, idGenerator } = context.regef
+      this.registry = registry
       this.policies = Policies.map((Policy) => new Policy())
-      this.id = id()
+      this.id = idGenerator.next()
       this.childRef = null
       this.type = type
       this.domData = {
@@ -23,16 +24,14 @@ const createDecorator = (type) => (...Policies) => (Wrapped) => {
 
     @bind saveChildRef(ref) {
       this.childRef = ref
-      this.policies.forEach((policy) => policy.setComponent(ref))
     }
 
     componentDidMount() {
-      this.context.registry.register(this.id, this)
+      activate(this)
     }
 
     componentWillUnmount() {
-      this.context.registry.unregister(this.id, this)
-      this.policies.forEach((policy) => policy.setComponent(null))
+      deactivate(this)
     }
 
     getEditPolicies() {
@@ -67,10 +66,8 @@ const createDecorator = (type) => (...Policies) => (Wrapped) => {
     }
   }
 
-  DecoratedComponent[REGEF_TYPE] = type
-
   DecoratedComponent.contextTypes = {
-    registry: () => null,
+    regef: () => null,
   }
 
   return DecoratedComponent

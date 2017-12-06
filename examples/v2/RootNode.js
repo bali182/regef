@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { node } from '../../src'
+import { root } from '../../src'
 import { addChild, setPosition } from './actions'
 import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
@@ -23,7 +23,7 @@ const position = ({ x, y }) => ({
 })
 
 @connect((nodes) => ({ nodes }), { addChild, setPosition })
-@node(RootNodeEditPolicy)
+@root(RootNodeEditPolicy)
 class RootNode extends React.Component {
   constructor() {
     super()
