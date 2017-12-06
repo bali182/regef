@@ -2,7 +2,6 @@ import React, { Children, cloneElement } from 'react'
 
 import ComponentRegistry from './ComponentRegistry'
 import bind from './utils/bind'
-import { REGEF_TYPE } from './constants'
 
 class Diagram extends React.Component {
   constructor() {
