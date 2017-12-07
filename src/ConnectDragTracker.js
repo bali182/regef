@@ -22,8 +22,10 @@ class ConnectDragTracker extends DragTracker {
 
   getStartConnectionRequest() {
     return {
+      // TODO think about this decision
+      [COMMAND_TARGET]: this.source.component,
       type: START_CONNECTION,
-      source: this.source.component,
+      source: this.source.component.getUserComponent(),
       sourceDOM: this.source.dom,
       ...this.coordinates,
     }
@@ -31,10 +33,12 @@ class ConnectDragTracker extends DragTracker {
 
   getEndConnectionRequest() {
     return {
+      // TODO think about this decision
+      [COMMAND_TARGET]: this.target.component,
       type: END_CONNECTION,
-      source: this.source.component,
+      source: this.source.component.getUserComponent(),
       sourceDOM: this.source.dom,
-      target: this.target.component,
+      target: this.target.component.getUserComponent(),
       targetDOM: this.target.dom,
       ...this.coordinates,
     }
@@ -70,25 +74,45 @@ class ConnectDragTracker extends DragTracker {
     return null
   }
 
+  handleFeedback(lastRequest, request) {
+    if (lastRequest !== null
+      && (request === null || request[COMMAND_TARGET] !== lastRequest[COMMAND_TARGET])) {
+      lastRequest[COMMAND_TARGET].eraseFeedback(lastRequest)
+    }
+    if (request !== null) {
+      request[COMMAND_TARGET].requestFeedback(request)
+    }
+  }
+
   onMouseDown(e) {
-    const req = this.buildStartConnectionRequest(e)
-    if (req !== null) {
+    const request = this.buildStartConnectionRequest(e)
+    if (request !== null) {
       this.progress = true
     }
+    this.handleFeedback(this.lastRequest, request)
+    this.lastRequest = request
   }
 
   onMouseMove(e) {
     if (!this.progress) {
       return
     }
-    const req = this.buildEndConnectRequest(e)
+    const request = this.buildEndConnectRequest(e)
+    this.handleFeedback(this.lastRequest, request)
+    this.lastRequest = request
   }
 
   onMouseUp(e) {
     if (!this.progress) {
       return
     }
-    const req = this.buildEndConnectRequest(e)
+    const request = this.buildEndConnectRequest(e)
+    if (this.lastRequest !== null && this.lastRequest[COMMAND_TARGET] !== null) {
+      this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
+    }
+    if (request !== null && request[COMMAND_TARGET]) {
+      request[COMMAND_TARGET].getCommand(request)
+    }
     this.progress = false
   }
 }

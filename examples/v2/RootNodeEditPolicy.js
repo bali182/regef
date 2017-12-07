@@ -5,7 +5,7 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     return component && component.props && component.props.id
   }
 
-  requestFeedback(request) {
+  requestAddOrMoveFeedback(request) {
     this.getComponent().setState({
       feedback: {
         x: request.componentX,
@@ -16,10 +16,26 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     })
   }
 
-  eraseFeedback() {
+  eraseAddOrMoveFeedback() {
     this.getComponent().setState({
       feedback: null,
     })
+  }
+
+  requestAddChildFeedback(request) {
+    this.requestAddOrMoveFeedback(request)
+  }
+
+  requestMoveChildFeedback(request) {
+    this.requestAddOrMoveFeedback(request)
+  }
+
+  eraseMoveChildFeedback(request) {
+    this.eraseAddOrMoveFeedback(request)
+  }
+
+  eraseAddChildFeedback(request) {
+    this.eraseAddOrMoveFeedback(request)
   }
 
   addChild({ component, componentX, componentY }) {

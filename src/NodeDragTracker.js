@@ -182,13 +182,13 @@ class NodeDragTracker extends DragTracker {
       return
     }
     const request = this.buildDragRequest(e)
-    this.progress = false
     if (this.targetParent !== null && this.lastRequest !== null) {
       this.targetParent.component.eraseFeedback(this.lastRequest)
     }
     if (request !== null && request[COMMAND_TARGET]) {
       request[COMMAND_TARGET].getCommand(request)
     }
+    this.progress = false
   }
 }
 
