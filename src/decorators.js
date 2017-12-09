@@ -1,15 +1,23 @@
 import { NODE_TYPE, PORT_TYPE, ROOT_TYPE } from './constants'
 import createDecorator from './createDecorator'
 
+/* eslint-disable no-param-reassign */
 const defaultActivate = (component) => {
   component.registry.register(component.id, component)
-  component.policies.forEach((policy) => policy.setComponent(component.childRef))
+  component.policies.forEach((policy) => {
+    policy.component = component.childRef
+    policy.toolkit = component.toolkit
+  })
 }
 
 const defaultDecativate = (component) => {
   component.registry.unregister(component.id)
-  component.policies.forEach((policy) => policy.setComponent(null))
+  component.policies.forEach((policy) => {
+    policy.component = null
+    policy.toolkit = null
+  })
 }
+/* eslint-enable no-param-reassign */
 
 const rootActivate = (component) => {
   component.registry.setRoot(component)

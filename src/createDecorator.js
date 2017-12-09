@@ -7,8 +7,9 @@ const createDecorator = ({ type, activate, deactivate }) => (...Policies) => (Wr
   class DecoratedComponent extends React.Component {
     constructor(props, context) {
       super(props, context)
-      const { registry, idGenerator } = context.regef
+      const { registry, idGenerator, toolkit } = context.regef
       this.registry = registry
+      this.toolkit = toolkit
       this.policies = Policies.map((Policy) => new Policy())
       this.id = idGenerator.next()
       this.childRef = null

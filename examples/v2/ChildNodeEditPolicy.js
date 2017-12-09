@@ -8,13 +8,13 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
   addChild({ component }) {
     if (this.isValidChild(component)) {
       const { props: { id: childId } } = component
-      const { props: { id, addChild } } = this.getComponent()
+      const { props: { id, addChild } } = this.component
       addChild({ id, childId })
     }
   }
 
   requestAddChildFeedback({ componentWidth, componentHeight }) {
-    this.getComponent().setState({
+    this.component.setState({
       feedback: {
         width: componentWidth,
         height: componentHeight,
@@ -23,7 +23,7 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
   }
 
   eraseAddChildFeedback() {
-    this.getComponent().setState({
+    this.component.setState({
       feedback: null,
     })
   }

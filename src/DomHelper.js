@@ -9,7 +9,7 @@ class DomHelper {
     const root = this.registry.getRootDom()
     for (let it = element; it !== null; it = it.parentNode) {
       const component = this.findComponent(it)
-      if (component) {
+      if (component !== null) {
         return this.matchesType(component, type) ? it : null
       }
       if (it === root) {
@@ -17,6 +17,24 @@ class DomHelper {
       }
     }
     return null
+  }
+
+  findRelevantChildrenIntenal(node, children = []) {
+    if (node !== null && node.hasChildNodes()) {
+      const childNodes = node.childNodes
+      for (let i = 0, len = childNodes.length; i < len; i += 1) {
+        const childNode = childNodes[i]
+        if (this.isValidElement(childNode)) {
+          children.push(childNode)
+        } else {
+          this.findRelevantChildrenIntenal(childNode, children)
+        }
+      }
+    }
+  }
+
+  findRelevantChildren(element) {
+    return this.findRelevantChildrenIntenal(element, [])
   }
 
   findClosestParent(element, type = null) {
