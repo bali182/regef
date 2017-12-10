@@ -1,5 +1,6 @@
 import { findDOMNode } from 'react-dom'
 import DomHelper from './DomHelper'
+import Rectangle from './Rectangle'
 
 const REGISTRY = Symbol('registry')
 const DOM_HELPER = Symbol('dom-helper')
@@ -33,6 +34,19 @@ class Toolkit {
     }
     return domHelper.findRelevantChildren(node)
       .map((childNode) => domHelper.findComponent(childNode).getUserComponent())
+  }
+
+  getBounds(component) {
+    const node = findDOMNode(component)
+    const root = this[REGISTRY].getRootDom()
+    const { left: rLeft, top: rTop } = root.getBoundingClientRect()
+    const { left, top, width, height } = node.getBoundingClientRect()
+    return new Rectangle(
+      left - rLeft,
+      top - rTop,
+      width,
+      height,
+    )
   }
 }
 
