@@ -1,6 +1,6 @@
+import { rectangle } from 'regef-2dmath'
 import { findDOMNode } from 'react-dom'
 import DomHelper from './DomHelper'
-import Rectangle from './Rectangle'
 
 const REGISTRY = Symbol('registry')
 const DOM_HELPER = Symbol('dom-helper')
@@ -41,7 +41,7 @@ class Toolkit {
     const root = this[REGISTRY].getRootDom()
     const { left: rLeft, top: rTop } = root.getBoundingClientRect()
     const { left, top, width, height } = node.getBoundingClientRect()
-    return new Rectangle(
+    return rectangle(
       left - rLeft,
       top - rTop,
       width,

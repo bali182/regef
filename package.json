@@ -22,7 +22,8 @@
   "dependencies": {
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "react-dom": "^16.0.0",
+    "regef-2dmath": "github:bali182/regef-2dmath#master"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
