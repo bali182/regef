@@ -1,5 +1,6 @@
 export const SET_POSITION = 'SET_POSITION'
 export const ADD_CHILD = 'ADD_CHILD'
+export const ADD_CONNECTION = 'ADD_CONNECTION'
 
 export const setPosition = ({ id, x, y }) => ({
   type: SET_POSITION,
@@ -15,5 +16,13 @@ export const addChild = ({ id, childId }) => ({
   payload: {
     id,
     childId,
+  },
+})
+
+export const addConnection = ({ source, target }) => ({
+  type: ADD_CONNECTION,
+  payload: {
+    source,
+    target,
   },
 })

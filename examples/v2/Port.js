@@ -25,10 +25,9 @@ const portStyle = {
   transform: 'translateY(-50%)',
 }
 
-// eslint-disable-next-line react/no-multi-comp
 @connect((state, { id }) => ({ model: state[id] }), { addChild, setPosition })
 @port()
-class ChildNode extends React.Component {
+class Port extends React.Component {
   render() {
     const { regef } = this.props
     return (<div style={portStyle} {...regef.domAttributes}>
@@ -37,4 +36,4 @@ class ChildNode extends React.Component {
   }
 }
 
-export default ChildNode
+export default Port

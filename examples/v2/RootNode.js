@@ -6,6 +6,7 @@ import { addChild, setPosition } from './actions'
 import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
+import Connection from './Connection';
 
 const rootNodeStyle = {
   flexGrow: 1,
@@ -25,7 +26,7 @@ const position = ({ x, y }) => ({
   left: x,
 })
 
-@connect((nodes) => ({ nodes }), { addChild, setPosition })
+@connect(({ nodes }) => ({ nodes }), { addChild, setPosition })
 @root(RootNodeEditPolicy)
 class RootNode extends React.Component {
   constructor() {
@@ -56,11 +57,18 @@ class RootNode extends React.Component {
     return null
   }
 
+  renderConnections() {
+    const { regef: { toolkit } } = this.props
+    // const children = toolkit.getChildren(this)
+    return <Connection x1={0} y1={100} x2={100} y2={110} />
+  }
+
   render() {
     const { regef } = this.props
     return (<div style={rootNodeStyle} {...regef.domAttributes}>
       {this.renderChildren()}
       {this.renderFeedback()}
+      {this.renderConnections()}
     </div>)
   }
 }

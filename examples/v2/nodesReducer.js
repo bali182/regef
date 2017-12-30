@@ -1,7 +1,7 @@
 import { ADD_CHILD, SET_POSITION } from './actions'
 import initialState from './initialState'
 
-const nodesReducer = (state = initialState, { type, payload }) => {
+const nodesReducer = (state = initialState.nodes, { type, payload }) => {
   switch (type) {
     case ADD_CHILD: {
       const { id, childId } = payload

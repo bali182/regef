@@ -1,4 +1,4 @@
-import { NODE_TYPE, PORT_TYPE, ROOT_TYPE } from './constants'
+import { NODE_TYPE, PORT_TYPE, ROOT_TYPE, CONNECTION_TYPE } from './constants'
 import createDecorator from './createDecorator'
 
 /* eslint-disable no-param-reassign */
@@ -41,4 +41,10 @@ export const root = createDecorator({
   type: ROOT_TYPE,
   activate: rootActivate,
   deactivate: rootDeactivate,
+})
+
+export const connection = createDecorator({
+  type: CONNECTION_TYPE,
+  activate: defaultActivate,
+  deactivate: defaultDecativate,
 })

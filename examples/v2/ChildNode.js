@@ -51,7 +51,7 @@ const portContainer = {
 }
 
 // eslint-disable-next-line react/no-multi-comp
-@connect((state, { id }) => ({ model: state[id] }), { addChild, setPosition })
+@connect(({ nodes }, { id }) => ({ model: nodes[id] }), { addChild, setPosition })
 @node(compose(ChildNodeEditPolicy))
 class ChildNode extends React.Component {
   constructor() {
