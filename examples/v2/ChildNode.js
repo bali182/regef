@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { node } from '../../src'
+import { node, compose } from '../../src'
 
 import renderNode from './renderNode'
 import ChildNodeEditPolicy from './ChildNodeEditPolicy'
@@ -52,7 +52,7 @@ const portContainer = {
 
 // eslint-disable-next-line react/no-multi-comp
 @connect((state, { id }) => ({ model: state[id] }), { addChild, setPosition })
-@node(ChildNodeEditPolicy)
+@node(compose(ChildNodeEditPolicy))
 class ChildNode extends React.Component {
   constructor() {
     super()
@@ -79,7 +79,7 @@ class ChildNode extends React.Component {
       ? withChildrenStyle
       : noChildrenStyle
     const fullStyle = { ...baseStyle, ...style, backgroundColor: model.color }
-    return (<div style={fullStyle} {...regef}>
+    return (<div style={fullStyle} {...regef.domAttributes}>
       <div style={portContainer}>
         {id} {model.children.map(renderNode)} {this.renderFeedback()}
         <Port />

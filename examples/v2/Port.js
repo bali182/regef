@@ -31,7 +31,7 @@ const portStyle = {
 class ChildNode extends React.Component {
   render() {
     const { regef } = this.props
-    return (<div style={portStyle} {...regef}>
+    return (<div style={portStyle} {...regef.domAttributes}>
       +
     </div>)
   }

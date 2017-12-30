@@ -4,18 +4,14 @@ import createDecorator from './createDecorator'
 /* eslint-disable no-param-reassign */
 const defaultActivate = (component) => {
   component.registry.register(component.id, component)
-  component.policies.forEach((policy) => {
-    policy.component = component.childRef
-    policy.toolkit = component.toolkit
-  })
+  component.policy.component = component.childRef
+  component.policy.toolkit = component.toolkit
 }
 
 const defaultDecativate = (component) => {
   component.registry.unregister(component.id)
-  component.policies.forEach((policy) => {
-    policy.component = null
-    policy.toolkit = null
-  })
+  component.policy.component = null
+  component.policy.toolkit = null
 }
 /* eslint-enable no-param-reassign */
 

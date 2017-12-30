@@ -58,7 +58,7 @@ class RootNode extends React.Component {
 
   render() {
     const { regef } = this.props
-    return (<div style={rootNodeStyle} {...regef}>
+    return (<div style={rootNodeStyle} {...regef.domAttributes}>
       {this.renderChildren()}
       {this.renderFeedback()}
     </div>)
