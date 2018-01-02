@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { DATA_ID } from './constants'
 import bind from './bind'
 import EditPolicy from './EditPolicy'
 
@@ -12,27 +11,17 @@ const createDecorator = ({ type, activate, deactivate }) =>
       class DecoratedComponent extends React.Component {
         constructor(props, context) {
           super(props, context)
-          const { registry, idGenerator, toolkit } = context.regef
+          const { registry, toolkit } = context.regef
           this.registry = registry
           this.toolkit = toolkit
           this.policy = new Policy()
-          this.id = idGenerator.next()
-          this.childRef = null
+          this.userComponent = null
           this.type = type
-          this.childProps = {
-            toolkit,
-            domAttributes: {
-              [DATA_ID]: this.id,
-            },
-          }
+          this.childProps = { toolkit }
         }
 
-        getUserComponent() {
-          return this.childRef
-        }
-
-        @bind saveChildRef(ref) {
-          this.childRef = ref
+        @bind setUserComponent(ref) {
+          this.userComponent = ref
         }
 
         componentDidMount() {
@@ -62,7 +51,7 @@ const createDecorator = ({ type, activate, deactivate }) =>
         render() {
           const { children, ...rest } = this.props
           const regefProps = mergeProps(this.childProps)
-          return (<Wrapped {...rest} ref={this.saveChildRef} {...regefProps}>
+          return (<Wrapped {...rest} ref={this.setUserComponent} {...regefProps}>
             {children}
           </Wrapped>)
         }

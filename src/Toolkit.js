@@ -1,5 +1,4 @@
 import { rectangle } from 'regef-2dmath'
-import { findDOMNode } from 'react-dom'
 import DomHelper from './DomHelper'
 
 const REGISTRY = Symbol('registry')
@@ -12,35 +11,52 @@ class Toolkit {
   }
 
   getRoot() {
-    return this[REGISTRY].getRoot().getUserComponent()
+    const root = this[REGISTRY].getRoot()
+    if (root === undefined || root === null) {
+      throw new Error('No root component!')
+    }
+    return this[REGISTRY].getRoot().component.userComponent
   }
 
   getParent(component) {
     const domHelper = this[DOM_HELPER]
     const registry = this[REGISTRY]
-    const node = findDOMNode(component)
-    if (node === null || node === registry.getRootDom()) {
+    const wrapper = registry.get(component)
+    if (wrapper === undefined || wrapper === null) {
+      throw new Error('Given component is not part of the diagram!')
+    } else if (wrapper === registry.getRoot()) {
       return null
     }
-    const parent = domHelper.findComponent(domHelper.findClosestElement(node, null))
-    return parent === null ? null : parent.getUserComponent()
+    const parent = domHelper.findClosest(wrapper.dom, null)
+    return parent === null ? null : parent.userComponent
   }
 
   getChildren(component) {
-    const node = findDOMNode(component)
+    const registry = this[REGISTRY]
     const domHelper = this[DOM_HELPER]
-    if (node === null) {
-      return []
+    const wrapper = registry.get(component)
+    if (wrapper === undefined || wrapper === null) {
+      throw new Error('Given component is not part of the diagram!')
     }
-    return domHelper.findRelevantChildren(node)
-      .map((childNode) => domHelper.findComponent(childNode).getUserComponent())
+    const domChildren = domHelper.findRelevantChildren(wrapper.dom)
+    const children = []
+    for (let i = 0, length = domChildren.length; i < length; i += 1) {
+      const child = registry.get(domChildren[i])
+      if (child !== undefined && child !== null) {
+        children.push(child)
+      }
+    }
+    return children
   }
 
   getBounds(component) {
-    const node = findDOMNode(component)
-    const root = this[REGISTRY].getRootDom()
-    const { left: rLeft, top: rTop } = root.getBoundingClientRect()
-    const { left, top, width, height } = node.getBoundingClientRect()
+    const registry = this[REGISTRY]
+    const wrapper = registry.get(component)
+    if (wrapper === undefined || wrapper === null) {
+      throw new Error('Given component is not part of the diagram!')
+    }
+    const { left: rLeft, top: rTop } = registry.getRoot().dom.getBoundingClientRect()
+    const { left, top, width, height } = wrapper.dom.getBoundingClientRect()
     return rectangle(
       left - rLeft,
       top - rTop,

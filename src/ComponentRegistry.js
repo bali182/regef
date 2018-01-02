@@ -1,31 +1,40 @@
-import { findDOMNode } from 'react-dom'
+import ComponentWrapper from './ComponentWrapper'
 
 class ComponentRegistry {
   constructor() {
-    this.components = {}
+    this.mapping = new Map()
     this.root = null
   }
-  setRoot(diagram) {
-    this.root = diagram
-    this.rootDom = findDOMNode(this.root)
+  setRoot(root) {
+    this.root = root
+    if (root === null || root === undefined) {
+      this.mapping.clear()
+    }
   }
   getRoot() {
     return this.root
   }
-  getRootDom() {
-    return this.rootDom
+  register(wrapper) {
+    if (!(wrapper instanceof ComponentWrapper)) {
+      throw new TypeError(`ComponentWrapper instance expected, got ${wrapper}`)
+    }
+    this.mapping.set(wrapper.dom, wrapper)
+    this.mapping.set(wrapper.component, wrapper)
+    this.mapping.set(wrapper.userComponent, wrapper)
   }
-  register(id, component) {
-    this.components[id] = component
+  unregister(input) {
+    const wrapper = this.get(input)
+    if (wrapper !== undefined) {
+      this.mapping.delete(wrapper.dom)
+      this.mapping.delete(wrapper.component)
+      this.mapping.delete(wrapper.userComponent)
+    }
   }
-  unregister(id) {
-    delete this.components[id]
+  get(input) {
+    return this.mapping.get(input)
   }
-  get(id) {
-    return this.components[id] || null
-  }
-  has(id) {
-    return Boolean(this.components[id])
+  has(input) {
+    return this.mapping.has(input)
   }
 }
 export default ComponentRegistry

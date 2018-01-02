@@ -1,8 +1,6 @@
 import React, { Children } from 'react'
 
-import IdGenerator from './IdGenerator'
 import ComponentRegistry from './ComponentRegistry'
-import ReadonlyComponentRegistry from './ReadonlyComponentRegistry'
 import Toolkit from './Toolkit'
 import bind from './bind'
 
@@ -10,8 +8,7 @@ class Diagram extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.registry = new ComponentRegistry()
-    this.toolkit = new Toolkit(new ReadonlyComponentRegistry(this.registry))
-    this.idGenerator = new IdGenerator()
+    this.toolkit = new Toolkit(this.registry)
   }
 
   componentDidMount() {

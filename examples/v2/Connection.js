@@ -37,10 +37,9 @@ class Connection extends React.Component {
   }
 
   render() {
-    const { regef } = this.props
     const style = this.calculateStyles()
     const coordinates = this.calculateCoordinates()
-    return (<svg style={style} shapeRendering="geometricPrecision" {...regef.domAttributes}>
+    return (<svg style={style} shapeRendering="geometricPrecision">
       <defs>
         <marker id="arrow" markerWidth={10} markerHeight={10} refX={9} refY={3} orient="auto" markerUnits="strokeWidth">
           <path d="M0,0 L0,6 L9,3 z" fill="#000" />

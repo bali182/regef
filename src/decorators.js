@@ -1,28 +1,29 @@
 import { NODE_TYPE, PORT_TYPE, ROOT_TYPE, CONNECTION_TYPE } from './constants'
 import createDecorator from './createDecorator'
+import { fromComponent } from './ComponentWrapper'
 
 /* eslint-disable no-param-reassign */
 const defaultActivate = (component) => {
-  component.registry.register(component.id, component)
-  component.policy.component = component.childRef
+  const wrapper = fromComponent(component)
+  component.registry.register(wrapper)
+  component.policy.component = component.userComponent
   component.policy.toolkit = component.toolkit
 }
 
 const defaultDecativate = (component) => {
-  component.registry.unregister(component.id)
+  component.registry.unregister(component)
   component.policy.component = null
   component.policy.toolkit = null
 }
-/* eslint-enable no-param-reassign */
 
 const rootActivate = (component) => {
-  component.registry.setRoot(component)
   defaultActivate(component)
+  component.registry.setRoot(component.registry.get(component))
 }
 
 const rootDeactivate = (component) => {
-  component.registry.setRoot(null)
   defaultDecativate(component)
+  component.registry.setRoot(null)
 }
 
 export const node = createDecorator({

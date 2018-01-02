@@ -1,31 +1,33 @@
 import { findDOMNode } from 'react-dom'
 
+const DOM = Symbol('DOM')
+const COMPONENT = Symbol('COMPONENT')
+const USER_COMPONENT = Symbol('USER_COMPONENT')
+
 class ComponentWrapper {
-  constructor(registry, domHelper) {
-    this.registry = registry
-    this.domHelper = domHelper
-    this.component = null
-    this.dom = null
+  constructor(dom, component, userComponent) {
+    this[DOM] = dom
+    this[COMPONENT] = component
+    this[USER_COMPONENT] = userComponent
   }
 
-  reset() {
-    this.dom = null
-    this.component = null
+  get dom() {
+    return this[DOM]
   }
 
-  setComponent(component) {
-    this.component = component
-    // No way of knowing if the dom element was re-created, so no point of equality check.
-    this.dom = findDOMNode(component)
+  get component() {
+    return this[COMPONENT]
   }
 
-  setDom(dom) {
-    if (dom !== this.dom) {
-      this.dom = dom
-      this.component = this.domHelper.findComponent(dom)
-    }
-    return this
+  get userComponent() {
+    return this[USER_COMPONENT]
   }
 }
+
+export const fromComponent = (component) => new ComponentWrapper(
+  findDOMNode(component),
+  component,
+  component.userComponent,
+)
 
 export default ComponentWrapper

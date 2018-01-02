@@ -1,14 +1,13 @@
 import DragTracker from './DragTracker'
-import ComponentWrapper from './ComponentWrapper'
 import DomHelper from './DomHelper'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE } from './constants'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
 export const buildDeltas = ({ clientX, clientY }, element) => {
-  const { top, left } = element.getBoundingClientRect()
-  const deltaX = clientX - left
-  const deltaY = clientY - top
+  const { x, y } = element.getBoundingClientRect()
+  const deltaX = clientX - x
+  const deltaY = clientY - y
   return {
     deltaX,
     deltaY,
@@ -24,46 +23,46 @@ class NodeDragTracker extends DragTracker {
   constructor(registry) {
     super(registry)
     this.domHelper = new DomHelper(registry)
-    this.target = new ComponentWrapper(registry, this.domHelper)
-    this.lastTargetParent = new ComponentWrapper(registry, this.domHelper)
-    this.targetParent = new ComponentWrapper(registry, this.domHelper)
-    this.currentParent = new ComponentWrapper(registry, this.domHelper)
+    this.target = null
+    this.lastTargetParent = null
+    this.targetParent = null
+    this.currentParent = null
     this.coordinates = null
     this.eventDeltas = null
     this.lastRequest = null
   }
 
-  findTargetedParent(e) {
+  findTargetedParent(eventTarget) {
     const { domHelper, target, currentParent } = this
-    const eventDom = domHelper.findClosestElement(e.target, ACCEPTED_TYPES)
-    if (eventDom === null || eventDom === target.dom || target.dom.contains(eventDom)) {
-      return currentParent.dom
+    const newTarget = domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom)) {
+      return currentParent
     }
-    return eventDom
+    return newTarget
   }
 
   updateCoordinates(e) {
     const { x: deltaX, y: deltaY } = buildCoordinates(e, this.eventDeltas)
-    const { top, left } = this.targetParent.dom.getBoundingClientRect()
+    const { x, y } = this.targetParent.dom.getBoundingClientRect()
     const { width, height } = this.target.dom.getBoundingClientRect()
     this.coordinates = {
       deltaX,
       deltaY,
-      componentX: deltaX - left,
-      componentY: deltaY - top,
+      componentX: deltaX - x,
+      componentY: deltaY - y,
       componentWidth: width,
       componentHeight: height,
     }
   }
 
   updateParents(e) {
-    const newTargetParentDom = this.findTargetedParent(e)
-    const targetParentDom = this.targetParent.dom
-    if (targetParentDom !== newTargetParentDom) {
-      this.lastTargetParent.setDom(targetParentDom)
-      this.targetParent.setDom(newTargetParentDom)
+    const newTargetParent = this.findTargetedParent(e.target)
+    const targetParent = this.targetParent
+    if (targetParent !== newTargetParent) {
+      this.lastTargetParent = targetParent
+      this.targetParent = newTargetParent
     } else {
-      this.lastTargetParent.setDom(targetParentDom)
+      this.lastTargetParent = targetParent
     }
   }
 
@@ -72,9 +71,9 @@ class NodeDragTracker extends DragTracker {
     return {
       [COMMAND_TARGET]: currentParent.component,
       type: MOVE_CHILD,
-      component: target.component.getUserComponent(),
+      component: target.component.userComponent,
       componentDOM: target.dom,
-      container: currentParent.component.getUserComponent(),
+      container: currentParent.component.userComponent,
       containerDOM: currentParent.dom,
       ...coordinates,
     }
@@ -85,11 +84,11 @@ class NodeDragTracker extends DragTracker {
     return {
       [COMMAND_TARGET]: targetParent.component,
       type: ADD_CHILD,
-      component: target.component.getUserComponent(),
+      component: target.component.userComponent,
       componentDOM: target.dom,
-      targetContainer: targetParent.component.getUserComponent(),
+      targetContainer: targetParent.component.userComponent,
       targetContainerDOM: targetParent.dom,
-      container: currentParent.component.getUserComponent(),
+      container: currentParent.component.userComponent,
       containerDOM: currentParent.dom,
       ...coordinates,
     }
@@ -110,11 +109,11 @@ class NodeDragTracker extends DragTracker {
   }
 
   isMoveChild() {
-    return this.currentParent.dom === this.targetParent.dom
+    return this.currentParent === this.targetParent
   }
 
   isAddChild() {
-    return this.currentParent.dom !== this.targetParent.dom
+    return this.currentParent !== this.targetParent
   }
 
   buildDragRequest(e) {
@@ -125,7 +124,7 @@ class NodeDragTracker extends DragTracker {
     this.updateParents(e)
     this.updateCoordinates(e)
 
-    if (this.target.dom === this.registry.getRootDom()) {
+    if (this.target === this.registry.getRoot()) {
       // TODO pan or selection
     } else if (this.isMoveChild(e)) {
       return this.getMoveChildRequest()
@@ -145,9 +144,9 @@ class NodeDragTracker extends DragTracker {
       this.lastRequest = null
       this.eventDeltas = null
       this.coordinates = null
-      this.targetParent.reset()
-      this.target.reset()
-      this.currentParent.reset()
+      this.targetParent = null
+      this.target = null
+      this.currentParent = null
     }
   }
 
@@ -155,12 +154,10 @@ class NodeDragTracker extends DragTracker {
     if (!this.domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.domHelper.findClosestElement(e.target, ACCEPTED_TYPES)
-    if (target !== null) {
-      const parent = this.domHelper.findClosestElement(target.parentNode, ACCEPTED_TYPES)
-        || this.registry.getRootDom()
-      this.target.setDom(target)
-      this.currentParent.setDom(parent)
+    this.target = this.domHelper.findClosest(e.target, ACCEPTED_TYPES)
+    if (this.target !== null) {
+      const parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
+      this.currentParent = parent || this.registry.getRoot()
       this.eventDeltas = buildDeltas(e, this.target.dom)
       this.progress = true
     }

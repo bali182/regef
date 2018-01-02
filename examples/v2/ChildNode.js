@@ -74,12 +74,12 @@ class ChildNode extends React.Component {
   }
 
   render() {
-    const { model, regef, id, style } = this.props
+    const { model, id, style } = this.props
     const baseStyle = model.children.length > 0 || this.state.feedback
       ? withChildrenStyle
       : noChildrenStyle
     const fullStyle = { ...baseStyle, ...style, backgroundColor: model.color }
-    return (<div style={fullStyle} {...regef.domAttributes}>
+    return (<div style={fullStyle}>
       <div style={portContainer}>
         {id} {model.children.map(renderNode)} {this.renderFeedback()}
         <Port />

@@ -6,7 +6,7 @@ import { addChild, setPosition } from './actions'
 import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
-import Connection from './Connection';
+import Connection from './Connection'
 
 const rootNodeStyle = {
   flexGrow: 1,
@@ -33,6 +33,7 @@ class RootNode extends React.Component {
     super()
     this.state = {
       feedback: null,
+      connections: null,
     }
   }
 
@@ -58,14 +59,19 @@ class RootNode extends React.Component {
   }
 
   renderConnections() {
-    const { regef: { toolkit } } = this.props
-    // const children = toolkit.getChildren(this)
     return <Connection x1={0} y1={100} x2={100} y2={110} />
   }
 
+  componentDidUpdate() {
+    const { regef: { toolkit } } = this.props
+    // eslint-disable-next-line react/no-did-update-set-state
+    const children = toolkit.getChildren(this)
+    console.log(children)
+    // this.setState({})
+  }
+
   render() {
-    const { regef } = this.props
-    return (<div style={rootNodeStyle} {...regef.domAttributes}>
+    return (<div style={rootNodeStyle}>
       {this.renderChildren()}
       {this.renderFeedback()}
       {this.renderConnections()}
