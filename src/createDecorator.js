@@ -2,8 +2,12 @@ import React from 'react'
 
 import bind from './bind'
 import EditPolicy from './EditPolicy'
+import { watchRegister } from './watchers'
 
 const defaultMergeProps = (regef) => ({ regef })
+
+const toolkitResolver = (component, registry, toolkit) => () =>
+  watchRegister(registry, component).then(() => toolkit)
 
 const createDecorator = ({ type, activate, deactivate }) =>
   (Policy = EditPolicy, mergeProps = defaultMergeProps) =>
@@ -17,7 +21,7 @@ const createDecorator = ({ type, activate, deactivate }) =>
           this.policy = new Policy()
           this.userComponent = null
           this.type = type
-          this.childProps = { toolkit }
+          this.childProps = { toolkit: toolkitResolver(this, registry, toolkit) }
         }
 
         @bind setUserComponent(ref) {

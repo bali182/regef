@@ -62,12 +62,19 @@ class RootNode extends React.Component {
     return <Connection x1={0} y1={100} x2={100} y2={110} />
   }
 
+  componentDidMount() {
+    const { regef: { toolkit } } = this.props
+    toolkit().then((kit) => {
+      console.log('mount', kit.nodes().map((node) => kit.bounds(node)))
+    })
+  }
+
   componentDidUpdate() {
     const { regef: { toolkit } } = this.props
-    // eslint-disable-next-line react/no-did-update-set-state
-    const children = toolkit.getChildren(this)
-    console.log(children)
-    // this.setState({})
+    toolkit().then((kit) => {
+      console.log(kit)
+      console.log('update', kit.nodes().map((node) => kit.bounds(node)))
+    }).catch((e) => console.error(e))
   }
 
   render() {

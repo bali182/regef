@@ -1,5 +1,6 @@
 import { rectangle } from 'regef-2dmath'
 import DomHelper from './DomHelper'
+import { NODE_TYPE, PORT_TYPE, CONNECTION_TYPE } from './constants'
 
 const REGISTRY = Symbol('registry')
 const DOM_HELPER = Symbol('dom-helper')
@@ -10,7 +11,7 @@ class Toolkit {
     this[DOM_HELPER] = new DomHelper(registry)
   }
 
-  getRoot() {
+  root() {
     const root = this[REGISTRY].getRoot()
     if (root === undefined || root === null) {
       throw new Error('No root component!')
@@ -18,7 +19,7 @@ class Toolkit {
     return this[REGISTRY].getRoot().component.userComponent
   }
 
-  getParent(component) {
+  parent(component) {
     const domHelper = this[DOM_HELPER]
     const registry = this[REGISTRY]
     const wrapper = registry.get(component)
@@ -31,7 +32,7 @@ class Toolkit {
     return parent === null ? null : parent.userComponent
   }
 
-  getChildren(component) {
+  children(component) {
     const registry = this[REGISTRY]
     const domHelper = this[DOM_HELPER]
     const wrapper = registry.get(component)
@@ -49,7 +50,31 @@ class Toolkit {
     return children
   }
 
-  getBounds(component) {
+  ofType(type) {
+    const all = this[REGISTRY].all()
+    const ofType = []
+    for (let i = 0, length = all.length; i < length; i += 1) {
+      const wrapper = all[i]
+      if (wrapper.component.type === type) {
+        ofType.push(wrapper.userComponent)
+      }
+    }
+    return ofType
+  }
+
+  nodes() {
+    return this.ofType(NODE_TYPE)
+  }
+
+  ports() {
+    return this.ofType(PORT_TYPE)
+  }
+
+  connections() {
+    return this.ofType(CONNECTION_TYPE)
+  }
+
+  bounds(component) {
     const registry = this[REGISTRY]
     const wrapper = registry.get(component)
     if (wrapper === undefined || wrapper === null) {
