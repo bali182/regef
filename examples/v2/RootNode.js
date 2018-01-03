@@ -26,7 +26,7 @@ const position = ({ x, y }) => ({
   left: x,
 })
 
-@connect(({ nodes }) => ({ nodes }), { addChild, setPosition })
+@connect(({ nodes, connections }) => ({ nodes, connections }), { addChild, setPosition })
 @root(RootNodeEditPolicy)
 class RootNode extends React.Component {
   constructor() {
@@ -59,29 +59,58 @@ class RootNode extends React.Component {
   }
 
   renderConnections() {
-    return <Connection x1={0} y1={100} x2={100} y2={110} />
+    if (this.state.connections !== null) {
+      return this.state.connections
+        .map(({ x1, y1, x2, y2, key }) => (<Connection
+          key={key}
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+        />))
+    }
+    return null
+  }
+
+  buildConnectionsRepresentation() {
+    this.props.regef.toolkit().then((toolkit) => {
+      const nodes = toolkit.nodes()
+      const connections = this.props.connections.map(({ source, target }) => {
+        const sourceNode = nodes.find(({ props: { id } }) => id === source)
+        const targetNode = nodes.find(({ props: { id } }) => id === target)
+        if (sourceNode === undefined || targetNode === undefined) {
+          throw new Error(`source or target undefined ${source} ${target}`)
+        }
+        return {
+          source: toolkit.bounds(sourceNode),
+          target: toolkit.bounds(targetNode),
+          key: `${source}-${target}`,
+        }
+      }).map(({ source, target, key }) => {
+        // TODO better arrow display
+        const centerToCenter = source.center().lineSegmentTo(target.center())
+        const { x1, y1, x2, y2 } = centerToCenter
+        return { x1, y1, x2, y2, key }
+      })
+      this.setState({ connections })
+    }).catch((e) => console.error(e))
   }
 
   componentDidMount() {
-    const { regef: { toolkit } } = this.props
-    toolkit().then((kit) => {
-      console.log('mount', kit.nodes().map((node) => kit.bounds(node)))
-    })
+    this.buildConnectionsRepresentation()
   }
 
-  componentDidUpdate() {
-    const { regef: { toolkit } } = this.props
-    toolkit().then((kit) => {
-      console.log(kit)
-      console.log('update', kit.nodes().map((node) => kit.bounds(node)))
-    }).catch((e) => console.error(e))
+  componentDidUpdate(prevProps) {
+    if (!Object.is(prevProps, this.props)) {
+      this.buildConnectionsRepresentation()
+    }
   }
 
   render() {
     return (<div style={rootNodeStyle}>
+      {this.renderConnections()}
       {this.renderChildren()}
       {this.renderFeedback()}
-      {this.renderConnections()}
     </div>)
   }
 }

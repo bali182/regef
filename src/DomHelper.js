@@ -6,9 +6,9 @@ class DomHelper {
   findClosest(dom, type = null) {
     const root = this.registry.getRoot().dom
     for (let it = dom; it !== null; it = it.parentNode) {
-      const component = this.registry.get(it)
-      if (component !== undefined && component !== null) {
-        return this.matchesType(component.component, type) ? component : null
+      const wrapper = this.registry.get(it)
+      if (wrapper !== undefined && wrapper !== null) {
+        return this.matchesType(wrapper.component, type) ? wrapper : null
       }
       if (it === root) {
         return null

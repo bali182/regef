@@ -1,5 +1,4 @@
 import DragTracker from './DragTracker'
-import LazyComponentWrapper from './ComponentWrapper'
 import DomHelper from './DomHelper'
 import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 
@@ -7,8 +6,8 @@ class ConnectDragTracker extends DragTracker {
   constructor(registry) {
     super(registry)
     this.domHelper = new DomHelper(registry)
-    this.source = new LazyComponentWrapper(this.domHelper)
-    this.target = new LazyComponentWrapper(this.domHelper)
+    this.source = null
+    this.target = null
     this.coordinates = null
     this.lastRequest = null
   }
@@ -56,7 +55,7 @@ class ConnectDragTracker extends DragTracker {
       return null
     }
 
-    this.target.dom = this.domHelper.findClosest(e.target)
+    this.target = this.domHelper.findClosest(e.target)
     this.coordinates = this.buildCoordinates(e)
     return this.getEndConnectionRequest()
   }
@@ -67,7 +66,7 @@ class ConnectDragTracker extends DragTracker {
     }
     const source = this.domHelper.findClosest(e.target, PORT_TYPE)
     if (source !== null) {
-      this.source.dom = source
+      this.source = source
       this.coordinates = this.buildCoordinates(e)
       return this.getStartConnectionRequest()
     }
