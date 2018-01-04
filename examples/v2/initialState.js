@@ -13,14 +13,14 @@ const initial = {
     },
     a: {
       color: 'green',
-      x: 300,
+      x: 220,
       y: 100,
       children: [],
     },
     b: {
       color: 'blue',
       x: 50,
-      y: 50,
+      y: 70,
       children: [],
     },
     c: {
@@ -31,14 +31,14 @@ const initial = {
     },
     d: {
       color: 'coral',
-      x: 100,
-      y: 100,
+      x: 10,
+      y: 150,
       children: [],
     },
     e: {
       color: 'cyan',
       x: 200,
-      y: 70,
+      y: 30,
       children: [],
     },
   },

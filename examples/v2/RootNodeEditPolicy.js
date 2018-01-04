@@ -1,4 +1,4 @@
-import { DispatchingEditPolicy } from '../../src'
+import { DispatchingEditPolicy } from '../../src/index'
 
 class RootNodeEditPolict extends DispatchingEditPolicy {
   isValidChild(component) {
@@ -30,12 +30,24 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     this.requestAddOrMoveFeedback(request)
   }
 
+  requestEndConnectionFeedback(request) {
+    const sourceLocation = this.toolkit.bounds(this.toolkit.parent(request.source)).center()
+    const targetLocation = request.location
+    const connectionFeedback = sourceLocation.lineSegmentTo(targetLocation)
+    this.component.setState({ connectionFeedback })
+  }
+
   eraseMoveChildFeedback(request) {
     this.eraseAddOrMoveFeedback(request)
   }
 
   eraseAddChildFeedback(request) {
     this.eraseAddOrMoveFeedback(request)
+  }
+
+
+  eraseEndConnectionFeedback() {
+    this.component.setState({ connectionFeedback: null })
   }
 
   addChild({ component, componentX, componentY }) {

@@ -28,7 +28,7 @@ class Toolkit {
     } else if (wrapper === registry.getRoot()) {
       return null
     }
-    const parent = domHelper.findClosest(wrapper.dom, null)
+    const parent = domHelper.findClosest(wrapper.dom.parentNode, null)
     return parent === null ? null : parent.userComponent
   }
 
@@ -48,6 +48,15 @@ class Toolkit {
       }
     }
     return children
+  }
+
+  editPolicy(component) {
+    const registry = this[REGISTRY]
+    const wrapper = registry.get(component)
+    if (wrapper === undefined || wrapper === null) {
+      throw new Error('Given component is not part of the diagram!')
+    }
+    return wrapper.component.editPolicy
   }
 
   ofType(type) {

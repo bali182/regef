@@ -1,4 +1,4 @@
-import { DispatchingEditPolicy } from '../../src/'
+import { DispatchingEditPolicy } from '../../src/index'
 
 class ChildNodeEditPolicy extends DispatchingEditPolicy {
   isValidChild(component) {
@@ -13,6 +13,15 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     }
   }
 
+  endConnection({ source, target }) {
+    const sourceId = this.toolkit.parent(source).props.id
+    const targetId = target.props.id
+    this.toolkit.root().props.addConnection({
+      source: sourceId,
+      target: targetId,
+    })
+  }
+
   requestAddChildFeedback({ componentWidth, componentHeight }) {
     this.component.setState({
       feedback: {
@@ -22,10 +31,21 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     })
   }
 
+  requestEndConnectionFeedback(request) {
+    const sourceLocation = this.toolkit.bounds(this.toolkit.parent(request.source)).center()
+    const targetLocation = this.toolkit.bounds(request.target).center()
+    const connectionFeedback = sourceLocation.lineSegmentTo(targetLocation)
+    this.toolkit.root().setState({ connectionFeedback })
+  }
+
   eraseAddChildFeedback() {
     this.component.setState({
       feedback: null,
     })
+  }
+
+  eraseEndConnectionFeedback() {
+    this.toolkit.root().setState({ connectionFeedback: null })
   }
 }
 

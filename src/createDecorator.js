@@ -18,7 +18,7 @@ const createDecorator = ({ type, activate, deactivate }) =>
           const { registry, toolkit } = context.regef
           this.registry = registry
           this.toolkit = toolkit
-          this.policy = new Policy()
+          this.editPolicy = new Policy()
           this.userComponent = null
           this.type = type
           this.childProps = { toolkit: toolkitResolver(this, registry, toolkit) }
@@ -36,20 +36,16 @@ const createDecorator = ({ type, activate, deactivate }) =>
           deactivate(this)
         }
 
-        getEditPolicy() {
-          return this.policy
-        }
-
         getCommand(request) {
-          return this.policy.getCommand(request)
+          return this.editPolicy.getCommand(request)
         }
 
         requestFeedback(request) {
-          return this.policy.requestFeedback(request)
+          return this.editPolicy.requestFeedback(request)
         }
 
         eraseFeedback(request) {
-          return this.policy.eraseFeedback(request)
+          return this.editPolicy.eraseFeedback(request)
         }
 
         render() {

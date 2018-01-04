@@ -1,3 +1,4 @@
+import { point } from 'regef-2dmath'
 import DragTracker from './DragTracker'
 import DomHelper from './DomHelper'
 import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
@@ -26,7 +27,7 @@ class ConnectDragTracker extends DragTracker {
       type: START_CONNECTION,
       source: this.source.component.userComponent,
       sourceDOM: this.source.dom,
-      ...this.coordinates,
+      location: point(this.coordinates),
     }
   }
 
@@ -39,7 +40,7 @@ class ConnectDragTracker extends DragTracker {
       sourceDOM: this.source.dom,
       target: this.target.component.userComponent,
       targetDOM: this.target.dom,
-      ...this.coordinates,
+      location: point(this.coordinates),
     }
   }
 

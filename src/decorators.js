@@ -6,14 +6,14 @@ import { fromComponent } from './ComponentWrapper'
 const defaultActivate = (component) => {
   const wrapper = fromComponent(component)
   component.registry.register(wrapper)
-  component.policy.component = component.userComponent
-  component.policy.toolkit = component.toolkit
+  component.editPolicy.component = component.userComponent
+  component.editPolicy.toolkit = component.toolkit
 }
 
 const defaultDecativate = (component) => {
   component.registry.unregister(component)
-  component.policy.component = null
-  component.policy.toolkit = null
+  component.editPolicy.component = null
+  component.editPolicy.toolkit = null
 }
 
 const rootActivate = (component) => {

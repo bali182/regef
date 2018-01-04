@@ -29,6 +29,7 @@ class Connection extends React.Component {
     const { x1, x2, y1, y2 } = this.props
     return {
       position: 'absolute',
+      pointerEvents: 'none',
       width: this.calculateWidth() + 5,
       height: this.calculateHeight() + 5,
       top: Math.min(y1, y2) - 2.5,

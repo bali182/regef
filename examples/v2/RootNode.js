@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { root } from '../../src'
-import { addChild, setPosition } from './actions'
+import { addChild, setPosition, addConnection } from './actions'
 import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
@@ -26,13 +26,17 @@ const position = ({ x, y }) => ({
   left: x,
 })
 
-@connect(({ nodes, connections }) => ({ nodes, connections }), { addChild, setPosition })
+const stateToProps = ({ nodes, connections }) => ({ nodes, connections })
+const boundActions = { addChild, setPosition, addConnection }
+
+@connect(stateToProps, boundActions)
 @root(RootNodeEditPolicy)
 class RootNode extends React.Component {
   constructor() {
     super()
     this.state = {
       feedback: null,
+      connectionFeedback: null,
       connections: null,
     }
   }
@@ -54,6 +58,14 @@ class RootNode extends React.Component {
         width={feedback.width || 50}
         height={feedback.height || 50}
       />)
+    }
+    return null
+  }
+
+  renderConnectionFeedback() {
+    if (this.state.connectionFeedback !== null) {
+      const { x1, y1, x2, y2 } = this.state.connectionFeedback
+      return <Connection x1={x1} y1={y1} x2={x2} y2={y2} />
     }
     return null
   }
@@ -93,7 +105,7 @@ class RootNode extends React.Component {
         return { x1, y1, x2, y2, key }
       })
       this.setState({ connections })
-    }).catch((e) => console.error(e))
+    }).catch((e) => { throw e })
   }
 
   componentDidMount() {
@@ -108,6 +120,7 @@ class RootNode extends React.Component {
 
   render() {
     return (<div style={rootNodeStyle}>
+      {this.renderConnectionFeedback()}
       {this.renderConnections()}
       {this.renderChildren()}
       {this.renderFeedback()}
