@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/bali182/regef#readme",
   "dependencies": {
-    "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "regef-2dmath": "github:bali182/regef-2dmath#master"
@@ -49,7 +48,6 @@
     "redux": "^3.7.2",
     "sloc": "^0.2.0",
     "source-map-loader": "^0.2.3",
-    "typings": "^2.1.1",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2"
   }
