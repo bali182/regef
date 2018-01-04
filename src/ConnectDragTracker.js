@@ -15,8 +15,12 @@ class ConnectDragTracker extends DragTracker {
 
   cancel() {
     if (this.progress) {
-      this.source.reset()
-      this.target.reset()
+      if (this.lastRequest !== null) {
+        this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
+      }
+      this.source = null
+      this.target = null
+      this.progress = false
     }
   }
 
