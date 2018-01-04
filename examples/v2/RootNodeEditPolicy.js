@@ -5,13 +5,14 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     return component && component.props && component.props.id
   }
 
-  requestAddOrMoveFeedback(request) {
+  requestAddOrMoveFeedback({ location: { x, y }, component }) {
+    const { width, height } = this.toolkit.bounds(component)
     this.component.setState({
       feedback: {
-        x: request.componentX,
-        y: request.componentY,
-        width: request.componentWidth,
-        height: request.componentHeight,
+        x,
+        y,
+        width,
+        height,
       },
     })
   }
@@ -50,7 +51,7 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     this.component.setState({ connectionFeedback: null })
   }
 
-  addChild({ component, componentX, componentY }) {
+  addChild({ component, location: { x, y } }) {
     if (this.isValidChild(component)) {
       const receiver = this.component
       receiver.props.addChild({
@@ -58,20 +59,20 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
         childId: component.props.id,
       })
       receiver.props.setPosition({
+        x,
+        y,
         id: component.props.id,
-        x: componentX,
-        y: componentY,
       })
     }
   }
 
-  moveChild({ component, componentX, componentY }) {
+  moveChild({ component, location: { x, y } }) {
     if (this.isValidChild(component)) {
       const receiver = this.component
       receiver.props.setPosition({
+        x,
+        y,
         id: component.props.id,
-        x: componentX,
-        y: componentY,
       })
     }
   }

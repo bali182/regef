@@ -1,3 +1,4 @@
+import { point } from 'regef-2dmath'
 import DragTracker from './DragTracker'
 import DomHelper from './DomHelper'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE } from './constants'
@@ -44,14 +45,11 @@ class NodeDragTracker extends DragTracker {
   updateCoordinates(e) {
     const { x: deltaX, y: deltaY } = buildCoordinates(e, this.eventDeltas)
     const { x, y } = this.targetParent.dom.getBoundingClientRect()
-    const { width, height } = this.target.dom.getBoundingClientRect()
     this.coordinates = {
       deltaX,
       deltaY,
       componentX: deltaX - x,
       componentY: deltaY - y,
-      componentWidth: width,
-      componentHeight: height,
     }
   }
 
@@ -75,7 +73,8 @@ class NodeDragTracker extends DragTracker {
       componentDOM: target.dom,
       container: currentParent.component.userComponent,
       containerDOM: currentParent.dom,
-      ...coordinates,
+      location: point(coordinates.componentX, coordinates.componentY),
+      delta: point(coordinates.deltaX, coordinates.deltaY),
     }
   }
 
@@ -90,7 +89,8 @@ class NodeDragTracker extends DragTracker {
       targetContainerDOM: targetParent.dom,
       container: currentParent.component.userComponent,
       containerDOM: currentParent.dom,
-      ...coordinates,
+      location: point(coordinates.componentX, coordinates.componentY),
+      delta: point(coordinates.deltaX, coordinates.deltaY),
     }
   }
 

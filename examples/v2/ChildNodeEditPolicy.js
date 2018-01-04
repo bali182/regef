@@ -22,11 +22,12 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  requestAddChildFeedback({ componentWidth, componentHeight }) {
+  requestAddChildFeedback({ component }) {
+    const { width, height } = this.toolkit.bounds(component)
     this.component.setState({
       feedback: {
-        width: componentWidth,
-        height: componentHeight,
+        width,
+        height,
       },
     })
   }
