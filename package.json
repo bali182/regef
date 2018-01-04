@@ -19,9 +19,11 @@
     "url": "https://github.com/bali182/regef/issues"
   },
   "homepage": "https://github.com/bali182/regef#readme",
-  "dependencies": {
+  "peerDependencies": {
     "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "react-dom": "^16.0.0"
+  },
+  "dependencies": {
     "regef-2dmath": "github:bali182/regef-2dmath#master"
   },
   "devDependencies": {
@@ -43,6 +45,8 @@
     "extract-text-webpack-plugin": "^3.0.0",
     "html-webpack-plugin": "^2.30.1",
     "jest": "^21.1.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",
     "react-test-renderer": "^16.0.0",
     "redux": "^3.7.2",
