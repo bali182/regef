@@ -1,12 +1,10 @@
 import { point } from 'regef-2dmath'
-import DragTracker from './DragTracker'
-import DomHelper from './DomHelper'
+import BaseDragTracker from './BaseDragTracker'
 import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 
-class ConnectDragTracker extends DragTracker {
-  constructor(registry) {
-    super(registry)
-    this.domHelper = new DomHelper(registry)
+class ConnectDragTracker extends BaseDragTracker {
+  constructor() {
+    super()
     this.source = null
     this.target = null
     this.coordinates = null

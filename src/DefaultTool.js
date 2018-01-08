@@ -1,19 +1,14 @@
 import Tool from './Tool'
-import NodeDragTracker from './NodeDragTracker'
-import ConnectDragTracker from './ConnectDragTracker'
 
 class DefaultTool extends Tool {
-  constructor() {
+  constructor(dragTrackers = []) {
     super()
-    this.dragTrackers = []
+    this.dragTrackers = dragTrackers
   }
 
   setComponentRegistry(registry) {
     super.setComponentRegistry(registry)
-    this.dragTrackers = [
-      new NodeDragTracker(registry),
-      new ConnectDragTracker(registry),
-    ]
+    this.dragTrackers.forEach((tracker) => tracker.setComponentRegistry(registry))
   }
 
   onKeyUp({ key }) {

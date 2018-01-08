@@ -1,19 +1,22 @@
 class DragTracker {
-  constructor(registry) {
-    this.registry = registry
-    this.progress = false
+  setComponentRegistry() {
+    throw new TypeError('not implemented')
   }
 
   cancel() {
+    throw new TypeError('not implemented')
   }
 
-  onMouseDown(/* e */) {
+  onMouseDown() {
+    throw new TypeError('not implemented')
   }
 
-  onMouseMove(/* e */) {
+  onMouseMove() {
+    throw new TypeError('not implemented')
   }
 
-  onMouseUp(/* e */) {
+  onMouseUp() {
+    throw new TypeError('not implemented')
   }
 }
 

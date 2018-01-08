@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { render } from 'react-dom'
 
 import store from './store'
-import { Diagram, DefaultTool } from '../../src'
+import { Diagram, DefaultTool, NodeDragTracker, ConnectDragTracker } from '../../src'
 import RootNode from './RootNode'
 
 const rootStyle = {
@@ -18,10 +18,15 @@ const rootStyle = {
   flexDirection: 'row',
 }
 
+const tool = new DefaultTool([
+  new NodeDragTracker(),
+  new ConnectDragTracker(),
+])
+
 render(
   <Provider store={store}>
     <div style={rootStyle}>
-      <Diagram tool={new DefaultTool()}>
+      <Diagram tool={tool}>
         <RootNode />
       </Diagram>
     </div>

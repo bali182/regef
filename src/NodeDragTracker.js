@@ -1,7 +1,6 @@
 import { point } from 'regef-2dmath'
-import DragTracker from './DragTracker'
-import DomHelper from './DomHelper'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE } from './constants'
+import BaseDragTracker from './BaseDragTracker'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -20,10 +19,9 @@ export const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
   y: clientY - deltaY,
 })
 
-class NodeDragTracker extends DragTracker {
-  constructor(registry) {
-    super(registry)
-    this.domHelper = new DomHelper(registry)
+class NodeDragTracker extends BaseDragTracker {
+  constructor() {
+    super()
     this.target = null
     this.lastTargetParent = null
     this.targetParent = null
