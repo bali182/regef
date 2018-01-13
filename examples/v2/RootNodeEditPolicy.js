@@ -38,6 +38,10 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     this.component.setState({ connectionFeedback })
   }
 
+  requestSelectFeedback({ bounds }) {
+    this.component.setState({ selectionFeedback: bounds })
+  }
+
   eraseMoveChildFeedback(request) {
     this.eraseAddOrMoveFeedback(request)
   }
@@ -49,6 +53,10 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
 
   eraseEndConnectionFeedback() {
     this.component.setState({ connectionFeedback: null })
+  }
+
+  eraseSelectFeedback() {
+    this.component.setState({ selectionFeedback: null })
   }
 
   addChild({ component, location: { x, y } }) {
@@ -75,6 +83,10 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
         id: component.props.id,
       })
     }
+  }
+
+  select({ selection }) {
+    console.log(selection)
   }
 }
 

@@ -7,6 +7,7 @@ import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
 import Connection from './Connection'
+import SelectionFeedbackNode from './SelectionFeedbackNode';
 
 const rootNodeStyle = {
   flexGrow: 1,
@@ -37,6 +38,7 @@ class RootNode extends React.Component {
     this.state = {
       feedback: null,
       connectionFeedback: null,
+      selectionFeedback: null,
       connections: null,
     }
   }
@@ -49,7 +51,7 @@ class RootNode extends React.Component {
     })
   }
 
-  renderFeedback() {
+  renderDragFeedback() {
     const { feedback } = this.state
     if (feedback !== null) {
       return (<FeedbackNode
@@ -80,6 +82,19 @@ class RootNode extends React.Component {
           x2={x2}
           y2={y2}
         />))
+    }
+    return null
+  }
+
+  renderSelectionFeedback() {
+    if (this.state.selectionFeedback !== null) {
+      const { x, y, width, height } = this.state.selectionFeedback
+      return (<SelectionFeedbackNode
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+      />)
     }
     return null
   }
@@ -123,7 +138,8 @@ class RootNode extends React.Component {
       {this.renderConnectionFeedback()}
       {this.renderConnections()}
       {this.renderChildren()}
-      {this.renderFeedback()}
+      {this.renderDragFeedback()}
+      {this.renderSelectionFeedback()}
     </div>)
   }
 }

@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { render } from 'react-dom'
 
 import store from './store'
-import { Diagram, DefaultTool, NodeDragTracker, ConnectDragTracker } from '../../src'
+import { Diagram, DefaultTool, NodeDragTracker, ConnectDragTracker, SingleSelectionDragTracker, MultiSelectionDragTracker } from '../../src'
 import RootNode from './RootNode'
 
 const rootStyle = {
@@ -21,6 +21,8 @@ const rootStyle = {
 const tool = new DefaultTool([
   new NodeDragTracker(),
   new ConnectDragTracker(),
+  new SingleSelectionDragTracker(),
+  new MultiSelectionDragTracker(),
 ])
 
 render(

@@ -29,6 +29,7 @@ class NodeDragTracker extends BaseDragTracker {
     this.coordinates = null
     this.eventDeltas = null
     this.lastRequest = null
+    this.mouseMoved = false
   }
 
   findTargetedParent(eventTarget) {
@@ -42,7 +43,7 @@ class NodeDragTracker extends BaseDragTracker {
 
   updateCoordinates(e) {
     const { x: deltaX, y: deltaY } = buildCoordinates(e, this.eventDeltas)
-    const { x, y } = this.targetParent.dom.getBoundingClientRect()
+    const { x, y } = this.registry.root.dom.getBoundingClientRect()
     this.coordinates = {
       deltaX,
       deltaY,
@@ -122,14 +123,11 @@ class NodeDragTracker extends BaseDragTracker {
     this.updateParents(e)
     this.updateCoordinates(e)
 
-    if (this.target === this.registry.getRoot()) {
-      // TODO pan or selection
-    } else if (this.isMoveChild(e)) {
+    if (this.isMoveChild(e)) {
       return this.getMoveChildRequest()
     } else if (this.isAddChild(e)) {
       return this.getAddChildRequest()
     }
-
     return null
   }
 
@@ -152,11 +150,12 @@ class NodeDragTracker extends BaseDragTracker {
     if (!this.domHelper.isInsideDiagram(e.target)) {
       return
     }
-    this.target = this.domHelper.findClosest(e.target, ACCEPTED_TYPES)
+    this.target = this.domHelper.findClosest(e.target, NODE_TYPE)
     if (this.target !== null) {
       const parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
       this.currentParent = parent || this.registry.getRoot()
       this.eventDeltas = buildDeltas(e, this.target.dom)
+      this.mouseMoved = false
       this.progress = true
     }
   }
@@ -165,6 +164,7 @@ class NodeDragTracker extends BaseDragTracker {
     if (!this.progress) {
       return
     }
+    this.mouseMoved = true
     const request = this.buildDragRequest(e)
     this.handleFeedback(this.lastRequest, request)
     if (request !== null) {
@@ -180,7 +180,7 @@ class NodeDragTracker extends BaseDragTracker {
     if (this.targetParent !== null && this.lastRequest !== null) {
       this.targetParent.component.eraseFeedback(this.lastRequest)
     }
-    if (request !== null && request[COMMAND_TARGET]) {
+    if (request !== null && request[COMMAND_TARGET] && this.mouseMoved) {
       request[COMMAND_TARGET].getCommand(request)
     }
     this.progress = false
