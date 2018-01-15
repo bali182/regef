@@ -19,11 +19,6 @@ export const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
   y: clientY - deltaY,
 })
 
-const asLocation = (dom) => {
-  const { x, y } = dom.getBoundingClientRect()
-  return point(x, y)
-}
-
 class NodeDragTracker extends BaseDragTracker {
   constructor() {
     super()
@@ -51,7 +46,7 @@ class NodeDragTracker extends BaseDragTracker {
     const { x, y } = this.registry.root.dom.getBoundingClientRect()
     const location = point(absoluteX - x, absoluteY - y)
     const offset = point(absoluteX, absoluteY)
-    const delta = point(this.startLocation.x - absoluteX, this.startLocation.y - absoluteY)
+    const delta = point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y)
     this.coordinates = {
       location,
       offset,
@@ -166,7 +161,7 @@ class NodeDragTracker extends BaseDragTracker {
       const parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
       this.currentParent = parent || this.registry.getRoot()
       this.eventDeltas = buildDeltas(e, this.target.dom)
-      this.startLocation = asLocation(this.target.dom)
+      this.startLocation = point(e.clientX, e.clientY)
       this.mouseMoved = false
       this.progress = true
     }
