@@ -19,6 +19,11 @@ export const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
   y: clientY - deltaY,
 })
 
+const asLocation = (dom) => {
+  const { x, y } = dom.getBoundingClientRect()
+  return point(x, y)
+}
+
 class NodeDragTracker extends BaseDragTracker {
   constructor() {
     super()
@@ -42,13 +47,15 @@ class NodeDragTracker extends BaseDragTracker {
   }
 
   updateCoordinates(e) {
-    const { x: deltaX, y: deltaY } = buildCoordinates(e, this.eventDeltas)
+    const { x: absoluteX, y: absoluteY } = buildCoordinates(e, this.eventDeltas)
     const { x, y } = this.registry.root.dom.getBoundingClientRect()
+    const location = point(absoluteX - x, absoluteY - y)
+    const offset = point(absoluteX, absoluteY)
+    const delta = point(this.startLocation.x - absoluteX, this.startLocation.y - absoluteY)
     this.coordinates = {
-      deltaX,
-      deltaY,
-      componentX: deltaX - x,
-      componentY: deltaY - y,
+      location,
+      offset,
+      delta,
     }
   }
 
@@ -65,6 +72,7 @@ class NodeDragTracker extends BaseDragTracker {
 
   getMoveChildRequest() {
     const { target, currentParent, coordinates } = this
+    const { location, offset, delta } = coordinates
     return {
       [COMMAND_TARGET]: currentParent.component,
       type: MOVE_CHILD,
@@ -72,13 +80,15 @@ class NodeDragTracker extends BaseDragTracker {
       componentDOM: target.dom,
       container: currentParent.component.userComponent,
       containerDOM: currentParent.dom,
-      location: point(coordinates.componentX, coordinates.componentY),
-      delta: point(coordinates.deltaX, coordinates.deltaY),
+      location,
+      offset,
+      delta,
     }
   }
 
   getAddChildRequest() {
     const { target, targetParent, currentParent, coordinates } = this
+    const { location, offset, delta } = coordinates
     return {
       [COMMAND_TARGET]: targetParent.component,
       type: ADD_CHILD,
@@ -88,8 +98,9 @@ class NodeDragTracker extends BaseDragTracker {
       targetContainerDOM: targetParent.dom,
       container: currentParent.component.userComponent,
       containerDOM: currentParent.dom,
-      location: point(coordinates.componentX, coordinates.componentY),
-      delta: point(coordinates.deltaX, coordinates.deltaY),
+      location,
+      offset,
+      delta,
     }
   }
 
@@ -155,6 +166,7 @@ class NodeDragTracker extends BaseDragTracker {
       const parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
       this.currentParent = parent || this.registry.getRoot()
       this.eventDeltas = buildDeltas(e, this.target.dom)
+      this.startLocation = asLocation(this.target.dom)
       this.mouseMoved = false
       this.progress = true
     }

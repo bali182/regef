@@ -2,7 +2,7 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { render } from 'react-dom'
 
-import store from './store'
+import store from './redux/store'
 import { Diagram, DefaultTool, NodeDragTracker, ConnectDragTracker, SingleSelectionDragTracker, MultiSelectionDragTracker } from '../../src'
 import RootNode from './RootNode'
 

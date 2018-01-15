@@ -5,9 +5,13 @@ import { node, compose } from '../../src'
 import renderNode from './renderNode'
 import ChildNodeEditPolicy from './ChildNodeEditPolicy'
 import Port from './Port'
-import { addChild, setPosition } from './actions'
+import { addChild, setPosition } from './redux/actions'
 
 import FeedbackNode from './FeedbackNode'
+
+const selectedStyle = {
+  boxShadow: '0px 5px 5px 0px rgba(0,0,0,0.5)',
+}
 
 const noChildrenStyle = {
   display: 'flex',
@@ -50,8 +54,15 @@ const portContainer = {
   padding: '10px 20px 10px 10px',
 }
 
+const stateToProps = ({ nodes, selection }, { id }) => ({
+  model: nodes[id],
+  selected: selection.indexOf(id) >= 0,
+})
+
+const boundActions = { addChild, setPosition }
+
 // eslint-disable-next-line react/no-multi-comp
-@connect(({ nodes }, { id }) => ({ model: nodes[id] }), { addChild, setPosition })
+@connect(stateToProps, boundActions)
 @node(compose(ChildNodeEditPolicy))
 class ChildNode extends React.Component {
   constructor() {
@@ -74,11 +85,17 @@ class ChildNode extends React.Component {
   }
 
   render() {
-    const { model, id, style } = this.props
+    const { model, id, style, selected } = this.props
     const baseStyle = model.children.length > 0 || this.state.feedback
       ? withChildrenStyle
       : noChildrenStyle
-    const fullStyle = { ...baseStyle, ...style, backgroundColor: model.color }
+    const selectionStyle = selected ? selectedStyle : {}
+    const fullStyle = {
+      ...baseStyle,
+      ...style,
+      ...selectionStyle,
+      backgroundColor: model.color,
+    }
     return (<div style={fullStyle}>
       <div style={portContainer}>
         {id} {model.children.map(renderNode)} {this.renderFeedback()}

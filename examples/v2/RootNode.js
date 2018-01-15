@@ -2,12 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { root } from '../../src'
-import { addChild, setPosition, addConnection } from './actions'
+import { addChild, setPosition, addConnection, setSelection } from './redux/actions'
 import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
 import Connection from './Connection'
-import SelectionFeedbackNode from './SelectionFeedbackNode';
+import SelectionFeedbackNode from './SelectionFeedbackNode'
 
 const rootNodeStyle = {
   flexGrow: 1,
@@ -27,8 +27,12 @@ const position = ({ x, y }) => ({
   left: x,
 })
 
-const stateToProps = ({ nodes, connections }) => ({ nodes, connections })
-const boundActions = { addChild, setPosition, addConnection }
+const stateToProps = ({ nodes, connections, selection }) => ({
+  nodes,
+  connections,
+  selection,
+})
+const boundActions = { addChild, setPosition, addConnection, setSelection }
 
 @connect(stateToProps, boundActions)
 @root(RootNodeEditPolicy)

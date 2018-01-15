@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { port } from '../../src'
 
-import { addChild, setPosition } from './actions'
+import { addChild, setPosition } from './redux/actions'
 
 const portStyle = {
   display: 'flex',

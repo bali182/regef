@@ -1,4 +1,5 @@
 export const SET_POSITION = 'SET_POSITION'
+export const SET_SELECTION = 'SET_SELECTION'
 export const ADD_CHILD = 'ADD_CHILD'
 export const ADD_CONNECTION = 'ADD_CONNECTION'
 
@@ -24,5 +25,12 @@ export const addConnection = ({ source, target }) => ({
   payload: {
     source,
     target,
+  },
+})
+
+export const setSelection = ({ selection }) => ({
+  type: SET_SELECTION,
+  payload: {
+    selection,
   },
 })

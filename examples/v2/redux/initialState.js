@@ -18,7 +18,7 @@ const initial = {
       children: [],
     },
     b: {
-      color: 'blue',
+      color: 'yellow',
       x: 50,
       y: 70,
       children: [],
@@ -52,6 +52,7 @@ const initial = {
       target: 'd',
     },
   ],
+  selection: [],
 }
 
 export default initial

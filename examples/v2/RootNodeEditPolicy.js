@@ -74,19 +74,33 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     }
   }
 
-  moveChild({ component, location: { x, y } }) {
+  moveChild({ component, location, delta }) {
     if (this.isValidChild(component)) {
-      const receiver = this.component
-      receiver.props.setPosition({
-        x,
-        y,
-        id: component.props.id,
-      })
+      const root = this.component
+      const { selection, nodes } = root.props
+      const id = component.props.id
+      console.log(delta)
+      if (selection.indexOf(id) >= 0) {
+        // move all selected component using the delta
+        selection.forEach((nodeId) => {
+          const node = nodes[nodeId]
+          root.props.setPosition({
+            x: node.x + delta.x,
+            y: node.y + delta.y,
+            id: nodeId,
+          })
+        })
+      } else {
+        const { x, y } = location
+        root.props.setSelection({ selection: [id] })
+        root.props.setPosition({ x, y, id })
+      }
     }
   }
 
   select({ selection }) {
-    console.log(selection)
+    const ids = selection.map((component) => component.props.id)
+    this.component.props.setSelection({ selection: ids })
   }
 }
 
