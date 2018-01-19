@@ -3,6 +3,7 @@ import ComponentWrapper from './ComponentWrapper'
 class ComponentRegistry {
   constructor() {
     this.mapping = new Map()
+    this.wrappers = new Set()
     this.root = null
     this.registerListeners = []
     this.unregisterListeners = []
@@ -23,6 +24,7 @@ class ComponentRegistry {
     this.mapping.set(wrapper.dom, wrapper)
     this.mapping.set(wrapper.component, wrapper)
     this.mapping.set(wrapper.userComponent, wrapper)
+    this.wrappers.add(wrapper)
     this.registerListeners.forEach((listener) => listener(wrapper))
   }
   unregister(input) {
@@ -31,6 +33,7 @@ class ComponentRegistry {
       this.mapping.delete(wrapper.dom)
       this.mapping.delete(wrapper.component)
       this.mapping.delete(wrapper.userComponent)
+      this.wrappers.delete(wrapper)
       this.unregisterListeners.forEach((listener) => listener(wrapper))
     }
   }
@@ -38,7 +41,7 @@ class ComponentRegistry {
     return this.mapping.get(input)
   }
   all() {
-    return Array.from(new Set(this.mapping.values()))
+    return Array.from(this.wrappers)
   }
   has(input) {
     return this.mapping.has(input)
