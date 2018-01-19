@@ -79,7 +79,6 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
       const root = this.component
       const { selection, nodes } = root.props
       const id = component.props.id
-      console.log(delta)
       if (selection.indexOf(id) >= 0) {
         // move all selected component using the delta
         selection.forEach((nodeId) => {

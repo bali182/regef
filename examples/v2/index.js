@@ -18,12 +18,16 @@ const rootStyle = {
   flexDirection: 'row',
 }
 
-const tool = new DefaultTool([
-  new NodeDragTracker(),
-  new ConnectDragTracker(),
-  new SingleSelectionDragTracker(),
-  new MultiSelectionDragTracker(),
-])
+const tool = new DefaultTool({
+  dragTrackers: [
+    new NodeDragTracker(),
+    new ConnectDragTracker(),
+    new SingleSelectionDragTracker(),
+    new MultiSelectionDragTracker(),
+  ],
+  keyHandlers: [],
+  selectionProvider: null,
+})
 
 render(
   <Provider store={store}>

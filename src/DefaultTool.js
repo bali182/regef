@@ -1,9 +1,11 @@
 import Tool from './Tool'
 
 class DefaultTool extends Tool {
-  constructor(dragTrackers = []) {
+  constructor({ dragTrackers = [], keyHandlers = [], selectionProvider = null }) {
     super()
     this.dragTrackers = dragTrackers
+    this.keyHandlers = keyHandlers
+    this.selectionProvider = selectionProvider
   }
 
   setComponentRegistry(registry) {
