@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { render } from 'react-dom'
 
 import store from './redux/store'
-import { Diagram, DefaultTool, NodeDragTracker, ConnectDragTracker, SingleSelectionDragTracker, MultiSelectionDragTracker } from '../../src'
+import { Diagram, Engine, NodeDragTracker, ConnectDragTracker, SingleSelectionDragTracker, MultiSelectionDragTracker } from '../../src/index'
 import RootNode from './RootNode'
 
 const rootStyle = {
@@ -18,7 +18,7 @@ const rootStyle = {
   flexDirection: 'row',
 }
 
-const tool = new DefaultTool({
+const engine = new Engine({
   dragTrackers: [
     new NodeDragTracker(),
     new ConnectDragTracker(),
@@ -32,7 +32,7 @@ const tool = new DefaultTool({
 render(
   <Provider store={store}>
     <div style={rootStyle}>
-      <Diagram tool={tool}>
+      <Diagram engine={engine}>
         <RootNode />
       </Diagram>
     </div>

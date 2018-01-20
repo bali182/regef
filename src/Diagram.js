@@ -12,9 +12,9 @@ class Diagram extends React.Component {
   }
 
   componentDidMount() {
-    const { tool } = this.props
-    if (tool) {
-      tool.setComponentRegistry(this.registry)
+    const { engine } = this.props
+    if (engine) {
+      engine.setComponentRegistry(this.registry)
     }
 
     document.addEventListener('mousedown', this.onMouseDown)
@@ -24,10 +24,10 @@ class Diagram extends React.Component {
     document.addEventListener('keyup', this.onKeyUp)
   }
 
-  componentWillReceiveProps({ tool: newTool }) {
-    const { tool: currentTool } = this.props
-    if (newTool !== currentTool) {
-      newTool.setComponentRegistry(this.registry)
+  componentWillReceiveProps({ engine: newEngine }) {
+    const { engine: currentEngine } = this.props
+    if (newEngine !== currentEngine) {
+      newEngine.setComponentRegistry(this.registry)
     }
   }
 
@@ -44,33 +44,23 @@ class Diagram extends React.Component {
   }
 
   @bind onKeyDown(e) {
-    if (this.props.tool) {
-      this.props.tool.onKeyDown(e)
-    }
+    this.props.engine.onKeyDown(e)
   }
 
   @bind onKeyUp(e) {
-    if (this.props.tool) {
-      this.props.tool.onKeyUp(e)
-    }
+    this.props.engine.onKeyUp(e)
   }
 
   @bind onMouseDown(e) {
-    if (this.props.tool) {
-      this.props.tool.onMouseDown(e)
-    }
+    this.props.engine.onMouseDown(e)
   }
 
   @bind onMouseMove(e) {
-    if (this.props.tool) {
-      this.props.tool.onMouseMove(e)
-    }
+    this.props.engine.onMouseMove(e)
   }
 
   @bind onMouseUp(e) {
-    if (this.props.tool) {
-      this.props.tool.onMouseUp(e)
-    }
+    this.props.engine.onMouseUp(e)
   }
 
   getChildContext() {
