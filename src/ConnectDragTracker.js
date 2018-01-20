@@ -47,7 +47,7 @@ class ConnectDragTracker extends BaseDragTracker {
   }
 
   buildCoordinates({ clientX, clientY }) {
-    const { top, left } = this.registry.getRoot().dom.getBoundingClientRect()
+    const { top, left } = this.registry.root.dom.getBoundingClientRect()
     const x = clientX - left
     const y = clientY - top
     return { x, y }

@@ -4,7 +4,7 @@ class DomHelper {
   }
 
   findClosest(dom, type = null) {
-    const root = this.registry.getRoot().dom
+    const root = this.registry.root.dom
     for (let it = dom; it !== null; it = it.parentNode) {
       const wrapper = this.registry.get(it)
       if (wrapper !== undefined && wrapper !== null) {
@@ -37,14 +37,14 @@ class DomHelper {
   }
 
   findClosestParent(element, type = null) {
-    if (element === this.registry.getRoot().dom) {
+    if (element === this.registry.root.dom) {
       return element
     }
     return this.findClosestElement(element.parentNode, type)
   }
 
   isInsideDiagram(element) {
-    return this.registry.getRoot().dom.contains(element)
+    return this.registry.root.dom.contains(element)
   }
 
   matchesType(component, type) {

@@ -159,7 +159,7 @@ class NodeDragTracker extends BaseDragTracker {
     this.target = this.domHelper.findClosest(e.target, NODE_TYPE)
     if (this.target !== null) {
       const parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
-      this.currentParent = parent || this.registry.getRoot()
+      this.currentParent = parent || this.registry.root
       this.eventDeltas = buildDeltas(e, this.target.dom)
       this.startLocation = point(e.clientX, e.clientY)
       this.mouseMoved = false

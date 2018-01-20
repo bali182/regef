@@ -12,11 +12,11 @@ class Toolkit {
   }
 
   root() {
-    const root = this[REGISTRY].getRoot()
+    const root = this[REGISTRY].root
     if (root === undefined || root === null) {
       throw new Error('No root component!')
     }
-    return this[REGISTRY].getRoot().component.userComponent
+    return this[REGISTRY].root.component.userComponent
   }
 
   parent(component) {
@@ -25,7 +25,7 @@ class Toolkit {
     const wrapper = registry.get(component)
     if (wrapper === undefined || wrapper === null) {
       throw new Error('Given component is not part of the diagram!')
-    } else if (wrapper === registry.getRoot()) {
+    } else if (wrapper === registry.root) {
       return null
     }
     const parent = domHelper.findClosest(wrapper.dom.parentNode, null)
@@ -89,7 +89,7 @@ class Toolkit {
     if (wrapper === undefined || wrapper === null) {
       throw new Error('Given component is not part of the diagram!')
     }
-    const { left: rLeft, top: rTop } = registry.getRoot().dom.getBoundingClientRect()
+    const { left: rLeft, top: rTop } = registry.root.dom.getBoundingClientRect()
     const { left, top, width, height } = wrapper.dom.getBoundingClientRect()
     return rectangle(
       left - rLeft,

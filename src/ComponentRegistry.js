@@ -14,9 +14,6 @@ class ComponentRegistry {
       this.mapping.clear()
     }
   }
-  getRoot() {
-    return this.root
-  }
   register(wrapper) {
     if (!(wrapper instanceof ComponentWrapper)) {
       throw new TypeError(`ComponentWrapper instance expected, got ${wrapper}`)
