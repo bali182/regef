@@ -3,7 +3,15 @@ import { Provider } from 'react-redux'
 import { render } from 'react-dom'
 
 import store from './redux/store'
-import { Diagram, Engine, NodeDragTracker, ConnectDragTracker, SingleSelectionDragTracker, MultiSelectionDragTracker } from '../../src/index'
+import {
+  Diagram,
+  Engine,
+  NodeDragTracker,
+  ConnectDragTracker,
+  SingleSelectionDragTracker,
+  MultiSelectionDragTracker,
+  CancelDragTrackersKeyHandler,
+} from '../../src/index'
 import RootNode from './RootNode'
 
 const rootStyle = {
@@ -25,7 +33,9 @@ const engine = new Engine({
     new SingleSelectionDragTracker(),
     new MultiSelectionDragTracker(),
   ],
-  keyHandlers: [],
+  keyHandlers: [
+    new CancelDragTrackersKeyHandler(),
+  ],
   selectionProvider: null,
 })
 

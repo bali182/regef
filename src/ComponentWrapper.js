@@ -4,7 +4,7 @@ const DOM = Symbol('DOM')
 const COMPONENT = Symbol('COMPONENT')
 const USER_COMPONENT = Symbol('USER_COMPONENT')
 
-class ComponentWrapper {
+export default class ComponentWrapper {
   constructor(dom, component, userComponent) {
     this[DOM] = dom
     this[COMPONENT] = component
@@ -29,5 +29,3 @@ export const fromComponent = (component) => new ComponentWrapper(
   component,
   component.userComponent,
 )
-
-export default ComponentWrapper

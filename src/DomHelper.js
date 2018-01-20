@@ -1,4 +1,4 @@
-class DomHelper {
+export default class DomHelper {
   constructor(registry) {
     this.registry = registry
   }
@@ -65,5 +65,3 @@ class DomHelper {
     return type === component.type
   }
 }
-
-export default DomHelper

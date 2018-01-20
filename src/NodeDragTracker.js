@@ -4,7 +4,7 @@ import BaseDragTracker from './BaseDragTracker'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
-export const buildDeltas = ({ clientX, clientY }, element) => {
+const buildDeltas = ({ clientX, clientY }, element) => {
   const { x, y } = element.getBoundingClientRect()
   const deltaX = clientX - x
   const deltaY = clientY - y
@@ -14,12 +14,12 @@ export const buildDeltas = ({ clientX, clientY }, element) => {
   }
 }
 
-export const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
+const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
   x: clientX - deltaX,
   y: clientY - deltaY,
 })
 
-class NodeDragTracker extends BaseDragTracker {
+export default class NodeDragTracker extends BaseDragTracker {
   constructor() {
     super()
     this.target = null
@@ -193,5 +193,3 @@ class NodeDragTracker extends BaseDragTracker {
     this.progress = false
   }
 }
-
-export default NodeDragTracker

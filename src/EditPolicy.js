@@ -1,4 +1,4 @@
-class EditPolicy {
+export default class EditPolicy {
   constructor() {
     this.component = null
     this.toolkit = null
@@ -13,5 +13,3 @@ class EditPolicy {
   eraseFeedback(/* request */) {
   }
 }
-
-export default EditPolicy

@@ -3,7 +3,7 @@ import EditPolicy from './EditPolicy'
 const TOOLKIT = Symbol('TOOLKIT')
 const COMPONENT = Symbol('COMPONENT')
 
-class CompositeEditPolicy extends EditPolicy {
+export default class CompositeEditPolicy extends EditPolicy {
   constructor(policies = []) {
     super()
     this.policies = policies
@@ -71,5 +71,3 @@ export const compose = (...Policies) => {
   }
   return CustomizedCompositeEditPolicy
 }
-
-export default CompositeEditPolicy

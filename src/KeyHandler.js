@@ -1,4 +1,4 @@
-export default class DragTracker {
+export default class KeyHandler {
   setEngine() {
     throw new TypeError('not implemented')
   }
@@ -8,13 +8,10 @@ export default class DragTracker {
   cancel() {
     throw new TypeError('not implemented')
   }
-  onMouseDown() {
+  onKeyDown() {
     throw new TypeError('not implemented')
   }
-  onMouseMove() {
-    throw new TypeError('not implemented')
-  }
-  onMouseUp() {
+  onKeyUp() {
     throw new TypeError('not implemented')
   }
 }

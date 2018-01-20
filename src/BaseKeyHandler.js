@@ -1,7 +1,7 @@
-import DragTracker from './DragTracker'
+import KeyHandler from './KeyHandler'
 import DomHelper from './DomHelper'
 
-class BaseDragTracker extends DragTracker {
+export default class BaseKeyHandler extends KeyHandler {
   constructor() {
     super()
     this.engine = null
@@ -19,5 +19,3 @@ class BaseDragTracker extends DragTracker {
     this.domHelper = registry === null ? null : new DomHelper(registry)
   }
 }
-
-export default BaseDragTracker

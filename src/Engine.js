@@ -10,15 +10,20 @@ class Engine {
   }
   setComponentRegistry(registry) {
     this.registry = registry
-    this.dragTrackers.forEach((tracker) => tracker.setComponentRegistry(registry))
+    this.dragTrackers.forEach((tracker) => {
+      tracker.setComponentRegistry(registry)
+      tracker.setEngine(this)
+    })
+    this.keyHandlers.forEach((handler) => {
+      handler.setComponentRegistry(registry)
+      handler.setEngine(this)
+    })
   }
-  onKeyUp({ key }) {
-    switch (key) {
-      case 'Escape':
-        this.dragTrackers.forEach((tracker) => tracker.cancel())
-        break
-      default:
-    }
+  onKeyUp(e) {
+    this.keyHandlers.forEach((handler) => handler.onKeyUp(e))
+  }
+  onKeyDown(e) {
+    this.keyHandlers.forEach((handler) => handler.onKeyDown(e))
   }
   onMouseDown(e) {
     this.dragTrackers.forEach((tracker) => tracker.onMouseDown(e))

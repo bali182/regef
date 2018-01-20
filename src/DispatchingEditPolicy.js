@@ -2,7 +2,7 @@ import EditPolicy from './EditPolicy'
 
 import { ADD_CHILD, MOVE_CHILD, START_CONNECTION, END_CONNECTION, SELECT } from './constants'
 
-class DispatchingEditPolicy extends EditPolicy {
+export default class DispatchingEditPolicy extends EditPolicy {
   getCommand(request) {
     switch (request.type) {
       case ADD_CHILD: return this.addChild(request)
@@ -54,5 +54,3 @@ class DispatchingEditPolicy extends EditPolicy {
   eraseEndConnectionFeedback(/* request */) { }
   eraseSelectFeedback(/* request */) { }
 }
-
-export default DispatchingEditPolicy

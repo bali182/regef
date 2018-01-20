@@ -1,6 +1,6 @@
 import ComponentWrapper from './ComponentWrapper'
 
-class ComponentRegistry {
+export default class ComponentRegistry {
   constructor() {
     this.mapping = new Map()
     this.wrappers = new Set()
@@ -56,4 +56,3 @@ class ComponentRegistry {
     this.unregisterListeners = this.unregisterListeners.filter((e) => e !== listener)
   }
 }
-export default ComponentRegistry

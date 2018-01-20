@@ -4,7 +4,7 @@ import ComponentRegistry from './ComponentRegistry'
 import Toolkit from './Toolkit'
 import bind from './bind'
 
-class Diagram extends React.Component {
+export default class Diagram extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.registry = new ComponentRegistry()
@@ -82,6 +82,3 @@ class Diagram extends React.Component {
 Diagram.childContextTypes = {
   regef: () => null,
 }
-
-
-export default Diagram

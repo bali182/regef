@@ -5,7 +5,7 @@ import { NODE_TYPE, PORT_TYPE, CONNECTION_TYPE } from './constants'
 const REGISTRY = Symbol('registry')
 const DOM_HELPER = Symbol('dom-helper')
 
-class Toolkit {
+export default class Toolkit {
   constructor(registry) {
     this[REGISTRY] = registry
     this[DOM_HELPER] = new DomHelper(registry)
@@ -99,5 +99,3 @@ class Toolkit {
     )
   }
 }
-
-export default Toolkit

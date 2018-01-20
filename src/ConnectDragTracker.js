@@ -2,7 +2,7 @@ import { point } from 'regef-2dmath'
 import BaseDragTracker from './BaseDragTracker'
 import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 
-class ConnectDragTracker extends BaseDragTracker {
+export default class ConnectDragTracker extends BaseDragTracker {
   constructor() {
     super()
     this.source = null
@@ -118,5 +118,3 @@ class ConnectDragTracker extends BaseDragTracker {
     this.progress = false
   }
 }
-
-export default ConnectDragTracker

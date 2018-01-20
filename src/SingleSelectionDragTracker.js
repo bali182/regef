@@ -7,7 +7,7 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
   return point(clientX - x, clientY - y)
 }
 
-class SingleSelectionDragTracker extends BaseDragTracker {
+export default class SingleSelectionDragTracker extends BaseDragTracker {
   constructor() {
     super()
     this.startLocation = null
@@ -66,5 +66,3 @@ class SingleSelectionDragTracker extends BaseDragTracker {
     }
   }
 }
-
-export default SingleSelectionDragTracker
