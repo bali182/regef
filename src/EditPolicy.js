@@ -4,7 +4,7 @@ export default class EditPolicy {
     this.toolkit = null
   }
 
-  getCommand(/* request */) {
+  perform(/* request */) {
   }
 
   requestFeedback(/* request */) {

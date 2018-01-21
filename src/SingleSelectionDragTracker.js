@@ -62,7 +62,7 @@ export default class SingleSelectionDragTracker extends BaseDragTracker {
     this.endLocation = this.startLocation
     if (this.possibleSingleSelection) {
       const request = this.createSingleSelectionRequest()
-      request[COMMAND_TARGET].getCommand(request)
+      request[COMMAND_TARGET].perform(request)
     }
   }
 }

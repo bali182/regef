@@ -41,10 +41,10 @@ export default class CompositeEditPolicy extends EditPolicy {
     }
   }
 
-  getCommand(request) {
+  perform(request) {
     for (let i = 0, len = this.policies.length; i < len; i += 1) {
       const policy = this.policies[i]
-      policy.getCommand(request)
+      policy.perform(request)
     }
   }
 

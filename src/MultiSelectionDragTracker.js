@@ -90,7 +90,7 @@ export default class MultiSelectionDragTracker extends BaseDragTracker {
     if (this.lastRequest !== null) {
       this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
     }
-    request[COMMAND_TARGET].getCommand(request)
+    request[COMMAND_TARGET].perform(request)
     this.progress = false
   }
 }

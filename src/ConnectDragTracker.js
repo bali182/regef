@@ -113,7 +113,7 @@ export default class ConnectDragTracker extends BaseDragTracker {
       this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
     }
     if (request !== null && request[COMMAND_TARGET]) {
-      request[COMMAND_TARGET].getCommand(request)
+      request[COMMAND_TARGET].perform(request)
     }
     this.progress = false
   }

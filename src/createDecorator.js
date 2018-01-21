@@ -36,8 +36,8 @@ const createDecorator = ({ type, activate, deactivate }) =>
           deactivate(this)
         }
 
-        getCommand(request) {
-          return this.editPolicy.getCommand(request)
+        perform(request) {
+          return this.editPolicy.perform(request)
         }
 
         requestFeedback(request) {

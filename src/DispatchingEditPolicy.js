@@ -3,7 +3,7 @@ import EditPolicy from './EditPolicy'
 import { ADD_CHILD, MOVE_CHILD, START_CONNECTION, END_CONNECTION, SELECT } from './constants'
 
 export default class DispatchingEditPolicy extends EditPolicy {
-  getCommand(request) {
+  perform(request) {
     switch (request.type) {
       case ADD_CHILD: return this.addChild(request)
       case MOVE_CHILD: return this.moveChild(request)

@@ -188,7 +188,7 @@ export default class NodeDragTracker extends BaseDragTracker {
       this.targetParent.component.eraseFeedback(this.lastRequest)
     }
     if (request !== null && request[COMMAND_TARGET] && this.mouseMoved) {
-      request[COMMAND_TARGET].getCommand(request)
+      request[COMMAND_TARGET].perform(request)
     }
     this.progress = false
   }
