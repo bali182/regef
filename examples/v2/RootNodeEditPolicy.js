@@ -101,6 +101,11 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     const ids = selection.map((component) => component.props.id)
     this.component.props.setSelection({ selection: ids })
   }
+
+  delete({ selection }) {
+    const ids = selection.map((component) => component.props.id)
+    ids.forEach((id) => this.component.props.deleteNode({ id }))
+  }
 }
 
 export default RootNodeEditPolict

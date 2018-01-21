@@ -14,6 +14,7 @@ export default class Diagram extends React.Component {
   componentDidMount() {
     const { engine } = this.props
     if (engine) {
+      engine.setToolkit(this.toolkit)
       engine.setComponentRegistry(this.registry)
     }
 
@@ -27,6 +28,7 @@ export default class Diagram extends React.Component {
   componentWillReceiveProps({ engine: newEngine }) {
     const { engine: currentEngine } = this.props
     if (newEngine !== currentEngine) {
+      newEngine.setToolkit(this.toolkit)
       newEngine.setComponentRegistry(this.registry)
     }
   }

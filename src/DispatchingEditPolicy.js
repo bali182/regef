@@ -1,6 +1,6 @@
 import EditPolicy from './EditPolicy'
 
-import { ADD_CHILD, MOVE_CHILD, START_CONNECTION, END_CONNECTION, SELECT } from './constants'
+import { ADD_CHILD, MOVE_CHILD, START_CONNECTION, END_CONNECTION, SELECT, DELETE } from './constants'
 
 export default class DispatchingEditPolicy extends EditPolicy {
   perform(request) {
@@ -10,6 +10,7 @@ export default class DispatchingEditPolicy extends EditPolicy {
       case START_CONNECTION: return this.startConnection(request)
       case END_CONNECTION: return this.endConnection(request)
       case SELECT: return this.select(request)
+      case DELETE: return this.delete(request)
       default: throw new Error(`Unknown request type ${request.type}`)
     }
   }
@@ -41,6 +42,7 @@ export default class DispatchingEditPolicy extends EditPolicy {
   startConnection(/* request */) { }
   endConnection(/* request */) { }
   select(/* request */) { }
+  delete(/* request */) { }
 
   requestAddChildFeedback(/* request */) { }
   requestMoveChildFeedback(/* request */) { }

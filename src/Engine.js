@@ -1,9 +1,19 @@
+import SelectionProvider from './SelectionProvider'
+
 class Engine {
-  constructor({ dragTrackers = [], keyHandlers = [], selectionProvider = null }) {
+  constructor({
+    dragTrackers = [],
+    keyHandlers = [],
+    selectionProvider = new SelectionProvider(),
+  }) {
+    this.toolkit = null
     this.registry = null
     this.dragTrackers = dragTrackers
     this.keyHandlers = keyHandlers
     this.selectionProvider = selectionProvider
+  }
+  setToolkit(toolkit) {
+    this.toolkit = toolkit
   }
   getComponentRegistry() {
     return this.registry
@@ -18,6 +28,9 @@ class Engine {
       handler.setComponentRegistry(registry)
       handler.setEngine(this)
     })
+    if (this.selectionProvider instanceof SelectionProvider) {
+      this.selectionProvider.setToolkit(this.toolkit)
+    }
   }
   onKeyUp(e) {
     this.keyHandlers.forEach((handler) => handler.onKeyUp(e))
@@ -33,6 +46,12 @@ class Engine {
   }
   onMouseUp(e) {
     this.dragTrackers.forEach((tracker) => tracker.onMouseUp(e))
+  }
+  selection() {
+    if (!(this.selectionProvider instanceof SelectionProvider)) {
+      return []
+    }
+    return this.selectionProvider.selection()
   }
 }
 

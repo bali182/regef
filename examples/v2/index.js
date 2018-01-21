@@ -11,8 +11,10 @@ import {
   SingleSelectionDragTracker,
   MultiSelectionDragTracker,
   CancelDragTrackersKeyHandler,
+  DeleteKeyHandler,
 } from '../../src/index'
 import RootNode from './RootNode'
+import NodeSelectionProvider from './NodeSelectionProvider'
 
 const rootStyle = {
   marginTop: '25vh',
@@ -35,8 +37,9 @@ const engine = new Engine({
   ],
   keyHandlers: [
     new CancelDragTrackersKeyHandler(),
+    new DeleteKeyHandler(),
   ],
-  selectionProvider: null,
+  selectionProvider: new NodeSelectionProvider(),
 })
 
 render(

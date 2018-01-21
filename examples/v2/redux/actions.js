@@ -2,6 +2,7 @@ export const SET_POSITION = 'SET_POSITION'
 export const SET_SELECTION = 'SET_SELECTION'
 export const ADD_CHILD = 'ADD_CHILD'
 export const ADD_CONNECTION = 'ADD_CONNECTION'
+export const DELETE_NODE = 'DELETE_NODE'
 
 export const setPosition = ({ id, x, y }) => ({
   type: SET_POSITION,
@@ -9,6 +10,13 @@ export const setPosition = ({ id, x, y }) => ({
     id,
     x,
     y,
+  },
+})
+
+export const deleteNode = ({ id }) => ({
+  type: DELETE_NODE,
+  payload: {
+    id,
   },
 })
 

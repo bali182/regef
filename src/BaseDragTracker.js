@@ -9,14 +9,21 @@ class BaseDragTracker extends DragTracker {
     this.registry = null
     this.domHelper = null
   }
-
   setEngine(engine) {
     this.engine = engine
   }
-
   setComponentRegistry(registry) {
     this.registry = registry
     this.domHelper = registry === null ? null : new DomHelper(registry)
+  }
+  onMouseDown() {
+    // empty
+  }
+  onMouseMove() {
+    // empty
+  }
+  onMouseUp() {
+    // empty
   }
 }
 

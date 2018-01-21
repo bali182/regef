@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { root } from '../../src'
-import { addChild, setPosition, addConnection, setSelection } from './redux/actions'
+import { addChild, setPosition, addConnection, setSelection, deleteNode } from './redux/actions'
 import renderNode from './renderNode'
 import RootNodeEditPolicy from './RootNodeEditPolicy'
 import FeedbackNode from './FeedbackNode'
@@ -27,12 +27,8 @@ const position = ({ x, y }) => ({
   left: x,
 })
 
-const stateToProps = ({ nodes, connections, selection }) => ({
-  nodes,
-  connections,
-  selection,
-})
-const boundActions = { addChild, setPosition, addConnection, setSelection }
+const stateToProps = ({ nodes, selection }) => ({ nodes, selection })
+const boundActions = { addChild, setPosition, addConnection, setSelection, deleteNode }
 
 @connect(stateToProps, boundActions)
 @root(RootNodeEditPolicy)
@@ -106,7 +102,12 @@ class RootNode extends React.Component {
   buildConnectionsRepresentation() {
     this.props.regef.toolkit().then((toolkit) => {
       const nodes = toolkit.nodes()
-      const connections = this.props.connections.map(({ source, target }) => {
+      const conns = Object.keys(this.props.nodes)
+        .map((source) => {
+          const node = this.props.nodes[source]
+          return node.connections.map((target) => ({ source, target }))
+        }).reduce((all, c) => all.concat(c), [])
+      const connections = conns.map(({ source, target }) => {
         const sourceNode = nodes.find(({ props: { id } }) => id === source)
         const targetNode = nodes.find(({ props: { id } }) => id === target)
         if (sourceNode === undefined || targetNode === undefined) {
@@ -138,7 +139,8 @@ class RootNode extends React.Component {
   }
 
   render() {
-    return (<div style={rootNodeStyle}>
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+    return (<div style={rootNodeStyle} tabIndex={0}>
       {this.renderConnectionFeedback()}
       {this.renderConnections()}
       {this.renderChildren()}

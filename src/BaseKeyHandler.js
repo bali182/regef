@@ -18,4 +18,10 @@ export default class BaseKeyHandler extends KeyHandler {
     this.registry = registry
     this.domHelper = registry === null ? null : new DomHelper(registry)
   }
+  onKeyDown() {
+    // emtpy
+  }
+  onKeyUp() {
+    // empty
+  }
 }
