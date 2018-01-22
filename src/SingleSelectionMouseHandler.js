@@ -13,18 +13,21 @@ export default class SingleSelectionMouseHandler extends BaseMouseHandler {
     this.startLocation = null
     this.endLocation = null
     this.possibleSingleSelection = false
+    this.additional = false
     this.selection = []
   }
 
   createSingleSelectionRequest() {
-    const { startLocation, endLocation, selection } = this
+    const { startLocation, endLocation, selection, additional } = this
     return {
       [COMMAND_TARGET]: this.registry.root.component,
       type: SELECT,
       bounds: rectangle(startLocation, dimension(0, 0)),
       startLocation,
       endLocation,
-      selection,
+      selection: additional
+        ? this.engine.selection().concat(selection)
+        : selection,
     }
   }
 
@@ -55,14 +58,16 @@ export default class SingleSelectionMouseHandler extends BaseMouseHandler {
     this.possibleSingleSelection = false
   }
 
-  onMouseUp() {
+  onMouseUp({ ctrlKey, metaKey }) {
     if (!this.progress) {
       return
     }
     this.endLocation = this.startLocation
     if (this.possibleSingleSelection) {
+      this.additional = metaKey || ctrlKey
       const request = this.createSingleSelectionRequest()
       request[COMMAND_TARGET].perform(request)
+      this.additional = false
     }
   }
 }

@@ -11,8 +11,15 @@ const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   return rectangle(x, y, width, height)
 }
 
-const findSelectedElements = (bounds, toolkit) => toolkit.nodes()
-  .filter((node) => bounds.containsRectangle(toolkit.bounds(node)))
+const findSelectedElements = (bounds, toolkit, additional, selection) => {
+  const additionalFilter = additional
+    ? ((node) => selection.indexOf(node) < 0)
+    : (() => true)
+  const newSelection = toolkit.nodes()
+    .filter(additionalFilter)
+    .filter((node) => bounds.containsRectangle(toolkit.bounds(node)))
+  return additional ? selection.concat(newSelection) : newSelection
+}
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
@@ -26,6 +33,7 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
     this.endLocation = null
     this.lastRequest = null
     this.toolkit = null
+    this.additional = false
   }
 
   setComponentRegistry(registry) {
@@ -34,7 +42,7 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
   }
 
   createMultiSelectionRequest() {
-    const { startLocation, endLocation, toolkit } = this
+    const { startLocation, endLocation, toolkit, additional, engine } = this
     const bounds = buildBounds(startLocation, endLocation)
     return {
       [COMMAND_TARGET]: this.registry.root.component,
@@ -43,7 +51,7 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
       startLocation,
       endLocation,
       get selection() {
-        return findSelectedElements(bounds, toolkit)
+        return findSelectedElements(bounds, toolkit, additional, engine.selection())
       },
     }
   }
@@ -86,11 +94,13 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
       return
     }
     this.endLocation = locationOf(e, this.registry.root.dom)
+    this.additional = e.shiftKey
     const request = this.createMultiSelectionRequest()
     if (this.lastRequest !== null) {
       this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
     }
     request[COMMAND_TARGET].perform(request)
     this.progress = false
+    this.additional = false
   }
 }
