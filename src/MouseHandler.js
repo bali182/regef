@@ -1,4 +1,4 @@
-export default class DragTracker {
+export default class MouseHandler {
   setEngine() {
     throw new TypeError('not implemented')
   }

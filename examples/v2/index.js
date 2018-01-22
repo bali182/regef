@@ -6,11 +6,11 @@ import store from './redux/store'
 import {
   Diagram,
   Engine,
-  NodeDragTracker,
-  ConnectDragTracker,
-  SingleSelectionDragTracker,
-  MultiSelectionDragTracker,
-  CancelDragTrackersKeyHandler,
+  NodeMouseHandler,
+  ConnectMouseHandler,
+  SingleSelectionMouseHandler,
+  MultiSelectionMouseHandler,
+  CancelMouseHandlersKeyHandler,
   DeleteKeyHandler,
 } from '../../src/index'
 import RootNode from './RootNode'
@@ -29,14 +29,14 @@ const rootStyle = {
 }
 
 const engine = new Engine({
-  dragTrackers: [
-    new NodeDragTracker(),
-    new ConnectDragTracker(),
-    new SingleSelectionDragTracker(),
-    new MultiSelectionDragTracker(),
+  mouseHandlers: [
+    new NodeMouseHandler(),
+    new ConnectMouseHandler(),
+    new SingleSelectionMouseHandler(),
+    new MultiSelectionMouseHandler(),
   ],
   keyHandlers: [
-    new CancelDragTrackersKeyHandler(),
+    new CancelMouseHandlersKeyHandler(),
     new DeleteKeyHandler(),
   ],
   selectionProvider: new NodeSelectionProvider(),

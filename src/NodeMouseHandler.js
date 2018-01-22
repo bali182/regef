@@ -1,6 +1,6 @@
 import { point } from 'regef-2dmath'
 import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE } from './constants'
-import BaseDragTracker from './BaseDragTracker'
+import BaseMouseHandler from './BaseMouseHandler'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -19,7 +19,7 @@ const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
   y: clientY - deltaY,
 })
 
-export default class NodeDragTracker extends BaseDragTracker {
+export default class NodeMouseHandler extends BaseMouseHandler {
   constructor() {
     super()
     this.target = null

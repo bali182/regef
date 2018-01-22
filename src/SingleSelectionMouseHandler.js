@@ -1,13 +1,13 @@
 import { point, rectangle, dimension } from 'regef-2dmath'
 import { COMMAND_TARGET, NODE_TYPE, SELECT } from './constants'
-import BaseDragTracker from './BaseDragTracker'
+import BaseMouseHandler from './BaseMouseHandler'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
   return point(clientX - x, clientY - y)
 }
 
-export default class SingleSelectionDragTracker extends BaseDragTracker {
+export default class SingleSelectionMouseHandler extends BaseMouseHandler {
   constructor() {
     super()
     this.startLocation = null

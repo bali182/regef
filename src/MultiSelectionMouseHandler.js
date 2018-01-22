@@ -1,6 +1,6 @@
 import { point, rectangle } from 'regef-2dmath'
 import { COMMAND_TARGET, ROOT_TYPE, SELECT } from './constants'
-import BaseDragTracker from './BaseDragTracker'
+import BaseMouseHandler from './BaseMouseHandler'
 import Toolkit from './Toolkit'
 
 const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
@@ -19,7 +19,7 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
   return point(clientX - x, clientY - y)
 }
 
-export default class MultiSelectionDragTracker extends BaseDragTracker {
+export default class MultiSelectionDragTracker extends BaseMouseHandler {
   constructor() {
     super()
     this.startLocation = null

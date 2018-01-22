@@ -1,7 +1,7 @@
-import DragTracker from './DragTracker'
+import MouseHandler from './MouseHandler'
 import DomHelper from './DomHelper'
 
-class BaseDragTracker extends DragTracker {
+class BaseMouseHandler extends MouseHandler {
   constructor() {
     super()
     this.engine = null
@@ -27,4 +27,4 @@ class BaseDragTracker extends DragTracker {
   }
 }
 
-export default BaseDragTracker
+export default BaseMouseHandler
