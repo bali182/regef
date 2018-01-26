@@ -11,16 +11,6 @@ const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   return rectangle(x, y, width, height)
 }
 
-const findSelectedElements = (bounds, toolkit, additional, selection) => {
-  const additionalFilter = additional
-    ? ((node) => selection.indexOf(node) < 0)
-    : (() => true)
-  const newSelection = toolkit.nodes()
-    .filter(additionalFilter)
-    .filter((node) => bounds.containsRectangle(toolkit.bounds(node)))
-  return additional ? selection.concat(newSelection) : newSelection
-}
-
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
   return point(clientX - x, clientY - y)
@@ -51,7 +41,14 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
       startLocation,
       endLocation,
       get selection() {
-        return findSelectedElements(bounds, toolkit, additional, engine.selection())
+        const selection = engine.selection()
+        const additionalFilter = additional
+          ? ((node) => selection.indexOf(node) < 0)
+          : (() => true)
+        const newSelection = toolkit.nodes()
+          .filter(additionalFilter)
+          .filter((node) => bounds.containsRectangle(toolkit.bounds(node)))
+        return additional ? selection.concat(newSelection) : newSelection
       },
     }
   }
