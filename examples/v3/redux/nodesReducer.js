@@ -11,7 +11,7 @@ const withAllNestedChildren = (state, id, children = []) => {
   return children
 }
 
-const nodesReducer = (state = initialState.nodes, { type, payload }) => {
+const componentsReducer = (state = initialState.components, { type, payload }) => {
   switch (type) {
     case ADD_CHILD: {
       const { id, childId } = payload
@@ -67,4 +67,4 @@ const nodesReducer = (state = initialState.nodes, { type, payload }) => {
   }
 }
 
-export default nodesReducer
+export default componentsReducer

@@ -1,5 +1,5 @@
 const initial = {
-  nodes: {
+  components: {
     root: {
       type: 'ROOT',
       children: [
@@ -35,13 +35,13 @@ const initial = {
       y: 10,
     },
     map: {
-      type: 'CHILD',
+      type: 'STEP',
     },
     filter: {
-      type: 'CHILD',
+      type: 'STEP',
     },
     reduce: {
-      type: 'CHILD',
+      type: 'STEP',
     },
   },
   selection: [],

@@ -1,6 +1,4 @@
-import React from 'react'
-
-const rootStyle = {
+export const rootStyle = {
   marginTop: '10vh',
   marginLeft: '10vw',
   width: '80vw',
@@ -10,9 +8,3 @@ const rootStyle = {
   border: '1px solid #ccc',
   position: 'relative',
 }
-
-const RootComponent = ({ children, ...rest }) => (<div style={rootStyle} {...rest}>
-  {children}
-</div>)
-
-export default RootComponent

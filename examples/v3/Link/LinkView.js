@@ -22,13 +22,15 @@ const calculateStyles = (x1, y1, x2, y2) => ({
   left: Math.min(x1, x2) - 2.5,
 })
 
-const LinkComponent = ({ x1, y1, x2, y2, selected }) => {
+const LinkView = ({ x1, y1, x2, y2, selected }) => {
   const coordinates = calculateCoordinates(x1, y1, x2, y2)
   const linkStyle = calculateStyles(x1, y1, x2, y2)
-  const color = selected ? '#006db6' : '#ddd'
+  const color = selected ? '#006db6' : '#888'
+  // TODO this is not robust
+  const id = selected ? 'arrow-selected' : 'arrow'
   return (<svg style={linkStyle} shapeRendering="geometricPrecision">
     <defs>
-      <marker id="arrow" markerWidth={10} markerHeight={10} refX={9} refY={3} orient="auto" markerUnits="strokeWidth">
+      <marker id={id} markerWidth={10} markerHeight={10} refX={9} refY={3} orient="auto" markerUnits="strokeWidth">
         <path d="M0,0 L0,6 L9,3 z" fill={color} />
       </marker>
     </defs>
@@ -39,9 +41,9 @@ const LinkComponent = ({ x1, y1, x2, y2, selected }) => {
       y2={coordinates.y2 + 2.5}
       strokeWidth={1}
       stroke={color}
-      markerEnd="url(#arrow)"
+      markerEnd={`url(#${id})`}
     />
   </svg>)
 }
 
-export default LinkComponent
+export default LinkView
