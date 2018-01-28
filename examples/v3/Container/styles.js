@@ -5,7 +5,7 @@ export const normalContainerStyle = {
   alignContent: 'center',
   alignItems: 'center',
   justifyContent: 'center',
-  border: '1px solid #ddd',
+  border: '1px solid #ccc',
   borderRadius: '2px',
   fontSize: '.8em',
   whiteSpace: 'nowrap',
@@ -16,7 +16,7 @@ export const normalContainerStyle = {
 
 export const selectedContainerStyle = {
   ...normalContainerStyle,
-  borderColor: '#006db6',
+  border: '1px solid #006db6',
   boxShadow: '0px 0px 20px -5px #006db6',
 }
 
@@ -24,14 +24,14 @@ export const normalTitleStyle = {
   boxSizing: 'border-box',
   padding: '5px 10px',
   textAlign: 'center',
-  borderBottom: '1px solid #ddd',
+  borderBottom: '1px solid #ccc',
   minHeight: '20px',
   width: '100%',
 }
 
 export const selectedTitleStyle = {
   ...normalTitleStyle,
-  borderColor: '#006db6',
+  borderBottom: '1px solid #006db6',
 }
 
 export const laneStyle = {

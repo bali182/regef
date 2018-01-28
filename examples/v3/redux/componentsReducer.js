@@ -28,10 +28,11 @@ const componentsReducer = (state = initialState.components, { type, payload }) =
     case SET_POSITION: {
       const { id, x, y } = payload
       const node = state[id]
-      return {
+      const newState = {
         ...state,
         [id]: { ...node, x, y },
       }
+      return newState
     }
     case ADD_CONNECTION: {
       const { source, target } = payload

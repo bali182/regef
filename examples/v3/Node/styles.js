@@ -6,7 +6,7 @@ export const normalNodeStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   padding: '5px 10px',
-  border: '1px solid #ddd',
+  border: '1px solid #ccc',
   borderRadius: '2px',
   height: '30px',
   fontSize: '.8em',
@@ -17,6 +17,6 @@ export const normalNodeStyle = {
 
 export const selectedNodeStyle = {
   ...normalNodeStyle,
-  borderColor: '#006db6',
+  border: '1px solid #006db6',
   boxShadow: '0px 0px 20px -5px #006db6',
 }

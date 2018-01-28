@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from 'redux'
-import components from './nodesReducer'
+import components from './componentsReducer'
 import selection from './selectionReducer'
 
 const reducer = combineReducers({

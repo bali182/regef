@@ -3,13 +3,17 @@ import { connect } from 'react-redux'
 
 import ContainerView from './ContainerView'
 import Step from '../Step'
+import { node } from '../../../src/index'
+import ContainerEditPolicy from './ContainerEditPolicy'
 
-const stateToProps = ({ components }, { id }) => ({
+const stateToProps = ({ components, selection }, { id }) => ({
   container: components[id],
+  selected: selection.indexOf(id) >= 0,
   components,
 })
 
 @connect(stateToProps)
+@node(ContainerEditPolicy)
 export default class Container extends React.Component {
   renderChildren() {
     const { components, container: { children } } = this.props
@@ -25,9 +29,9 @@ export default class Container extends React.Component {
   }
 
   render() {
-    const { id } = this.props
+    const { id, selected } = this.props
     const { x, y } = this.props.container
-    return (<ContainerView x={x} y={y} id={id}>
+    return (<ContainerView x={x} y={y} id={id} selected={selected}>
       {this.renderChildren()}
     </ContainerView>)
   }

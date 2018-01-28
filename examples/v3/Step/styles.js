@@ -11,13 +11,13 @@ export const normalStepStyle = {
   fontSize: '.8em',
   minWidth: '40px',
   minHeight: '40px',
-  border: '1px solid #ddd',
+  border: '1px solid #ccc',
   cursor: 'default',
   margin: '10px',
 }
 
 export const selectedStepStyle = {
   ...normalStepStyle,
-  borderColor: '#006db6',
+  border: '1px solid #006db6',
   boxShadow: '0px 0px 20px -5px #006db6',
 }

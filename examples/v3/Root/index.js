@@ -1,18 +1,35 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import RootView from './RootView'
+import { root } from '../../../src/index'
+import { setPosition, setSelection } from '../redux/actions'
 
 import Container from '../Container'
 import Node from '../Node'
+import RootEditPolicy from './RootEditPolicy'
+import { DragFeedback, SelectionFeedback } from './RectFeedback'
 
-const stateToProps = ({ components }) => ({ components })
+const stateToProps = ({ components, selection }) => ({
+  components,
+  selection,
+})
 
-@connect(stateToProps)
+const boundActions = { setPosition, setSelection }
+
+@connect(stateToProps, boundActions)
+@root(RootEditPolicy)
 export default class Root extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      moveFeedback: null,
+      selectionFeedback: null,
+    }
+  }
   renderChildren() {
     const { components } = this.props
-    const { root } = this.props.components
-    return root.children.map((id) => {
+    const { root: rootComponent } = this.props.components
+    return rootComponent.children.map((id) => {
       const component = components[id]
       switch (component.type) {
         case 'NODE':
@@ -24,9 +41,25 @@ export default class Root extends React.Component {
       }
     })
   }
+  renderMoveFeedback() {
+    if (this.state.moveFeedback) {
+      const { x, y, width, height } = this.state.moveFeedback
+      return <DragFeedback x={x} y={y} width={width} height={height} />
+    }
+    return null
+  }
+  renderSelectionFeedback() {
+    if (this.state.selectionFeedback) {
+      const { x, y, width, height } = this.state.selectionFeedback
+      return <SelectionFeedback x={x} y={y} width={width} height={height} />
+    }
+    return null
+  }
   render() {
     return (<RootView>
       {this.renderChildren()}
+      {this.renderMoveFeedback()}
+      {this.renderSelectionFeedback()}
     </RootView>)
   }
 }
