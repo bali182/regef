@@ -43,8 +43,14 @@ export default class Root extends React.Component {
   }
   renderMoveFeedback() {
     if (this.state.moveFeedback) {
-      const { x, y, width, height } = this.state.moveFeedback
-      return <DragFeedback x={x} y={y} width={width} height={height} />
+      return this.state.moveFeedback.map(({ x, y, width, height }, key) => (<DragFeedback
+        // eslint-disable-next-line react/no-array-index-key
+        key={key}
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+      />))
     }
     return null
   }

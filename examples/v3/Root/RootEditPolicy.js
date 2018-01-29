@@ -1,12 +1,14 @@
 import { DispatchingEditPolicy } from '../../../src/index'
 
 export default class RootEditPolicy extends DispatchingEditPolicy {
-  moveChild({ component, delta }) {
-    const { x, y } = this.toolkit.bounds(component).location()
-    this.component.props.setPosition({
-      id: component.props.id,
-      x: Math.round(x + delta.x),
-      y: Math.round(y + delta.y),
+  moveChild({ components, delta }) {
+    components.forEach((component) => {
+      const { x, y } = this.toolkit.bounds(component).location()
+      this.component.props.setPosition({
+        id: component.props.id,
+        x: Math.round(x + delta.x),
+        y: Math.round(y + delta.y),
+      })
     })
   }
 
@@ -15,9 +17,9 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     this.component.props.setSelection({ selection: ids })
   }
 
-  requestMoveChildFeedback({ component, delta }) {
+  requestMoveChildFeedback({ components, delta }) {
     this.component.setState({
-      moveFeedback: this.toolkit.bounds(component).translate(delta),
+      moveFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),
     })
   }
 

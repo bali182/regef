@@ -13,6 +13,7 @@ export const normalNodeStyle = {
   whiteSpace: 'nowrap',
   userSelect: 'none',
   cursor: 'default',
+  backgroundColor: '#fff',
 }
 
 export const selectedNodeStyle = {

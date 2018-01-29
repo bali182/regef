@@ -14,6 +14,7 @@ export const normalStepStyle = {
   border: '1px solid #ccc',
   cursor: 'default',
   margin: '10px',
+  backgroundColor: '#fff',
 }
 
 export const selectedStepStyle = {

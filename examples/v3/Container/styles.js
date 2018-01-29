@@ -12,6 +12,7 @@ export const normalContainerStyle = {
   userSelect: 'none',
   boxSizing: 'border-box',
   cursor: 'default',
+  backgroundColor: '#fff',
 }
 
 export const selectedContainerStyle = {
@@ -22,6 +23,7 @@ export const selectedContainerStyle = {
 
 export const normalTitleStyle = {
   boxSizing: 'border-box',
+  backgroundColor: '#fff',
   padding: '5px 10px',
   textAlign: 'center',
   borderBottom: '1px solid #ccc',

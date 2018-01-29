@@ -1,5 +1,5 @@
-import { point } from 'regef-2dmath'
-import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE } from './constants'
+import { point, rectangle, dimension } from 'regef-2dmath'
+import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import BaseMouseHandler from './BaseMouseHandler'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
@@ -14,11 +14,6 @@ const buildDeltas = ({ clientX, clientY }, element) => {
   }
 }
 
-const buildCoordinates = ({ clientX, clientY }, { deltaX, deltaY }) => ({
-  x: clientX - deltaX,
-  y: clientY - deltaY,
-})
-
 export default class NodeMouseHandler extends BaseMouseHandler {
   constructor() {
     super()
@@ -30,12 +25,16 @@ export default class NodeMouseHandler extends BaseMouseHandler {
     this.eventDeltas = null
     this.lastRequest = null
     this.mouseMoved = false
+    this.startLocation = null
   }
 
   findTargetedParent(eventTarget) {
     const { domHelper, target, currentParent } = this
     const newTarget = domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
-    if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom)) {
+    if (newTarget === null
+      || newTarget === target
+      || target.dom.contains(newTarget.dom)
+      || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
       return currentParent
     }
     return newTarget
@@ -66,13 +65,21 @@ export default class NodeMouseHandler extends BaseMouseHandler {
     }
   }
 
+  getMovedComponents() {
+    const target = this.target.userComponent
+    if (this.engine.selection().indexOf(target) >= 0) {
+      return this.engine.selection()
+    }
+    return [target]
+  }
+
   getMoveChildRequest() {
-    const { target, currentParent, coordinates } = this
+    const { currentParent, coordinates } = this
     const { location, offset, delta } = coordinates
     return {
       [COMMAND_TARGET]: currentParent.component,
       type: MOVE_CHILD,
-      component: target.component.userComponent,
+      components: this.getMovedComponents(),
       container: currentParent.component.userComponent,
       location,
       offset,
@@ -81,17 +88,29 @@ export default class NodeMouseHandler extends BaseMouseHandler {
   }
 
   getAddChildRequest() {
-    const { target, targetParent, currentParent, coordinates } = this
+    const { targetParent, currentParent, coordinates } = this
     const { location, offset, delta } = coordinates
     return {
       [COMMAND_TARGET]: targetParent.component,
       type: ADD_CHILD,
-      component: target.component.userComponent,
+      components: this.getMovedComponents(),
       targetContainer: targetParent.component.userComponent,
       container: currentParent.component.userComponent,
       location,
       offset,
       delta,
+    }
+  }
+
+  getSelectionRequest() {
+    const { startLocation, target } = this
+    return {
+      [COMMAND_TARGET]: this.registry.root.component,
+      type: SELECT,
+      bounds: rectangle(startLocation, dimension(0, 0)),
+      startLocation,
+      endLocation: startLocation,
+      selection: [target.userComponent],
     }
   }
 
@@ -169,6 +188,11 @@ export default class NodeMouseHandler extends BaseMouseHandler {
     }
     this.mouseMoved = true
     const request = this.buildDragRequest(e)
+    const selection = this.engine.selection()
+    if (selection.indexOf(this.target.userComponent) < 0) {
+      const selectionReq = this.getSelectionRequest()
+      selectionReq[COMMAND_TARGET].perform(selectionReq)
+    }
     this.handleFeedback(this.lastRequest, request)
     if (request !== null) {
       this.lastRequest = request
