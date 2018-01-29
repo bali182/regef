@@ -42,10 +42,11 @@ export default class NodeMouseHandler extends BaseMouseHandler {
   }
 
   updateCoordinates(e) {
-    const { x: absoluteX, y: absoluteY } = buildCoordinates(e, this.eventDeltas)
-    const { x, y } = this.registry.root.dom.getBoundingClientRect()
-    const location = point(absoluteX - x, absoluteY - y)
-    const offset = point(absoluteX, absoluteY)
+    const { deltaX, deltaY } = this.eventDeltas
+    const { clientX, clientY } = e
+    const { x: rootX, y: rootY } = this.registry.root.dom.getBoundingClientRect()
+    const location = point(clientX - rootX, clientY - rootY)
+    const offset = point(deltaX, deltaY)
     const delta = point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y)
     this.coordinates = {
       location,
