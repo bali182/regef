@@ -17,6 +17,11 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     this.component.props.setSelection({ selection: ids })
   }
 
+  delete({ selection }) {
+    const ids = selection.map((component) => component.props.id)
+    ids.forEach((id) => this.component.props.deleteComponent({ id }))
+  }
+
   requestMoveChildFeedback({ components, delta }) {
     this.component.setState({
       moveFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),

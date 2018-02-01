@@ -44,7 +44,7 @@ export default class Toolkit {
     for (let i = 0, length = domChildren.length; i < length; i += 1) {
       const child = registry.get(domChildren[i])
       if (child !== undefined && child !== null) {
-        children.push(child)
+        children.push(child.userComponent)
       }
     }
     return children

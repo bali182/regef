@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import RootView from './RootView'
 import { root } from '../../../src/index'
-import { setPosition, setSelection } from '../redux/actions'
+import { setPosition, setSelection, deleteComponent } from '../redux/actions'
 
 import Container from '../Container'
 import Node from '../Node'
@@ -14,7 +14,7 @@ const stateToProps = ({ components, selection }) => ({
   selection,
 })
 
-const boundActions = { setPosition, setSelection }
+const boundActions = { setPosition, setSelection, deleteComponent }
 
 @connect(stateToProps, boundActions)
 @root(RootEditPolicy)

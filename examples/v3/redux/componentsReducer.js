@@ -1,9 +1,12 @@
-import { ADD_CHILD, SET_POSITION, DELETE_NODE, ADD_CONNECTION } from './actions'
+import { ADD_CHILD, SET_POSITION, DELETE_COMPONENT, ADD_CONNECTION, SET_CHILDREN } from './actions'
 import initialState from './initialState'
 
 const withAllNestedChildren = (state, id, children = []) => {
   children.push(id)
   const node = state[id]
+  if (!Array.isArray(node.children)) {
+    return children
+  }
   if (node.children.length === 0) {
     return children
   }
@@ -34,6 +37,15 @@ const componentsReducer = (state = initialState.components, { type, payload }) =
       }
       return newState
     }
+    case SET_CHILDREN: {
+      const { id, children } = payload
+      const node = state[id]
+      const newState = {
+        ...state,
+        [id]: { ...node, children },
+      }
+      return newState
+    }
     case ADD_CONNECTION: {
       const { source, target } = payload
       const node = state[source]
@@ -47,20 +59,21 @@ const componentsReducer = (state = initialState.components, { type, payload }) =
         },
       }
     }
-    case DELETE_NODE: {
+    case DELETE_COMPONENT: {
       const { id } = payload
       const affected = withAllNestedChildren(state, id)
       return Object.keys(state)
         .filter((key) => affected.indexOf(key) < 0)
         .reduce((newState, key) => {
           const node = state[key]
-          return Object.assign(newState, {
-            [key]: {
-              ...node,
-              children: node.children.filter((c) => affected.indexOf(c) < 0),
-              connections: node.connections.filter((t) => affected.indexOf(t) < 0),
-            },
-          })
+          const newNode = { ...node }
+          if (node.connections) {
+            newNode.connections = node.connections.filter((t) => affected.indexOf(t) < 0)
+          }
+          if (node.children) {
+            newNode.children = node.children.filter((c) => affected.indexOf(c) < 0)
+          }
+          return Object.assign(newState, { [key]: newNode })
         }, {})
     }
     default:

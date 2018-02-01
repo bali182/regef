@@ -5,6 +5,7 @@ import ContainerView from './ContainerView'
 import Step from '../Step'
 import { node } from '../../../src/index'
 import ContainerEditPolicy from './ContainerEditPolicy'
+import { setChildren } from '../redux/actions'
 
 const stateToProps = ({ components, selection }, { id }) => ({
   container: components[id],
@@ -12,7 +13,7 @@ const stateToProps = ({ components, selection }, { id }) => ({
   components,
 })
 
-@connect(stateToProps)
+@connect(stateToProps, { setChildren })
 @node(ContainerEditPolicy)
 export default class Container extends React.Component {
   renderChildren() {
