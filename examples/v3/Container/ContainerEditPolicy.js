@@ -25,6 +25,31 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
     })
   }
 
+  requestMoveChildFeedback({ location, components }) {
+    const { toolkit, component } = this
+    const children = toolkit.children(component)
+    if (!components.every((moved) => children.indexOf(moved) >= 0)) {
+      return
+    }
+    component.setState({ insertionFeedback: this.insertionIndex(children, location) })
+  }
+
+  eraseMoveChildFeedback() {
+    this.component.setState({ insertionFeedback: null })
+  }
+
+  insertionIndex(children, location) {
+    const { toolkit } = this
+    for (let i = 0; i < children.length; i += 1) {
+      const child = children[i]
+      const bounds = toolkit.bounds(child)
+      if (bounds.x > location.x) {
+        return i
+      }
+    }
+    return null
+  }
+
   updatedChildren(children, components, before, after) {
     const withoutMoved = children.filter((child) => components.indexOf(child) < 0)
     if (after !== null && components.indexOf(after) < 0) {

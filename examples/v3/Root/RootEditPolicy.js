@@ -43,4 +43,16 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
       selectionFeedback: null,
     })
   }
+
+  requestAddChildFeedback({ components, delta }) {
+    if (components.some((c) => c.props.step)) {
+      this.component.setState({
+        errorFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),
+      })
+    }
+  }
+
+  eraseAddChildFeedback() {
+    this.component.setState({ errorFeedback: null })
+  }
 }

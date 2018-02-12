@@ -7,6 +7,7 @@ const RectFeedback = ({ x, y, width, height, fill, stroke }) => {
     border: stroke,
     borderRadius: '2px',
     userSelect: 'none',
+    pointerEvents: 'none',
     width,
     height,
     top: y,
@@ -22,6 +23,15 @@ export const DragFeedback = ({ x, y, width, height }) => (<RectFeedback
   height={height}
   fill="rgba(255, 255, 255, .8)"
   stroke="1px dashed #ccc"
+/>)
+
+export const ErrorFeedback = ({ x, y, width, height }) => (<RectFeedback
+  x={x}
+  y={y}
+  width={width}
+  height={height}
+  fill="rgba(255, 0, 51, .3)"
+  stroke="1px dashed #ff0033"
 />)
 
 export const SelectionFeedback = ({ x, y, width, height }) => (<RectFeedback

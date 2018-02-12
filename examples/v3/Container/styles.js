@@ -10,7 +10,6 @@ export const normalContainerStyle = {
   fontSize: '.8em',
   whiteSpace: 'nowrap',
   userSelect: 'none',
-  boxSizing: 'border-box',
   cursor: 'default',
   backgroundColor: '#fff',
 }
