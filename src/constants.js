@@ -9,9 +9,7 @@ export const CONNECTION_TYPE = 'connection'
 
 // Request types
 export const SELECT = 'select'
-export const RESIZE = 'resize'
 export const MOVE = 'move'
-export const INSERT = 'insert'
 export const DELETE = 'delete'
 export const MOVE_CHILD = 'move-child'
 export const ADD_CHILD = 'add-child'

@@ -28,7 +28,6 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
       [COMMAND_TARGET]: this.source.component,
       type: START_CONNECTION,
       source: this.source.component.userComponent,
-      sourceDOM: this.source.dom,
       location: point(this.coordinates),
     }
   }
@@ -39,9 +38,7 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
       [COMMAND_TARGET]: this.target.component,
       type: END_CONNECTION,
       source: this.source.component.userComponent,
-      sourceDOM: this.source.dom,
       target: this.target.component.userComponent,
-      targetDOM: this.target.dom,
       location: point(this.coordinates),
     }
   }
