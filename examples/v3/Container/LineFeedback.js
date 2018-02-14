@@ -1,36 +1,25 @@
 import React from 'react'
 
-const baseStyle = {
-  boxSizing: 'content-box',
-  userSelect: 'none',
+const containerStyle = {
+  position: 'relative',
   width: 0,
   height: '100%',
   minHeight: '40px',
+}
+
+const lineStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: 0,
+  height: '100%',
+  boxSizing: 'content-box',
+  userSelect: 'none',
   borderLeft: '1px dashed #ccc',
 }
 
-const firstStyle = {
-  ...baseStyle,
-  position: 'relative',
-  left: 5,
-}
-
-const lastStyle = {
-  ...baseStyle,
-  position: 'relative',
-  left: -5,
-}
-
-const LineFeedback = ({ first, last }) => {
-  let style = baseStyle
-  if (first) {
-    style = firstStyle
-  }
-  if (last) {
-    style = lastStyle
-  }
-  return (<div style={style} />)
-}
-
+const LineFeedback = () => (<div style={containerStyle}>
+  <div style={lineStyle} />
+</div>)
 
 export default LineFeedback

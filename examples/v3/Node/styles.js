@@ -12,6 +12,7 @@ export const normalNodeStyle = {
   fontSize: '.8em',
   whiteSpace: 'nowrap',
   userSelect: 'none',
+  MozUserSelect: 'none',
   cursor: 'default',
   backgroundColor: '#fff',
 }

@@ -25,21 +25,38 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  requestMoveChildFeedback({ location, components }) {
+  requestMoveChildFeedback({ location, delta, components }) {
     const { toolkit, component } = this
+    const root = toolkit.root()
     const children = toolkit.children(component)
-    if (!components.every((moved) => children.indexOf(moved) >= 0)) {
-      return
+    const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
+    if (components.every((moved) => children.indexOf(moved) >= 0)) {
+      component.setState({ insertionFeedback: this.insertionIndex(children, location) })
+      root.setState({ moveFeedback: bounds })
+    } else {
+      root.setState({ errorFeedback: bounds })
     }
-    component.setState({ insertionFeedback: this.insertionIndex(children, location) })
+  }
+
+  requestAddChildFeedback({ delta, components }) {
+    const { toolkit } = this
+    const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
+    toolkit.root().setState({ errorFeedback: bounds })
+  }
+  eraseAddChildFeedback() {
+    this.toolkit.root().setState({ errorFeedback: null })
   }
 
   eraseMoveChildFeedback() {
     this.component.setState({ insertionFeedback: null })
+    this.toolkit.root().setState({ moveFeedback: null, errorFeedback: null })
   }
 
   insertionIndex(children, location) {
     const { toolkit } = this
+    if (children.length === 0) {
+      return 0
+    }
     for (let i = 0; i < children.length; i += 1) {
       const child = children[i]
       const bounds = toolkit.bounds(child)
@@ -47,7 +64,7 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
         return i
       }
     }
-    return null
+    return children.length
   }
 
   updatedChildren(children, components, before, after) {

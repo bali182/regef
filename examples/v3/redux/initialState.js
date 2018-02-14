@@ -21,11 +21,9 @@ const initial = {
       x: 100,
       y: 100,
       children: [
-        'a',
-        'b',
-        'c',
-        'd',
-        'e',
+        'filter',
+        'map',
+        'reduce',
       ],
       connections: [
         'output',
@@ -36,19 +34,13 @@ const initial = {
       x: 200,
       y: 10,
     },
-    a: {
+    filter: {
       type: 'STEP',
     },
-    b: {
+    map: {
       type: 'STEP',
     },
-    c: {
-      type: 'STEP',
-    },
-    d: {
-      type: 'STEP',
-    },
-    e: {
+    reduce: {
       type: 'STEP',
     },
   },

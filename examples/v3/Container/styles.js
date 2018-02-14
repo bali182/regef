@@ -28,6 +28,8 @@ export const normalTitleStyle = {
   borderBottom: '1px solid #ccc',
   minHeight: '20px',
   width: '100%',
+  userSelect: 'none',
+  MozUserSelect: 'none',
 }
 
 export const selectedTitleStyle = {
@@ -41,4 +43,5 @@ export const laneStyle = {
   alignContent: 'center',
   alignItems: 'center',
   justifyContent: 'center',
+  padding: '5px 7px',
 }

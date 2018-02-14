@@ -8,12 +8,13 @@ export const normalStepStyle = {
   textAlign: 'center',
   borderRadius: '2px',
   userSelect: 'none',
+  MozUserSelect: 'none',
   fontSize: '.8em',
   minWidth: '40px',
   minHeight: '40px',
   border: '1px solid #ccc',
   cursor: 'default',
-  margin: '10px',
+  margin: '7px',
   backgroundColor: '#fff',
 }
 
