@@ -1,4 +1,5 @@
 import { Component as ReactComponent, ReactNode } from 'react'
+import { Rectangle, Point } from 'regef-2dmath'
 
 declare export const SELECT
 declare export const DELETE
@@ -15,9 +16,9 @@ export interface Intent {
 
 export interface SelectionIntent extends Intent {
   type: 'select'
-  bounds: any // TODO
-  startLocation: any // TODO
-  endLocation: any // TODO
+  bounds: Rectangle
+  startLocation: Point
+  endLocation: Point
   selection: ReactComponent<any, any>[]
 }
 
@@ -25,9 +26,9 @@ export interface MoveChildIntent extends Intent {
   type: 'move-child'
   components: ReactComponent<any, any>[]
   container: ReactComponent<any, any>
-  location: any // TODO
-  offset: any // TODO
-  delta: any // TODO
+  location: Point
+  offset: Point
+  delta: Point
 }
 
 export interface DeleteIntent extends Intent {
@@ -41,22 +42,22 @@ export interface AddChildIntent extends Intent {
   components: ReactComponent<any, any>[]
   targetContainer: ReactComponent<any, any>
   container: ReactComponent<any, any>
-  location: any //TODO
-  offset: any // TODO
-  delta: any // TODO
+  location: Point
+  offset: Point
+  delta: Point
 }
 
 export interface StartConnectionIntent extends Intent {
   type: 'start-connection'
   source: ReactComponent<any, any>
-  location: any // TODO
+  location: Point
 }
 
 export interface EndConnectionIntent extends Intent {
   type: 'end-connection'
   source: ReactComponent<any, any>
   target: ReactComponent<any, any>
-  location: any // TODO
+  location: Point
 }
 
 export class EditPolicy {
@@ -98,7 +99,7 @@ export class Toolkit {
   nodes(): ReactComponent<any, any>[]
   ports(): ReactComponent<any, any>[]
   connections(): ReactComponent<any, any>[]
-  bounds(component): any // TODO
+  bounds(component): Rectangle
 }
 
 export class Engine {
