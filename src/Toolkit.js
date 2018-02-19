@@ -1,4 +1,4 @@
-import { rectangle } from 'regef-2dmath'
+import { rectangle } from 'regef-geometry'
 import DomHelper from './DomHelper'
 import { NODE_TYPE, PORT_TYPE, CONNECTION_TYPE } from './constants'
 

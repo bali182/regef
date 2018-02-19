@@ -1,4 +1,4 @@
-import { point, rectangle } from 'regef-2dmath'
+import { point, rectangle } from 'regef-geometry'
 import { COMMAND_TARGET, ROOT_TYPE, SELECT } from './constants'
 import BaseMouseHandler from './BaseMouseHandler'
 import Toolkit from './Toolkit'

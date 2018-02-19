@@ -268,7 +268,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var regef2dmath = createCommonjsModule(function (module, exports) {
+var regefGeometry = createCommonjsModule(function (module, exports) {
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
@@ -714,15 +714,15 @@ exports.rectangle = rectangle;
 exports.lineSegment = lineSegment;
 });
 
-unwrapExports(regef2dmath);
-var regef2dmath_1 = regef2dmath.Point;
-var regef2dmath_2 = regef2dmath.Dimension;
-var regef2dmath_3 = regef2dmath.Rectangle;
-var regef2dmath_4 = regef2dmath.LineSegment;
-var regef2dmath_5 = regef2dmath.point;
-var regef2dmath_6 = regef2dmath.dimension;
-var regef2dmath_7 = regef2dmath.rectangle;
-var regef2dmath_8 = regef2dmath.lineSegment;
+unwrapExports(regefGeometry);
+var regefGeometry_1 = regefGeometry.Point;
+var regefGeometry_2 = regefGeometry.Dimension;
+var regefGeometry_3 = regefGeometry.Rectangle;
+var regefGeometry_4 = regefGeometry.LineSegment;
+var regefGeometry_5 = regefGeometry.point;
+var regefGeometry_6 = regefGeometry.dimension;
+var regefGeometry_7 = regefGeometry.rectangle;
+var regefGeometry_8 = regefGeometry.lineSegment;
 
 var DomHelper = function () {
   function DomHelper(registry) {
@@ -940,7 +940,7 @@ var Toolkit = function () {
           width = _wrapper$dom$getBound.width,
           height = _wrapper$dom$getBound.height;
 
-      return regef2dmath_7(left - rLeft, top - rTop, width, height);
+      return regefGeometry_7(left - rLeft, top - rTop, width, height);
     }
   }]);
   return Toolkit;
@@ -1516,9 +1516,9 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
           rootX = _registry$root$dom$ge.x,
           rootY = _registry$root$dom$ge.y;
 
-      var location = regef2dmath_5(clientX - rootX, clientY - rootY);
-      var offset = regef2dmath_5(deltaX, deltaY);
-      var delta = regef2dmath_5(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y);
+      var location = regefGeometry_5(clientX - rootX, clientY - rootY);
+      var offset = regefGeometry_5(deltaX, deltaY);
+      var delta = regefGeometry_5(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y);
       this.coordinates = {
         location: location,
         offset: offset,
@@ -1581,7 +1581,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
       var startLocation = this.startLocation,
           target = this.target;
 
-      return _ref4 = {}, defineProperty(_ref4, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref4, 'type', SELECT), defineProperty(_ref4, 'bounds', regef2dmath_7(startLocation, regef2dmath_6(0, 0))), defineProperty(_ref4, 'startLocation', startLocation), defineProperty(_ref4, 'endLocation', startLocation), defineProperty(_ref4, 'selection', [target.userComponent]), _ref4;
+      return _ref4 = {}, defineProperty(_ref4, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref4, 'type', SELECT), defineProperty(_ref4, 'bounds', regefGeometry_7(startLocation, regefGeometry_6(0, 0))), defineProperty(_ref4, 'startLocation', startLocation), defineProperty(_ref4, 'endLocation', startLocation), defineProperty(_ref4, 'selection', [target.userComponent]), _ref4;
     }
   }, {
     key: 'handleFeedback',
@@ -1650,7 +1650,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
         var parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
         this.currentParent = parent || this.registry.root;
         this.eventDeltas = buildDeltas(e, this.target.dom);
-        this.startLocation = regef2dmath_5(e.clientX, e.clientY);
+        this.startLocation = regefGeometry_5(e.clientX, e.clientY);
         this.mouseMoved = false;
         this.progress = true;
       }
@@ -1724,14 +1724,14 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
     value: function getStartConnectionRequest() {
       var _ref;
 
-      return _ref = {}, defineProperty(_ref, COMMAND_TARGET, this.source.component), defineProperty(_ref, 'type', START_CONNECTION), defineProperty(_ref, 'source', this.source.component.userComponent), defineProperty(_ref, 'location', regef2dmath_5(this.coordinates)), _ref;
+      return _ref = {}, defineProperty(_ref, COMMAND_TARGET, this.source.component), defineProperty(_ref, 'type', START_CONNECTION), defineProperty(_ref, 'source', this.source.component.userComponent), defineProperty(_ref, 'location', regefGeometry_5(this.coordinates)), _ref;
     }
   }, {
     key: 'getEndConnectionRequest',
     value: function getEndConnectionRequest() {
       var _ref2;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.target.component), defineProperty(_ref2, 'type', END_CONNECTION), defineProperty(_ref2, 'source', this.source.component.userComponent), defineProperty(_ref2, 'target', this.target.component.userComponent), defineProperty(_ref2, 'location', regef2dmath_5(this.coordinates)), _ref2;
+      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.target.component), defineProperty(_ref2, 'type', END_CONNECTION), defineProperty(_ref2, 'source', this.source.component.userComponent), defineProperty(_ref2, 'target', this.target.component.userComponent), defineProperty(_ref2, 'location', regefGeometry_5(this.coordinates)), _ref2;
     }
   }, {
     key: 'buildCoordinates',
@@ -1829,7 +1829,7 @@ var locationOf = function locationOf(_ref, rootDom) {
       x = _rootDom$getBoundingC.x,
       y = _rootDom$getBoundingC.y;
 
-  return regef2dmath_5(clientX - x, clientY - y);
+  return regefGeometry_5(clientX - x, clientY - y);
 };
 
 var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
@@ -1858,7 +1858,7 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
           selection = this.selection,
           additional = this.additional;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref2, 'type', SELECT), defineProperty(_ref2, 'bounds', regef2dmath_7(startLocation, regef2dmath_6(0, 0))), defineProperty(_ref2, 'startLocation', startLocation), defineProperty(_ref2, 'endLocation', endLocation), defineProperty(_ref2, 'selection', additional ? this.engine.selection().concat(selection) : selection), _ref2;
+      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref2, 'type', SELECT), defineProperty(_ref2, 'bounds', regefGeometry_7(startLocation, regefGeometry_6(0, 0))), defineProperty(_ref2, 'startLocation', startLocation), defineProperty(_ref2, 'endLocation', endLocation), defineProperty(_ref2, 'selection', additional ? this.engine.selection().concat(selection) : selection), _ref2;
     }
   }, {
     key: 'cancel',
@@ -1921,7 +1921,7 @@ var buildBounds = function buildBounds(_ref, _ref2) {
   var y = Math.min(y1, y2);
   var width = Math.max(x1, x2) - x;
   var height = Math.max(y1, y2) - y;
-  return regef2dmath_7(x, y, width, height);
+  return regefGeometry_7(x, y, width, height);
 };
 
 var locationOf$1 = function locationOf(_ref3, rootDom) {
@@ -1932,7 +1932,7 @@ var locationOf$1 = function locationOf(_ref3, rootDom) {
       x = _rootDom$getBoundingC.x,
       y = _rootDom$getBoundingC.y;
 
-  return regef2dmath_5(clientX - x, clientY - y);
+  return regefGeometry_5(clientX - x, clientY - y);
 };
 
 var MultiSelectionDragTracker = function (_BaseMouseHandler) {

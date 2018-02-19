@@ -1,4 +1,4 @@
-import { point } from 'regef-2dmath'
+import { point } from 'regef-geometry'
 import BaseMouseHandler from './BaseMouseHandler'
 import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 

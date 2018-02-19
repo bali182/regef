@@ -7,6 +7,7 @@
     "precommit": "npm run lint && npm run build && git add index.js",
     "start": "webpack-dev-server",
     "build": "rollup -c",
+    "run2": "rollup -c -w",
     "lint": "eslint src examples -c .eslintrc.json",
     "stats": "sloc src"
   },
@@ -25,7 +26,7 @@
     "react-dom": "^16.0.0"
   },
   "dependencies": {
-    "regef-2dmath": "github:bali182/regef-2dmath"
+    "regef-geometry": "github:bali182/regef-geometry"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

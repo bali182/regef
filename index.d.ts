@@ -1,5 +1,5 @@
 import { Component as ReactComponent, ReactNode } from 'react'
-import { Rectangle, Point } from 'regef-2dmath'
+import { Rectangle, Point } from 'regef-geometry'
 
 declare export const SELECT
 declare export const DELETE
