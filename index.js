@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var reactDom = require('react-dom');
+var regefGeometry = require('regef-geometry');
 var React = require('react');
 var React__default = _interopDefault(React);
 
@@ -260,470 +261,6 @@ var ComponentRegistry = function () {
   return ComponentRegistry;
 }();
 
-function unwrapExports (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-}
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-var regefGeometry = createCommonjsModule(function (module, exports) {
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var Dimension = function Dimension(width, height) {
-  _classCallCheck(this, Dimension);
-
-  this.width = Number(width);
-  this.height = Number(height);
-};
-
-var Rectangle =
-/*#__PURE__*/
-function () {
-  function Rectangle(x, y, width, height) {
-    _classCallCheck(this, Rectangle);
-
-    this.x = Number(x);
-    this.y = Number(y);
-    this.width = Number(width);
-    this.height = Number(height);
-  }
-
-  _createClass(Rectangle, [{
-    key: "location",
-    value: function location() {
-      return point(this.x, this.y);
-    }
-  }, {
-    key: "size",
-    value: function size() {
-      return dimension(this.width, this.height);
-    }
-  }, {
-    key: "translate",
-    value: function translate(p) {
-      var input = point(p);
-      return rectangle(this.x + input.x, this.y + input.y, this.width, this.height);
-    }
-  }, {
-    key: "containsPoint",
-    value: function containsPoint(p) {
-      var input = point(p);
-      return input.y >= this.y && input.y < this.y + this.height && input.x >= this.x && input.x < this.x + this.width;
-    }
-  }, {
-    key: "containsRectangle",
-    value: function containsRectangle(rect) {
-      var input = rectangle(rect);
-      return this.x <= input.x && this.y <= input.y && this.x + this.width >= input.x + input.width && this.y + this.height >= input.y + input.height;
-    }
-  }, {
-    key: "top",
-    value: function top() {
-      return lineSegment(this.topLeft(), this.topRight());
-    }
-  }, {
-    key: "right",
-    value: function right() {
-      return lineSegment(this.topRight(), this.bottomRight());
-    }
-  }, {
-    key: "bottom",
-    value: function bottom() {
-      return lineSegment(this.bottomRight(), this.bottomLeft());
-    }
-  }, {
-    key: "left",
-    value: function left() {
-      return lineSegment(this.bottomLeft(), this.topLeft());
-    }
-  }, {
-    key: "center",
-    value: function center() {
-      return point(this.x + this.width / 2, this.y + this.height / 2);
-    }
-  }, {
-    key: "topLeft",
-    value: function topLeft() {
-      return point(this.x, this.y);
-    }
-  }, {
-    key: "topRight",
-    value: function topRight() {
-      return point(this.x + this.width, this.y);
-    }
-  }, {
-    key: "bottomLeft",
-    value: function bottomLeft() {
-      return point(this.x, this.y + this.height);
-    }
-  }, {
-    key: "bottomRight",
-    value: function bottomRight() {
-      return point(this.x + this.width, this.y + this.height);
-    }
-  }]);
-
-  return Rectangle;
-}();
-
-function slope(segment) {
-  var x1 = segment.x1,
-      y1 = segment.y1,
-      x2 = segment.x2,
-      y2 = segment.y2;
-  return (y2 - y1) / (x2 - x1);
-} // https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line
-
-
-function lineIntersection(_ref, _ref2) {
-  var x1 = _ref.x1,
-      y1 = _ref.y1,
-      x2 = _ref.x2,
-      y2 = _ref.y2;
-  var x3 = _ref2.x1,
-      y3 = _ref2.y1,
-      x4 = _ref2.x2,
-      y4 = _ref2.y2;
-  var xNumerator = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4);
-  var yNumerator = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4);
-  var denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-
-  if (denominator === 0) {
-    return null;
-  }
-
-  var x = xNumerator / denominator;
-  var y = yNumerator / denominator;
-  return point(x, y);
-} // https://www.lucidarme.me/check-if-a-point-belongs-on-a-line-segment/
-
-
-function onSegment(segment, c) {
-  var a = segment.point1();
-  var b = segment.point2();
-  var ab = point(b.x - a.x, b.y - a.y);
-  var ac = point(c.x - a.x, c.y - a.y);
-  var kac = ab.x * ac.x + ab.y * ab.y;
-  var kab = ab.x * ab.x + ab.y * ab.y;
-  return kab >= 0 && kac >= 0 && kab - kac >= 0;
-}
-
-function _intersection(segment1, segment2) {
-  var slope1 = slope(segment1);
-  var slope2 = slope(segment2); // they are parallel
-
-  if (slope1 === slope2) {
-    return null;
-  } // intersect as line
-
-
-  var pt = lineIntersection(segment1, segment2); // point is on both line segments
-
-  if (pt !== null && onSegment(segment1, pt) && onSegment(segment2, pt)) {
-    return pt;
-  } // no intersection
-
-
-  return null;
-}
-
-var LineSegment =
-/*#__PURE__*/
-function () {
-  function LineSegment(x1, y1, x2, y2) {
-    _classCallCheck(this, LineSegment);
-
-    this.x1 = Number(x1);
-    this.y1 = Number(y1);
-    this.x2 = Number(x2);
-    this.y2 = Number(y2);
-  }
-
-  _createClass(LineSegment, [{
-    key: "point1",
-    value: function point1() {
-      return point(this.x1, this.y1);
-    }
-  }, {
-    key: "point2",
-    value: function point2() {
-      return point(this.x2, this.y2);
-    }
-  }, {
-    key: "length",
-    value: function length() {
-      var dx = this.x1 - this.x2;
-      var dy = this.y1 - this.y2;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-  }, {
-    key: "isHorizontal",
-    value: function isHorizontal() {
-      return this.y1 === this.y2;
-    }
-  }, {
-    key: "isVertical",
-    value: function isVertical() {
-      return this.x1 === this.x2;
-    }
-  }, {
-    key: "intersection",
-    value: function intersection(segment) {
-      var other = lineSegment(segment);
-      return _intersection(this, other);
-    }
-  }]);
-
-  return LineSegment;
-}();
-
-function isNumeric(input) {
-  return Number(input) === input;
-}
-
-function isPointLike(input) {
-  if (input instanceof Point) {
-    return true;
-  }
-
-  if (!(input instanceof Object)) {
-    return false;
-  }
-
-  var x = input.x,
-      y = input.y;
-  return isNumeric(x) && isNumeric(y);
-}
-
-function isDimensionLike(input) {
-  if (input instanceof Dimension) {
-    return true;
-  }
-
-  if (!(input instanceof Object)) {
-    return false;
-  }
-
-  var width = input.width,
-      height = input.height;
-  return isNumeric(width) && isNumeric(height);
-}
-
-function isRectangleLike(input) {
-  if (input instanceof Rectangle) {
-    return true;
-  }
-
-  if (!(input instanceof Object)) {
-    return false;
-  }
-
-  var x = input.x,
-      y = input.y,
-      width = input.width,
-      height = input.height;
-  return isNumeric(x) && isNumeric(y) && isNumeric(width) && isNumeric(height);
-}
-
-function isLineSegmentLike(input) {
-  if (input instanceof LineSegment) {
-    return true;
-  }
-
-  if (!(input instanceof Object)) {
-    return false;
-  }
-
-  var x1 = input.x1,
-      y1 = input.y1,
-      x2 = input.x2,
-      y2 = input.y2;
-  return isNumeric(x1) && isNumeric(y1) && isNumeric(x2) && isNumeric(y2);
-}
-/** @return {Dimension} */
-
-
-function dimension() {
-  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  if (args.length === 1 && args[0] instanceof Dimension) {
-    return args[0];
-  }
-
-  if (args.length === 2 && args.every(isNumeric)) {
-    var width = args[0],
-        height = args[1];
-    return new Dimension(width, height);
-  } else if (args.length === 1 && isDimensionLike(args[0])) {
-    var _args$ = args[0],
-        _width = _args$.width,
-        _height = _args$.height;
-    return new Dimension(_width, _height);
-  }
-
-  throw new TypeError(`Can't construct a Dimension from: ${args}!`);
-}
-/** @return {Point} */
-
-
-function point() {
-  for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    args[_key2] = arguments[_key2];
-  }
-
-  if (args.length === 1 && args[0] instanceof Point) {
-    return args[0];
-  } else if (args.length === 2 && args.every(isNumeric)) {
-    var x = args[0],
-        y = args[1];
-    return new Point(x, y);
-  } else if (args.length === 1 && isPointLike(args[0])) {
-    var _args$2 = args[0],
-        _x = _args$2.x,
-        _y = _args$2.y;
-    return new Point(_x, _y);
-  }
-
-  throw new TypeError(`Can't construct a Point from: ${args}!`);
-}
-/** @return {Rectangle} */
-
-
-function rectangle() {
-  for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-    args[_key3] = arguments[_key3];
-  }
-
-  if (args.length === 1 && args[0] instanceof Rectangle) {
-    return args[0];
-  } else if (args.length === 4 && args.every(isNumeric)) {
-    var x = args[0],
-        y = args[1],
-        width = args[2],
-        height = args[3];
-    return new Rectangle(x, y, width, height);
-  } else if (args.length === 1 && isRectangleLike(args[0])) {
-    var _args$3 = args[0],
-        _x2 = _args$3.x,
-        _y2 = _args$3.y,
-        _width2 = _args$3.width,
-        _height2 = _args$3.height;
-    return new Rectangle(_x2, _y2, _width2, _height2);
-  } else if (args.length === 2 && isPointLike(args[0]) && isDimensionLike(args[1])) {
-    var _args$4 = args[0],
-        _x3 = _args$4.x,
-        _y3 = _args$4.y,
-        _args$5 = args[1],
-        _width3 = _args$5.width,
-        _height3 = _args$5.height;
-    return new Rectangle(_x3, _y3, _width3, _height3);
-  }
-
-  throw new TypeError(`Can't construct a Rectangle from: ${args}!`);
-}
-/** @return {LineSegment} */
-
-
-function lineSegment() {
-  for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    args[_key4] = arguments[_key4];
-  }
-
-  if (args.length === 1 && args[0] instanceof LineSegment) {
-    return args[0];
-  } else if (args.length === 4 && args.every(isNumeric)) {
-    var x1 = args[0],
-        y1 = args[1],
-        x2 = args[2],
-        y2 = args[3];
-    return new LineSegment(x1, y1, x2, y2);
-  } else if (args.length === 1 && isLineSegmentLike(args[0])) {
-    var _args$6 = args[0],
-        _x4 = _args$6.x1,
-        _y4 = _args$6.y1,
-        _x5 = _args$6.x2,
-        _y5 = _args$6.y2;
-    return new LineSegment(_x4, _y4, _x5, _y5);
-  } else if (args.length === 2 && args.every(isPointLike)) {
-    var _args$7 = args[0],
-        _x6 = _args$7.x,
-        _y6 = _args$7.y,
-        _args$8 = args[1],
-        _x7 = _args$8.x,
-        _y7 = _args$8.y;
-    return new LineSegment(_x6, _y6, _x7, _y7);
-  }
-
-  throw new TypeError(`Can't construct a LineSegment from: ${args}!`);
-}
-
-var Point =
-/*#__PURE__*/
-function () {
-  function Point(x, y) {
-    _classCallCheck(this, Point);
-
-    this.x = Number(x);
-    this.y = Number(y);
-  }
-
-  _createClass(Point, [{
-    key: "translate",
-    value: function translate(p) {
-      var other = point(p);
-      return point(this.x + other.x, this.y + other.y);
-    }
-  }, {
-    key: "lineSegmentTo",
-    value: function lineSegmentTo(p) {
-      var other = point(p);
-      return lineSegment(this.x, this.y, other.x, other.y);
-    }
-  }, {
-    key: "distanceFromPoint",
-    value: function distanceFromPoint(p) {
-      var other = point(p); // eslint-disable-next-line no-restricted-properties
-
-      return Math.sqrt(Math.pow((other.x - this.x, 2), 2) + Math.pow(other.y - this.y, 2));
-    }
-  }]);
-
-  return Point;
-}();
-
-exports.Point = Point;
-exports.Dimension = Dimension;
-exports.Rectangle = Rectangle;
-exports.LineSegment = LineSegment;
-exports.point = point;
-exports.dimension = dimension;
-exports.rectangle = rectangle;
-exports.lineSegment = lineSegment;
-});
-
-unwrapExports(regefGeometry);
-var regefGeometry_1 = regefGeometry.Point;
-var regefGeometry_2 = regefGeometry.Dimension;
-var regefGeometry_3 = regefGeometry.Rectangle;
-var regefGeometry_4 = regefGeometry.LineSegment;
-var regefGeometry_5 = regefGeometry.point;
-var regefGeometry_6 = regefGeometry.dimension;
-var regefGeometry_7 = regefGeometry.rectangle;
-var regefGeometry_8 = regefGeometry.lineSegment;
-
 var DomHelper = function () {
   function DomHelper(registry) {
     classCallCheck(this, DomHelper);
@@ -940,7 +477,7 @@ var Toolkit = function () {
           width = _wrapper$dom$getBound.width,
           height = _wrapper$dom$getBound.height;
 
-      return regefGeometry_7(left - rLeft, top - rTop, width, height);
+      return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
     }
   }]);
   return Toolkit;
@@ -1516,9 +1053,9 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
           rootX = _registry$root$dom$ge.x,
           rootY = _registry$root$dom$ge.y;
 
-      var location = regefGeometry_5(clientX - rootX, clientY - rootY);
-      var offset = regefGeometry_5(deltaX, deltaY);
-      var delta = regefGeometry_5(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y);
+      var location = regefGeometry.point(clientX - rootX, clientY - rootY);
+      var offset = regefGeometry.point(deltaX, deltaY);
+      var delta = regefGeometry.point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y);
       this.coordinates = {
         location: location,
         offset: offset,
@@ -1581,7 +1118,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
       var startLocation = this.startLocation,
           target = this.target;
 
-      return _ref4 = {}, defineProperty(_ref4, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref4, 'type', SELECT), defineProperty(_ref4, 'bounds', regefGeometry_7(startLocation, regefGeometry_6(0, 0))), defineProperty(_ref4, 'startLocation', startLocation), defineProperty(_ref4, 'endLocation', startLocation), defineProperty(_ref4, 'selection', [target.userComponent]), _ref4;
+      return _ref4 = {}, defineProperty(_ref4, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref4, 'type', SELECT), defineProperty(_ref4, 'bounds', regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0))), defineProperty(_ref4, 'startLocation', startLocation), defineProperty(_ref4, 'endLocation', startLocation), defineProperty(_ref4, 'selection', [target.userComponent]), _ref4;
     }
   }, {
     key: 'handleFeedback',
@@ -1650,7 +1187,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
         var parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
         this.currentParent = parent || this.registry.root;
         this.eventDeltas = buildDeltas(e, this.target.dom);
-        this.startLocation = regefGeometry_5(e.clientX, e.clientY);
+        this.startLocation = regefGeometry.point(e.clientX, e.clientY);
         this.mouseMoved = false;
         this.progress = true;
       }
@@ -1724,14 +1261,14 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
     value: function getStartConnectionRequest() {
       var _ref;
 
-      return _ref = {}, defineProperty(_ref, COMMAND_TARGET, this.source.component), defineProperty(_ref, 'type', START_CONNECTION), defineProperty(_ref, 'source', this.source.component.userComponent), defineProperty(_ref, 'location', regefGeometry_5(this.coordinates)), _ref;
+      return _ref = {}, defineProperty(_ref, COMMAND_TARGET, this.source.component), defineProperty(_ref, 'type', START_CONNECTION), defineProperty(_ref, 'source', this.source.component.userComponent), defineProperty(_ref, 'location', regefGeometry.point(this.coordinates)), _ref;
     }
   }, {
     key: 'getEndConnectionRequest',
     value: function getEndConnectionRequest() {
       var _ref2;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.target.component), defineProperty(_ref2, 'type', END_CONNECTION), defineProperty(_ref2, 'source', this.source.component.userComponent), defineProperty(_ref2, 'target', this.target.component.userComponent), defineProperty(_ref2, 'location', regefGeometry_5(this.coordinates)), _ref2;
+      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.target.component), defineProperty(_ref2, 'type', END_CONNECTION), defineProperty(_ref2, 'source', this.source.component.userComponent), defineProperty(_ref2, 'target', this.target.component.userComponent), defineProperty(_ref2, 'location', regefGeometry.point(this.coordinates)), _ref2;
     }
   }, {
     key: 'buildCoordinates',
@@ -1829,7 +1366,7 @@ var locationOf = function locationOf(_ref, rootDom) {
       x = _rootDom$getBoundingC.x,
       y = _rootDom$getBoundingC.y;
 
-  return regefGeometry_5(clientX - x, clientY - y);
+  return regefGeometry.point(clientX - x, clientY - y);
 };
 
 var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
@@ -1858,7 +1395,7 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
           selection = this.selection,
           additional = this.additional;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref2, 'type', SELECT), defineProperty(_ref2, 'bounds', regefGeometry_7(startLocation, regefGeometry_6(0, 0))), defineProperty(_ref2, 'startLocation', startLocation), defineProperty(_ref2, 'endLocation', endLocation), defineProperty(_ref2, 'selection', additional ? this.engine.selection().concat(selection) : selection), _ref2;
+      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref2, 'type', SELECT), defineProperty(_ref2, 'bounds', regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0))), defineProperty(_ref2, 'startLocation', startLocation), defineProperty(_ref2, 'endLocation', endLocation), defineProperty(_ref2, 'selection', additional ? this.engine.selection().concat(selection) : selection), _ref2;
     }
   }, {
     key: 'cancel',
@@ -1921,7 +1458,7 @@ var buildBounds = function buildBounds(_ref, _ref2) {
   var y = Math.min(y1, y2);
   var width = Math.max(x1, x2) - x;
   var height = Math.max(y1, y2) - y;
-  return regefGeometry_7(x, y, width, height);
+  return regefGeometry.rectangle(x, y, width, height);
 };
 
 var locationOf$1 = function locationOf(_ref3, rootDom) {
@@ -1932,7 +1469,7 @@ var locationOf$1 = function locationOf(_ref3, rootDom) {
       x = _rootDom$getBoundingC.x,
       y = _rootDom$getBoundingC.y;
 
-  return regefGeometry_5(clientX - x, clientY - y);
+  return regefGeometry.point(clientX - x, clientY - y);
 };
 
 var MultiSelectionDragTracker = function (_BaseMouseHandler) {

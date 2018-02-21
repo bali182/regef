@@ -23,9 +23,7 @@
   "homepage": "https://github.com/bali182/regef#readme",
   "peerDependencies": {
     "react": "^16.0.0",
-    "react-dom": "^16.0.0"
-  },
-  "dependencies": {
+    "react-dom": "^16.0.0",
     "regef-geometry": "github:bali182/regef-geometry"
   },
   "devDependencies": {
@@ -48,6 +46,7 @@
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",
+    "regef-geometry": "github:bali182/regef-geometry",
     "redux": "^3.7.2",
     "rollup": "^0.56.1",
     "rollup-plugin-babel": "^3.0.3",
