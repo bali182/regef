@@ -37,7 +37,7 @@ export default class CompositeEditPolicy extends EditPolicy {
     }
     for (let i = 0, len = this.policies.length; i < len; i += 1) {
       const policy = this.policies[i]
-      policy.component = component
+      policy.host = component
     }
   }
 

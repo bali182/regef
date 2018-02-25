@@ -1778,7 +1778,7 @@ var CompositeEditPolicy = function (_EditPolicy) {
       }
       for (var i = 0, len = this.policies.length; i < len; i += 1) {
         var policy = this.policies[i];
-        policy.component = component;
+        policy.host = component;
       }
     }
   }]);
@@ -1976,13 +1976,13 @@ var createDecorator = function createDecorator(_ref) {
 var defaultActivate = function defaultActivate(component) {
   var wrapper = fromComponent(component);
   component.registry.register(wrapper);
-  component.editPolicy.component = component.userComponent;
+  component.editPolicy.host = component.userComponent;
   component.editPolicy.toolkit = component.toolkit;
 };
 
 var defaultDecativate = function defaultDecativate(component) {
   component.registry.unregister(component);
-  component.editPolicy.component = null;
+  component.editPolicy.host = null;
   component.editPolicy.toolkit = null;
 };
 
