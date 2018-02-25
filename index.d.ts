@@ -72,21 +72,21 @@ export class EditPolicy {
 }
 
 export class DispatchingEditPolicy extends EditPolicy {
-  addChild(intent: AddChildrenIntent): void
-  moveChild(intent: MoveChildrenIntent): void
+  addChildren(intent: AddChildrenIntent): void
+  moveChildren(intent: MoveChildrenIntent): void
   startConnection(intent: StartConnectionIntent): void
   endConnection(intent: EndConnectionIntent): void
   select(intent: SelectionIntent): void
   delete(intent: DeleteIntent): void
 
-  requestAddChildFeedback(intent: AddChildrenIntent): void
-  requestMoveChildFeedback(intent: MoveChildrenIntent): void
+  requestAddChildrenFeedback(intent: AddChildrenIntent): void
+  requestMoveChildrenFeedback(intent: MoveChildrenIntent): void
   requestStartConnectionFeedback(intent: StartConnectionIntent): void
   requestEndConnectionFeedback(intent: EndConnectionIntent): void
   requestSelectFeedback(intent: SelectionIntent): void
 
-  eraseAddChildFeedback(intent: AddChildrenIntent): void
-  eraseMoveChildFeedback(intent: MoveChildrenIntent): void
+  eraseAddChildrenFeedback(intent: AddChildrenIntent): void
+  eraseMoveChildrenFeedback(intent: MoveChildrenIntent): void
   eraseStartConnectionFeedback(intent: StartConnectionIntent): void
   eraseEndConnectionFeedback(intent: EndConnectionIntent): void
   eraseSelectFeedback(intent: SelectionIntent): void
@@ -126,16 +126,16 @@ interface DiagramProps {
 
 export class Diagram extends ReactComponent<DiagramProps, any> { /* empty */ }
 
-export function node(...policies: EditPolicy): (ReactConstructor: Function) => any
-export function port(...policies: EditPolicy): (ReactConstructor: Function) => any
-export function root(...policies: EditPolicy): (ReactConstructor: Function) => any
-export function connection(...policies: EditPolicy): (ReactConstructor: Function) => any
+export function node(...policies: EditPolicy[]): (ReactConstructor: Function) => any
+export function port(...policies: EditPolicy[]): (ReactConstructor: Function) => any
+export function root(...policies: EditPolicy[]): (ReactConstructor: Function) => any
+export function connection(...policies: EditPolicy[]): (ReactConstructor: Function) => any
 
 class ComponentWrapper {
   new(dom: Node, component: ReactComponent, userComponent: ReactComponent)
-  get dom(): Node
-  get component(): ReactComponent
-  get userComponent(): ReactComponent
+  dom: Node
+  component: ReactComponent
+  userComponent: ReactComponent
 }
 
 interface ComponentRegistry {
