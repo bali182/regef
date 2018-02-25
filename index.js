@@ -359,8 +359,8 @@ var CONNECTION_TYPE = 'connection';
 var SELECT = 'select';
 var MOVE = 'move';
 var DELETE = 'delete';
-var MOVE_CHILD = 'move-child';
-var ADD_CHILD = 'add-child';
+var MOVE_CHILDREN = 'move-children';
+var ADD_CHILDREN = 'add-children';
 var START_CONNECTION = 'start-connection';
 var END_CONNECTION = 'end-connection';
 
@@ -659,7 +659,7 @@ var EditPolicy = function () {
   function EditPolicy() {
     classCallCheck(this, EditPolicy);
 
-    this.component = null;
+    this.host = null;
     this.toolkit = null;
   }
 
@@ -688,10 +688,10 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'perform',
     value: function perform(request) {
       switch (request.type) {
-        case ADD_CHILD:
-          return this.addChild(request);
-        case MOVE_CHILD:
-          return this.moveChild(request);
+        case ADD_CHILDREN:
+          return this.addChildren(request);
+        case MOVE_CHILDREN:
+          return this.moveChildren(request);
         case START_CONNECTION:
           return this.startConnection(request);
         case END_CONNECTION:
@@ -708,10 +708,10 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'requestFeedback',
     value: function requestFeedback(request) {
       switch (request.type) {
-        case ADD_CHILD:
-          return this.requestAddChildFeedback(request);
-        case MOVE_CHILD:
-          return this.requestMoveChildFeedback(request);
+        case ADD_CHILDREN:
+          return this.requestAddChildrenFeedback(request);
+        case MOVE_CHILDREN:
+          return this.requestMoveChildrenFeedback(request);
         case START_CONNECTION:
           return this.requestStartConnectionFeedback(request);
         case END_CONNECTION:
@@ -726,10 +726,10 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'eraseFeedback',
     value: function eraseFeedback(request) {
       switch (request.type) {
-        case ADD_CHILD:
-          return this.eraseAddChildFeedback(request);
-        case MOVE_CHILD:
-          return this.eraseMoveChildFeedback(request);
+        case ADD_CHILDREN:
+          return this.eraseAddChildrenFeedback(request);
+        case MOVE_CHILDREN:
+          return this.eraseMoveChildrenFeedback(request);
         case START_CONNECTION:
           return this.eraseStartConnectionFeedback(request);
         case END_CONNECTION:
@@ -741,11 +741,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
       }
     }
   }, {
-    key: 'addChild',
-    value: function addChild() /* request */{}
+    key: 'addChildren',
+    value: function addChildren() /* request */{}
   }, {
-    key: 'moveChild',
-    value: function moveChild() /* request */{}
+    key: 'moveChildren',
+    value: function moveChildren() /* request */{}
   }, {
     key: 'startConnection',
     value: function startConnection() /* request */{}
@@ -759,11 +759,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'delete',
     value: function _delete() /* request */{}
   }, {
-    key: 'requestAddChildFeedback',
-    value: function requestAddChildFeedback() /* request */{}
+    key: 'requestAddChildrenFeedback',
+    value: function requestAddChildrenFeedback() /* request */{}
   }, {
-    key: 'requestMoveChildFeedback',
-    value: function requestMoveChildFeedback() /* request */{}
+    key: 'requestMoveChildrenFeedback',
+    value: function requestMoveChildrenFeedback() /* request */{}
   }, {
     key: 'requestStartConnectionFeedback',
     value: function requestStartConnectionFeedback() /* request */{}
@@ -774,11 +774,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'requestSelectFeedback',
     value: function requestSelectFeedback() /* request */{}
   }, {
-    key: 'eraseAddChildFeedback',
-    value: function eraseAddChildFeedback() /* request */{}
+    key: 'eraseAddChildrenFeedback',
+    value: function eraseAddChildrenFeedback() /* request */{}
   }, {
-    key: 'eraseMoveChildFeedback',
-    value: function eraseMoveChildFeedback() /* request */{}
+    key: 'eraseMoveChildrenFeedback',
+    value: function eraseMoveChildrenFeedback() /* request */{}
   }, {
     key: 'eraseStartConnectionFeedback',
     value: function eraseStartConnectionFeedback() /* request */{}
@@ -905,6 +905,40 @@ var Engine = function () {
   return Engine;
 }();
 
+var KeyHandler = function () {
+  function KeyHandler() {
+    classCallCheck(this, KeyHandler);
+  }
+
+  createClass(KeyHandler, [{
+    key: 'setEngine',
+    value: function setEngine() {
+      throw new TypeError('not implemented');
+    }
+  }, {
+    key: 'setComponentRegistry',
+    value: function setComponentRegistry() {
+      throw new TypeError('not implemented');
+    }
+  }, {
+    key: 'cancel',
+    value: function cancel() {
+      throw new TypeError('not implemented');
+    }
+  }, {
+    key: 'onKeyDown',
+    value: function onKeyDown() {
+      throw new TypeError('not implemented');
+    }
+  }, {
+    key: 'onKeyUp',
+    value: function onKeyUp() {
+      throw new TypeError('not implemented');
+    }
+  }]);
+  return KeyHandler;
+}();
+
 var MouseHandler = function () {
   function MouseHandler() {
     classCallCheck(this, MouseHandler);
@@ -1007,13 +1041,13 @@ var buildDeltas = function buildDeltas(_ref, element) {
   };
 };
 
-var NodeMouseHandler = function (_BaseMouseHandler) {
-  inherits(NodeMouseHandler, _BaseMouseHandler);
+var DragMouseHandler = function (_BaseMouseHandler) {
+  inherits(DragMouseHandler, _BaseMouseHandler);
 
-  function NodeMouseHandler() {
-    classCallCheck(this, NodeMouseHandler);
+  function DragMouseHandler() {
+    classCallCheck(this, DragMouseHandler);
 
-    var _this = possibleConstructorReturn(this, (NodeMouseHandler.__proto__ || Object.getPrototypeOf(NodeMouseHandler)).call(this));
+    var _this = possibleConstructorReturn(this, (DragMouseHandler.__proto__ || Object.getPrototypeOf(DragMouseHandler)).call(this));
 
     _this.target = null;
     _this.lastTargetParent = null;
@@ -1027,7 +1061,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
     return _this;
   }
 
-  createClass(NodeMouseHandler, [{
+  createClass(DragMouseHandler, [{
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget) {
       var domHelper = this.domHelper,
@@ -1094,7 +1128,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
           offset = coordinates.offset,
           delta = coordinates.delta;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, currentParent.component), defineProperty(_ref2, 'type', MOVE_CHILD), defineProperty(_ref2, 'components', this.getMovedComponents()), defineProperty(_ref2, 'container', currentParent.component.userComponent), defineProperty(_ref2, 'location', location), defineProperty(_ref2, 'offset', offset), defineProperty(_ref2, 'delta', delta), _ref2;
+      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, currentParent.component), defineProperty(_ref2, 'type', MOVE_CHILDREN), defineProperty(_ref2, 'components', this.getMovedComponents()), defineProperty(_ref2, 'container', currentParent.component.userComponent), defineProperty(_ref2, 'location', location), defineProperty(_ref2, 'offset', offset), defineProperty(_ref2, 'delta', delta), _ref2;
     }
   }, {
     key: 'getAddChildRequest',
@@ -1108,7 +1142,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
           offset = coordinates.offset,
           delta = coordinates.delta;
 
-      return _ref3 = {}, defineProperty(_ref3, COMMAND_TARGET, targetParent.component), defineProperty(_ref3, 'type', ADD_CHILD), defineProperty(_ref3, 'components', this.getMovedComponents()), defineProperty(_ref3, 'targetContainer', targetParent.component.userComponent), defineProperty(_ref3, 'container', currentParent.component.userComponent), defineProperty(_ref3, 'location', location), defineProperty(_ref3, 'offset', offset), defineProperty(_ref3, 'delta', delta), _ref3;
+      return _ref3 = {}, defineProperty(_ref3, COMMAND_TARGET, targetParent.component), defineProperty(_ref3, 'type', ADD_CHILDREN), defineProperty(_ref3, 'components', this.getMovedComponents()), defineProperty(_ref3, 'targetContainer', targetParent.component.userComponent), defineProperty(_ref3, 'container', currentParent.component.userComponent), defineProperty(_ref3, 'location', location), defineProperty(_ref3, 'offset', offset), defineProperty(_ref3, 'delta', delta), _ref3;
     }
   }, {
     key: 'getSelectionRequest',
@@ -1226,7 +1260,7 @@ var NodeMouseHandler = function (_BaseMouseHandler) {
       this.progress = false;
     }
   }]);
-  return NodeMouseHandler;
+  return DragMouseHandler;
 }(BaseMouseHandler);
 
 var ConnectMouseHandler = function (_BaseMouseHandler) {
@@ -1575,40 +1609,6 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
   return MultiSelectionDragTracker;
 }(BaseMouseHandler);
 
-var KeyHandler = function () {
-  function KeyHandler() {
-    classCallCheck(this, KeyHandler);
-  }
-
-  createClass(KeyHandler, [{
-    key: 'setEngine',
-    value: function setEngine() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp() {
-      throw new TypeError('not implemented');
-    }
-  }]);
-  return KeyHandler;
-}();
-
 var BaseKeyHandler = function (_KeyHandler) {
   inherits(BaseKeyHandler, _KeyHandler);
 
@@ -1767,7 +1767,7 @@ var CompositeEditPolicy = function (_EditPolicy) {
       }
     }
   }, {
-    key: 'component',
+    key: 'host',
     get: function get$$1() {
       return this[COMPONENT$1];
     },
@@ -2024,7 +2024,9 @@ exports.Diagram = Diagram;
 exports.EditPolicy = EditPolicy;
 exports.DispatchingEditPolicy = DispatchingEditPolicy;
 exports.Engine = Engine;
-exports.NodeMouseHandler = NodeMouseHandler;
+exports.KeyHandler = KeyHandler;
+exports.MouseHandler = MouseHandler;
+exports.DragMouseHandler = DragMouseHandler;
 exports.ConnectMouseHandler = ConnectMouseHandler;
 exports.SingleSelectionMouseHandler = SingleSelectionMouseHandler;
 exports.MultiSelectionMouseHandler = MultiSelectionDragTracker;
@@ -2044,8 +2046,8 @@ exports.CONNECTION_TYPE = CONNECTION_TYPE;
 exports.SELECT = SELECT;
 exports.MOVE = MOVE;
 exports.DELETE = DELETE;
-exports.MOVE_CHILD = MOVE_CHILD;
-exports.ADD_CHILD = ADD_CHILD;
+exports.MOVE_CHILDREN = MOVE_CHILDREN;
+exports.ADD_CHILDREN = ADD_CHILDREN;
 exports.START_CONNECTION = START_CONNECTION;
 exports.END_CONNECTION = END_CONNECTION;
 exports.COMMAND_TARGET = COMMAND_TARGET;

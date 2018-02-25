@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { MOVE_CHILD, ADD_CHILD, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
+import { MOVE_CHILDREN, ADD_CHILDREN, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import BaseMouseHandler from './BaseMouseHandler'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
@@ -14,7 +14,7 @@ const buildDeltas = ({ clientX, clientY }, element) => {
   }
 }
 
-export default class NodeMouseHandler extends BaseMouseHandler {
+export default class DragMouseHandler extends BaseMouseHandler {
   constructor() {
     super()
     this.target = null
@@ -78,7 +78,7 @@ export default class NodeMouseHandler extends BaseMouseHandler {
     const { location, offset, delta } = coordinates
     return {
       [COMMAND_TARGET]: currentParent.component,
-      type: MOVE_CHILD,
+      type: MOVE_CHILDREN,
       components: this.getMovedComponents(),
       container: currentParent.component.userComponent,
       location,
@@ -92,7 +92,7 @@ export default class NodeMouseHandler extends BaseMouseHandler {
     const { location, offset, delta } = coordinates
     return {
       [COMMAND_TARGET]: targetParent.component,
-      type: ADD_CHILD,
+      type: ADD_CHILDREN,
       components: this.getMovedComponents(),
       targetContainer: targetParent.component.userComponent,
       container: currentParent.component.userComponent,

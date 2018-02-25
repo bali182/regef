@@ -7,7 +7,7 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
 
   requestAddOrMoveFeedback({ location: { x, y }, component }) {
     const { width, height } = this.toolkit.bounds(component)
-    this.component.setState({
+    this.host.setState({
       feedback: {
         x,
         y,
@@ -18,16 +18,16 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
   }
 
   eraseAddOrMoveFeedback() {
-    this.component.setState({
+    this.host.setState({
       feedback: null,
     })
   }
 
-  requestAddChildFeedback(request) {
+  requestAddChildrenFeedback(request) {
     this.requestAddOrMoveFeedback(request)
   }
 
-  requestMoveChildFeedback(request) {
+  requestMoveChildrenFeedback(request) {
     this.requestAddOrMoveFeedback(request)
   }
 
@@ -35,33 +35,33 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     const sourceLocation = this.toolkit.bounds(this.toolkit.parent(request.source)).center()
     const targetLocation = request.location
     const connectionFeedback = sourceLocation.lineSegmentTo(targetLocation)
-    this.component.setState({ connectionFeedback })
+    this.host.setState({ connectionFeedback })
   }
 
   requestSelectFeedback({ bounds }) {
-    this.component.setState({ selectionFeedback: bounds })
+    this.host.setState({ selectionFeedback: bounds })
   }
 
-  eraseMoveChildFeedback(request) {
+  eraseMoveChildrenFeedback(request) {
     this.eraseAddOrMoveFeedback(request)
   }
 
-  eraseAddChildFeedback(request) {
+  eraseAddChildrenFeedback(request) {
     this.eraseAddOrMoveFeedback(request)
   }
 
 
   eraseEndConnectionFeedback() {
-    this.component.setState({ connectionFeedback: null })
+    this.host.setState({ connectionFeedback: null })
   }
 
   eraseSelectFeedback() {
-    this.component.setState({ selectionFeedback: null })
+    this.host.setState({ selectionFeedback: null })
   }
 
-  addChild({ component, location: { x, y } }) {
+  addChildren({ component, location: { x, y } }) {
     if (this.isValidChild(component)) {
-      const receiver = this.component
+      const receiver = this.host
       receiver.props.addChild({
         id: 'root',
         childId: component.props.id,
@@ -74,9 +74,9 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
     }
   }
 
-  moveChild({ component, location, delta }) {
+  moveChildren({ component, location, delta }) {
     if (this.isValidChild(component)) {
-      const root = this.component
+      const root = this.host
       const { selection, nodes } = root.props
       const id = component.props.id
       if (selection.indexOf(id) >= 0) {
@@ -99,12 +99,12 @@ class RootNodeEditPolict extends DispatchingEditPolicy {
 
   select({ selection }) {
     const ids = selection.map((component) => component.props.id)
-    this.component.props.setSelection({ selection: ids })
+    this.host.props.setSelection({ selection: ids })
   }
 
   delete({ selection }) {
     const ids = selection.map((component) => component.props.id)
-    ids.forEach((id) => this.component.props.deleteNode({ id }))
+    ids.forEach((id) => this.host.props.deleteNode({ id }))
   }
 }
 

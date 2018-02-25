@@ -5,10 +5,10 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     return component && component.props && component.props.id
   }
 
-  addChild({ component }) {
+  addChildren({ component }) {
     if (this.isValidChild(component)) {
       const { props: { id: childId } } = component
-      const { props: { id, addChild } } = this.component
+      const { props: { id, addChild } } = this.host
       addChild({ id, childId })
     }
   }
@@ -22,9 +22,9 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  requestAddChildFeedback({ component }) {
+  requestAddChildrenFeedback({ component }) {
     const { width, height } = this.toolkit.bounds(component)
-    this.component.setState({
+    this.host.setState({
       feedback: {
         width,
         height,
@@ -39,8 +39,8 @@ class ChildNodeEditPolicy extends DispatchingEditPolicy {
     this.toolkit.root().setState({ connectionFeedback })
   }
 
-  eraseAddChildFeedback() {
-    this.component.setState({
+  eraseAddChildrenFeedback() {
+    this.host.setState({
       feedback: null,
     })
   }

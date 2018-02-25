@@ -26,11 +26,11 @@ export default class CompositeEditPolicy extends EditPolicy {
     }
   }
 
-  get component() {
+  get host() {
     return this[COMPONENT]
   }
 
-  set component(component) {
+  set host(component) {
     this._component = component
     if (this.policies === null || this.policies === undefined) {
       return

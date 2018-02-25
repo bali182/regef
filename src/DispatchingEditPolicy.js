@@ -1,12 +1,12 @@
 import EditPolicy from './EditPolicy'
 
-import { ADD_CHILD, MOVE_CHILD, START_CONNECTION, END_CONNECTION, SELECT, DELETE } from './constants'
+import { ADD_CHILDREN, MOVE_CHILDREN, START_CONNECTION, END_CONNECTION, SELECT, DELETE } from './constants'
 
 export default class DispatchingEditPolicy extends EditPolicy {
   perform(request) {
     switch (request.type) {
-      case ADD_CHILD: return this.addChild(request)
-      case MOVE_CHILD: return this.moveChild(request)
+      case ADD_CHILDREN: return this.addChildren(request)
+      case MOVE_CHILDREN: return this.moveChildren(request)
       case START_CONNECTION: return this.startConnection(request)
       case END_CONNECTION: return this.endConnection(request)
       case SELECT: return this.select(request)
@@ -17,8 +17,8 @@ export default class DispatchingEditPolicy extends EditPolicy {
 
   requestFeedback(request) {
     switch (request.type) {
-      case ADD_CHILD: return this.requestAddChildFeedback(request)
-      case MOVE_CHILD: return this.requestMoveChildFeedback(request)
+      case ADD_CHILDREN: return this.requestAddChildrenFeedback(request)
+      case MOVE_CHILDREN: return this.requestMoveChildrenFeedback(request)
       case START_CONNECTION: return this.requestStartConnectionFeedback(request)
       case END_CONNECTION: return this.requestEndConnectionFeedback(request)
       case SELECT: return this.requestSelectFeedback(request)
@@ -28,8 +28,8 @@ export default class DispatchingEditPolicy extends EditPolicy {
 
   eraseFeedback(request) {
     switch (request.type) {
-      case ADD_CHILD: return this.eraseAddChildFeedback(request)
-      case MOVE_CHILD: return this.eraseMoveChildFeedback(request)
+      case ADD_CHILDREN: return this.eraseAddChildrenFeedback(request)
+      case MOVE_CHILDREN: return this.eraseMoveChildrenFeedback(request)
       case START_CONNECTION: return this.eraseStartConnectionFeedback(request)
       case END_CONNECTION: return this.eraseEndConnectionFeedback(request)
       case SELECT: return this.eraseSelectFeedback(request)
@@ -37,21 +37,21 @@ export default class DispatchingEditPolicy extends EditPolicy {
     }
   }
 
-  addChild(/* request */) { }
-  moveChild(/* request */) { }
+  addChildren(/* request */) { }
+  moveChildren(/* request */) { }
   startConnection(/* request */) { }
   endConnection(/* request */) { }
   select(/* request */) { }
   delete(/* request */) { }
 
-  requestAddChildFeedback(/* request */) { }
-  requestMoveChildFeedback(/* request */) { }
+  requestAddChildrenFeedback(/* request */) { }
+  requestMoveChildrenFeedback(/* request */) { }
   requestStartConnectionFeedback(/* request */) { }
   requestEndConnectionFeedback(/* request */) { }
   requestSelectFeedback(/* request */) { }
 
-  eraseAddChildFeedback(/* request */) { }
-  eraseMoveChildFeedback(/* request */) { }
+  eraseAddChildrenFeedback(/* request */) { }
+  eraseMoveChildrenFeedback(/* request */) { }
   eraseStartConnectionFeedback(/* request */) { }
   eraseEndConnectionFeedback(/* request */) { }
   eraseSelectFeedback(/* request */) { }

@@ -6,7 +6,7 @@ import store from './redux/store'
 import {
   Diagram,
   Engine,
-  NodeMouseHandler,
+  DragMouseHandler,
   ConnectMouseHandler,
   SingleSelectionMouseHandler,
   MultiSelectionMouseHandler,
@@ -30,7 +30,7 @@ const rootStyle = {
 
 const engine = new Engine({
   mouseHandlers: [
-    new NodeMouseHandler(),
+    new DragMouseHandler(),
     new ConnectMouseHandler(),
     new SingleSelectionMouseHandler(),
     new MultiSelectionMouseHandler(),

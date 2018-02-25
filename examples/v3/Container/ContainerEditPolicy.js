@@ -1,9 +1,9 @@
 import { DispatchingEditPolicy } from '../../../src/index'
 
 export default class ContainerEditPolicy extends DispatchingEditPolicy {
-  moveChild({ components, location }) {
-    const { toolkit, component } = this
-    const children = toolkit.children(component)
+  moveChildren({ components, location }) {
+    const { toolkit, host } = this
+    const children = toolkit.children(host)
     if (!components.every((moved) => children.indexOf(moved) >= 0)) {
       return
     }
@@ -19,36 +19,36 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
       before === null ? null : before.props.id,
       after === null ? null : after.props.id,
     )
-    component.props.setChildren({
-      id: component.props.id,
+    host.props.setChildren({
+      id: host.props.id,
       children: newState,
     })
   }
 
-  requestMoveChildFeedback({ location, delta, components }) {
-    const { toolkit, component } = this
+  requestMoveChildrenFeedback({ location, delta, components }) {
+    const { toolkit, host } = this
     const root = toolkit.root()
-    const children = toolkit.children(component)
+    const children = toolkit.children(host)
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
     if (components.every((moved) => children.indexOf(moved) >= 0)) {
-      component.setState({ insertionFeedback: this.insertionIndex(children, location) })
+      host.setState({ insertionFeedback: this.insertionIndex(children, location) })
       root.setState({ moveFeedback: bounds })
     } else {
       root.setState({ errorFeedback: bounds })
     }
   }
 
-  requestAddChildFeedback({ delta, components }) {
+  requestAddChildrenFeedback({ delta, components }) {
     const { toolkit } = this
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
     toolkit.root().setState({ errorFeedback: bounds })
   }
-  eraseAddChildFeedback() {
+  eraseAddChildrenFeedback() {
     this.toolkit.root().setState({ errorFeedback: null })
   }
 
-  eraseMoveChildFeedback() {
-    this.component.setState({ insertionFeedback: null })
+  eraseMoveChildrenFeedback() {
+    this.host.setState({ insertionFeedback: null })
     this.toolkit.root().setState({ moveFeedback: null, errorFeedback: null })
   }
 

@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import {
   Diagram,
   Engine,
-  NodeMouseHandler,
+  DragMouseHandler,
   ConnectMouseHandler,
   SingleSelectionMouseHandler,
   MultiSelectionMouseHandler,
@@ -19,7 +19,7 @@ import DiagramSelectionProvider from './DiagramSelectionProvider'
 
 const engine = new Engine({
   mouseHandlers: [
-    new NodeMouseHandler(),
+    new DragMouseHandler(),
     new ConnectMouseHandler(),
     new SingleSelectionMouseHandler(),
     new MultiSelectionMouseHandler(),

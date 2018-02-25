@@ -1,10 +1,10 @@
 import { DispatchingEditPolicy } from '../../../src/index'
 
 export default class RootEditPolicy extends DispatchingEditPolicy {
-  moveChild({ components, delta }) {
+  moveChildren({ components, delta }) {
     components.forEach((component) => {
       const { x, y } = this.toolkit.bounds(component).location()
-      this.component.props.setPosition({
+      this.host.props.setPosition({
         id: component.props.id,
         x: Math.round(x + delta.x),
         y: Math.round(y + delta.y),
@@ -14,45 +14,45 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
 
   select({ selection }) {
     const ids = selection.map((component) => component.props.id)
-    this.component.props.setSelection({ selection: ids })
+    this.host.props.setSelection({ selection: ids })
   }
 
   delete({ selection }) {
     const ids = selection.map((component) => component.props.id)
-    ids.forEach((id) => this.component.props.deleteComponent({ id }))
+    ids.forEach((id) => this.host.props.deleteComponent({ id }))
   }
 
-  requestMoveChildFeedback({ components, delta }) {
-    this.component.setState({
+  requestMoveChildrenFeedback({ components, delta }) {
+    this.host.setState({
       moveFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),
     })
   }
 
-  eraseMoveChildFeedback() {
-    this.component.setState({
+  eraseMoveChildrenFeedback() {
+    this.host.setState({
       moveFeedback: null,
     })
   }
 
   requestSelectFeedback({ bounds }) {
-    this.component.setState({ selectionFeedback: bounds })
+    this.host.setState({ selectionFeedback: bounds })
   }
 
   eraseSelectFeedback() {
-    this.component.setState({
+    this.host.setState({
       selectionFeedback: null,
     })
   }
 
-  requestAddChildFeedback({ components, delta }) {
+  requestAddChildrenFeedback({ components, delta }) {
     if (components.some((c) => c.props.step)) {
-      this.component.setState({
+      this.host.setState({
         errorFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),
       })
     }
   }
 
-  eraseAddChildFeedback() {
-    this.component.setState({ errorFeedback: null })
+  eraseAddChildrenFeedback() {
+    this.host.setState({ errorFeedback: null })
   }
 }

@@ -1,6 +1,6 @@
 export default class EditPolicy {
   constructor() {
-    this.component = null
+    this.host = null
     this.toolkit = null
   }
 
