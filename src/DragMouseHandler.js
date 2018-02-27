@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { MOVE_CHILDREN, ADD_CHILDREN, COMMAND_TARGET, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
+import { MOVE_CHILDREN, ADD_CHILDREN, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import BaseMouseHandler from './BaseMouseHandler'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
@@ -77,7 +77,6 @@ export default class DragMouseHandler extends BaseMouseHandler {
     const { currentParent, coordinates } = this
     const { location, offset, delta } = coordinates
     return {
-      [COMMAND_TARGET]: currentParent.component,
       type: MOVE_CHILDREN,
       components: this.getMovedComponents(),
       container: currentParent.component.userComponent,
@@ -91,7 +90,6 @@ export default class DragMouseHandler extends BaseMouseHandler {
     const { targetParent, currentParent, coordinates } = this
     const { location, offset, delta } = coordinates
     return {
-      [COMMAND_TARGET]: targetParent.component,
       type: ADD_CHILDREN,
       components: this.getMovedComponents(),
       targetContainer: targetParent.component.userComponent,
@@ -105,7 +103,6 @@ export default class DragMouseHandler extends BaseMouseHandler {
   getSelectionRequest() {
     const { startLocation, target } = this
     return {
-      [COMMAND_TARGET]: this.registry.root.component,
       type: SELECT,
       bounds: rectangle(startLocation, dimension(0, 0)),
       startLocation,
@@ -121,10 +118,10 @@ export default class DragMouseHandler extends BaseMouseHandler {
       lastTargetParent.dom !== targetParent.dom &&
       lastTargetParent.component !== null
     ) {
-      lastTargetParent.component.eraseFeedback(lastRequest)
+      this.engine.editPolicy.eraseFeedback(lastRequest)
     }
     if (request !== null) {
-      targetParent.component.requestFeedback(request)
+      this.engine.editPolicy.requestFeedback(request)
     }
   }
 
@@ -155,7 +152,7 @@ export default class DragMouseHandler extends BaseMouseHandler {
   cancel() {
     if (this.progress) {
       if (this.lastRequest !== null && this.targetParent !== null) {
-        this.targetParent.component.eraseFeedback(this.lastRequest)
+        this.engine.editPolicy.eraseFeedback(this.lastRequest)
       }
       this.progress = false
       this.lastRequest = null
@@ -191,7 +188,7 @@ export default class DragMouseHandler extends BaseMouseHandler {
     const selection = this.engine.selection()
     if (selection.indexOf(this.target.userComponent) < 0) {
       const selectionReq = this.getSelectionRequest()
-      selectionReq[COMMAND_TARGET].perform(selectionReq)
+      this.engine.editPolicy.perform(selectionReq)
     }
     this.handleFeedback(this.lastRequest, request)
     if (request !== null) {
@@ -205,10 +202,10 @@ export default class DragMouseHandler extends BaseMouseHandler {
     }
     const request = this.buildDragRequest(e)
     if (this.targetParent !== null && this.lastRequest !== null) {
-      this.targetParent.component.eraseFeedback(this.lastRequest)
+      this.engine.editPolicy.eraseFeedback(this.lastRequest)
     }
-    if (request !== null && request[COMMAND_TARGET] && this.mouseMoved) {
-      request[COMMAND_TARGET].perform(request)
+    if (request !== null && this.mouseMoved) {
+      this.engine.editPolicy.perform(request)
     }
     this.progress = false
   }

@@ -1,9 +1,11 @@
 import SelectionProvider from './SelectionProvider'
+import { compose } from './CompositeEditPolicy'
 
 class Engine {
   constructor({
     mouseHandlers = [],
     keyHandlers = [],
+    editPolicies = [],
     selectionProvider = new SelectionProvider(),
   }) {
     this.toolkit = null
@@ -11,9 +13,11 @@ class Engine {
     this.mouseHandlers = mouseHandlers
     this.keyHandlers = keyHandlers
     this.selectionProvider = selectionProvider
+    this.editPolicy = compose(editPolicies)
   }
   setToolkit(toolkit) {
     this.toolkit = toolkit
+    this.editPolicy.toolkit = toolkit
   }
   getComponentRegistry() {
     return this.registry

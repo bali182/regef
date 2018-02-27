@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import ContainerView from './ContainerView'
 import Step from '../Step'
 import { node } from '../../../src/index'
-import ContainerEditPolicy from './ContainerEditPolicy'
 import { setChildren } from '../redux/actions'
 import LineFeedback from './LineFeedback'
 
@@ -15,7 +14,7 @@ const stateToProps = ({ components, selection }, { id }) => ({
 })
 
 @connect(stateToProps, { setChildren })
-@node(ContainerEditPolicy)
+@node()
 export default class Container extends React.Component {
   constructor() {
     super()

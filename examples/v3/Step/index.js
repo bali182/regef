@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import StepView from './StepView'
 
 import { node } from '../../../src/index'
-import StepEditPolicy from './StepEditPolicy'
 
 const stateToProps = ({ components, selection }, { id }) => ({
   step: components[id],
@@ -11,7 +10,7 @@ const stateToProps = ({ components, selection }, { id }) => ({
 })
 
 @connect(stateToProps)
-@node(StepEditPolicy)
+@node()
 export default class Step extends React.Component {
   render() {
     const { id, selected } = this.props

@@ -1,9 +1,16 @@
 import { DispatchingEditPolicy } from '../../../src/index'
 
 export default class ContainerEditPolicy extends DispatchingEditPolicy {
-  moveChildren({ components, location }) {
-    const { toolkit, host } = this
-    const children = toolkit.children(host)
+  checkRelevant(component) {
+    return Boolean(component) && Boolean(component.props.container)
+  }
+
+  moveChildren({ components, container, location }) {
+    if (!this.checkRelevant(container)) {
+      return
+    }
+    const { toolkit } = this
+    const children = toolkit.children(container)
     if (!components.every((moved) => children.indexOf(moved) >= 0)) {
       return
     }
@@ -19,36 +26,48 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
       before === null ? null : before.props.id,
       after === null ? null : after.props.id,
     )
-    host.props.setChildren({
-      id: host.props.id,
+    container.props.setChildren({
+      id: container.props.id,
       children: newState,
     })
   }
 
-  requestMoveChildrenFeedback({ location, delta, components }) {
-    const { toolkit, host } = this
+  requestMoveChildrenFeedback({ location, delta, container, components }) {
+    if (!this.checkRelevant(container)) {
+      return
+    }
+    const { toolkit } = this
     const root = toolkit.root()
-    const children = toolkit.children(host)
+    const children = toolkit.children(container)
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
     if (components.every((moved) => children.indexOf(moved) >= 0)) {
-      host.setState({ insertionFeedback: this.insertionIndex(children, location) })
+      container.setState({ insertionFeedback: this.insertionIndex(children, location) })
       root.setState({ moveFeedback: bounds })
     } else {
       root.setState({ errorFeedback: bounds })
     }
   }
 
-  requestAddChildrenFeedback({ delta, components }) {
+  requestAddChildrenFeedback({ delta, components, targetContainer }) {
+    if (!this.checkRelevant(targetContainer)) {
+      return
+    }
     const { toolkit } = this
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
     toolkit.root().setState({ errorFeedback: bounds })
   }
-  eraseAddChildrenFeedback() {
+  eraseAddChildrenFeedback({ targetContainer }) {
+    if (!this.checkRelevant(targetContainer)) {
+      return
+    }
     this.toolkit.root().setState({ errorFeedback: null })
   }
 
-  eraseMoveChildrenFeedback() {
-    this.host.setState({ insertionFeedback: null })
+  eraseMoveChildrenFeedback({ container }) {
+    if (!this.checkRelevant(container)) {
+      return
+    }
+    container.setState({ insertionFeedback: null })
     this.toolkit.root().setState({ moveFeedback: null, errorFeedback: null })
   }
 

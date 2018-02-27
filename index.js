@@ -33,32 +33,6 @@ var createClass = function () {
   };
 }();
 
-var defineEnumerableProperties = function (obj, descs) {
-  for (var key in descs) {
-    var desc = descs[key];
-    desc.configurable = desc.enumerable = true;
-    if ("value" in desc) desc.writable = true;
-    Object.defineProperty(obj, key, desc);
-  }
-
-  return obj;
-};
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i];
@@ -364,9 +338,6 @@ var ADD_CHILDREN = 'add-children';
 var START_CONNECTION = 'start-connection';
 var END_CONNECTION = 'end-connection';
 
-// Request hidden target key
-var COMMAND_TARGET = Symbol('command-target');
-
 var REGISTRY = Symbol('registry');
 var DOM_HELPER = Symbol('dom-helper');
 
@@ -659,7 +630,6 @@ var EditPolicy = function () {
   function EditPolicy() {
     classCallCheck(this, EditPolicy);
 
-    this.host = null;
     this.toolkit = null;
   }
 
@@ -813,12 +783,96 @@ var SelectionProvider = function () {
   return SelectionProvider;
 }();
 
+var TOOLKIT = Symbol('TOOLKIT');
+
+var CompositeEditPolicy = function (_EditPolicy) {
+  inherits(CompositeEditPolicy, _EditPolicy);
+
+  function CompositeEditPolicy() {
+    var policies = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    classCallCheck(this, CompositeEditPolicy);
+
+    var _this = possibleConstructorReturn(this, (CompositeEditPolicy.__proto__ || Object.getPrototypeOf(CompositeEditPolicy)).call(this));
+
+    _this.policies = policies;
+    _this[TOOLKIT] = null;
+    return _this;
+  }
+
+  createClass(CompositeEditPolicy, [{
+    key: 'perform',
+    value: function perform(intent) {
+      this.policies.forEach(function (policy) {
+        return policy.perform(intent);
+      });
+    }
+  }, {
+    key: 'requestFeedback',
+    value: function requestFeedback(intent) {
+      this.policies.forEach(function (policy) {
+        return policy.requestFeedback(intent);
+      });
+    }
+  }, {
+    key: 'eraseFeedback',
+    value: function eraseFeedback(intent) {
+      this.policies.forEach(function (policy) {
+        return policy.eraseFeedback(intent);
+      });
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this[TOOLKIT];
+    },
+    set: function set$$1(toolkit) {
+      this._toolkit = toolkit;
+      if (this.policies === null || this.policies === undefined) {
+        return;
+      }
+      this.policies.forEach(function (policy) {
+        // eslint-disable-next-line no-param-reassign
+        policy.toolkit = toolkit;
+      });
+    }
+  }]);
+  return CompositeEditPolicy;
+}(EditPolicy);
+
+
+var compose = function compose(policies) {
+  if (policies === null || policies === undefined) {
+    return new EditPolicy();
+  } else if (policies instanceof EditPolicy) {
+    return policies;
+  } else if (Array.isArray(policies)) {
+    for (var i = 0, len = policies.length; i < len; i += 1) {
+      var element = policies[i];
+      if (!(element instanceof EditPolicy)) {
+        throw new TypeError('Expected policies[' + i + '] to be an EditPolicy, got ' + policies[0] + ' instead.');
+      }
+    }
+    switch (policies.length) {
+      case 0:
+        return new EditPolicy();
+      case 1:
+        return policies[0];
+      default:
+        return new CompositeEditPolicy(policies);
+    }
+  } else {
+    throw new TypeError('Expected EditPolicy or Array<EditPolicy>, got ' + policies + ' instead.');
+  }
+};
+
 var Engine = function () {
   function Engine(_ref) {
     var _ref$mouseHandlers = _ref.mouseHandlers,
         mouseHandlers = _ref$mouseHandlers === undefined ? [] : _ref$mouseHandlers,
         _ref$keyHandlers = _ref.keyHandlers,
         keyHandlers = _ref$keyHandlers === undefined ? [] : _ref$keyHandlers,
+        _ref$editPolicies = _ref.editPolicies,
+        editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
         _ref$selectionProvide = _ref.selectionProvider,
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
@@ -828,12 +882,14 @@ var Engine = function () {
     this.mouseHandlers = mouseHandlers;
     this.keyHandlers = keyHandlers;
     this.selectionProvider = selectionProvider;
+    this.editPolicy = compose(editPolicies);
   }
 
   createClass(Engine, [{
     key: 'setToolkit',
     value: function setToolkit(toolkit) {
       this.toolkit = toolkit;
+      this.editPolicy.toolkit = toolkit;
     }
   }, {
     key: 'getComponentRegistry',
@@ -1120,21 +1176,24 @@ var DragMouseHandler = function (_BaseMouseHandler) {
   }, {
     key: 'getMoveChildRequest',
     value: function getMoveChildRequest() {
-      var _ref2;
-
       var currentParent = this.currentParent,
           coordinates = this.coordinates;
       var location = coordinates.location,
           offset = coordinates.offset,
           delta = coordinates.delta;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, currentParent.component), defineProperty(_ref2, 'type', MOVE_CHILDREN), defineProperty(_ref2, 'components', this.getMovedComponents()), defineProperty(_ref2, 'container', currentParent.component.userComponent), defineProperty(_ref2, 'location', location), defineProperty(_ref2, 'offset', offset), defineProperty(_ref2, 'delta', delta), _ref2;
+      return {
+        type: MOVE_CHILDREN,
+        components: this.getMovedComponents(),
+        container: currentParent.component.userComponent,
+        location: location,
+        offset: offset,
+        delta: delta
+      };
     }
   }, {
     key: 'getAddChildRequest',
     value: function getAddChildRequest() {
-      var _ref3;
-
       var targetParent = this.targetParent,
           currentParent = this.currentParent,
           coordinates = this.coordinates;
@@ -1142,17 +1201,29 @@ var DragMouseHandler = function (_BaseMouseHandler) {
           offset = coordinates.offset,
           delta = coordinates.delta;
 
-      return _ref3 = {}, defineProperty(_ref3, COMMAND_TARGET, targetParent.component), defineProperty(_ref3, 'type', ADD_CHILDREN), defineProperty(_ref3, 'components', this.getMovedComponents()), defineProperty(_ref3, 'targetContainer', targetParent.component.userComponent), defineProperty(_ref3, 'container', currentParent.component.userComponent), defineProperty(_ref3, 'location', location), defineProperty(_ref3, 'offset', offset), defineProperty(_ref3, 'delta', delta), _ref3;
+      return {
+        type: ADD_CHILDREN,
+        components: this.getMovedComponents(),
+        targetContainer: targetParent.component.userComponent,
+        container: currentParent.component.userComponent,
+        location: location,
+        offset: offset,
+        delta: delta
+      };
     }
   }, {
     key: 'getSelectionRequest',
     value: function getSelectionRequest() {
-      var _ref4;
-
       var startLocation = this.startLocation,
           target = this.target;
 
-      return _ref4 = {}, defineProperty(_ref4, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref4, 'type', SELECT), defineProperty(_ref4, 'bounds', regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0))), defineProperty(_ref4, 'startLocation', startLocation), defineProperty(_ref4, 'endLocation', startLocation), defineProperty(_ref4, 'selection', [target.userComponent]), _ref4;
+      return {
+        type: SELECT,
+        bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
+        startLocation: startLocation,
+        endLocation: startLocation,
+        selection: [target.userComponent]
+      };
     }
   }, {
     key: 'handleFeedback',
@@ -1161,10 +1232,10 @@ var DragMouseHandler = function (_BaseMouseHandler) {
           targetParent = this.targetParent;
 
       if (lastRequest !== null && lastTargetParent.dom !== targetParent.dom && lastTargetParent.component !== null) {
-        lastTargetParent.component.eraseFeedback(lastRequest);
+        this.engine.editPolicy.eraseFeedback(lastRequest);
       }
       if (request !== null) {
-        targetParent.component.requestFeedback(request);
+        this.engine.editPolicy.requestFeedback(request);
       }
     }
   }, {
@@ -1199,7 +1270,7 @@ var DragMouseHandler = function (_BaseMouseHandler) {
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null && this.targetParent !== null) {
-          this.targetParent.component.eraseFeedback(this.lastRequest);
+          this.engine.editPolicy.eraseFeedback(this.lastRequest);
         }
         this.progress = false;
         this.lastRequest = null;
@@ -1237,7 +1308,7 @@ var DragMouseHandler = function (_BaseMouseHandler) {
       var selection = this.engine.selection();
       if (selection.indexOf(this.target.userComponent) < 0) {
         var selectionReq = this.getSelectionRequest();
-        selectionReq[COMMAND_TARGET].perform(selectionReq);
+        this.engine.editPolicy.perform(selectionReq);
       }
       this.handleFeedback(this.lastRequest, request);
       if (request !== null) {
@@ -1252,10 +1323,10 @@ var DragMouseHandler = function (_BaseMouseHandler) {
       }
       var request = this.buildDragRequest(e);
       if (this.targetParent !== null && this.lastRequest !== null) {
-        this.targetParent.component.eraseFeedback(this.lastRequest);
+        this.engine.editPolicy.eraseFeedback(this.lastRequest);
       }
-      if (request !== null && request[COMMAND_TARGET] && this.mouseMoved) {
-        request[COMMAND_TARGET].perform(request);
+      if (request !== null && this.mouseMoved) {
+        this.engine.editPolicy.perform(request);
       }
       this.progress = false;
     }
@@ -1283,7 +1354,7 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null) {
-          this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest);
+          this.engine.editPolicy.eraseFeedback(this.lastRequest);
         }
         this.source = null;
         this.target = null;
@@ -1293,22 +1364,27 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
   }, {
     key: 'getStartConnectionRequest',
     value: function getStartConnectionRequest() {
-      var _ref;
-
-      return _ref = {}, defineProperty(_ref, COMMAND_TARGET, this.source.component), defineProperty(_ref, 'type', START_CONNECTION), defineProperty(_ref, 'source', this.source.component.userComponent), defineProperty(_ref, 'location', regefGeometry.point(this.coordinates)), _ref;
+      return {
+        type: START_CONNECTION,
+        source: this.source.component.userComponent,
+        location: regefGeometry.point(this.coordinates)
+      };
     }
   }, {
     key: 'getEndConnectionRequest',
     value: function getEndConnectionRequest() {
-      var _ref2;
-
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.target.component), defineProperty(_ref2, 'type', END_CONNECTION), defineProperty(_ref2, 'source', this.source.component.userComponent), defineProperty(_ref2, 'target', this.target.component.userComponent), defineProperty(_ref2, 'location', regefGeometry.point(this.coordinates)), _ref2;
+      return {
+        type: END_CONNECTION,
+        source: this.source.component.userComponent,
+        target: this.target.component.userComponent,
+        location: regefGeometry.point(this.coordinates)
+      };
     }
   }, {
     key: 'buildCoordinates',
-    value: function buildCoordinates(_ref3) {
-      var clientX = _ref3.clientX,
-          clientY = _ref3.clientY;
+    value: function buildCoordinates(_ref) {
+      var clientX = _ref.clientX,
+          clientY = _ref.clientY;
 
       var _registry$root$dom$ge = this.registry.root.dom.getBoundingClientRect(),
           top = _registry$root$dom$ge.top,
@@ -1346,11 +1422,11 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
   }, {
     key: 'handleFeedback',
     value: function handleFeedback(lastRequest, request) {
-      if (lastRequest !== null && (request === null || request[COMMAND_TARGET] !== lastRequest[COMMAND_TARGET])) {
-        lastRequest[COMMAND_TARGET].eraseFeedback(lastRequest);
+      if (lastRequest !== null && (request === null || request.target !== lastRequest.target)) {
+        this.engine.editPolicy.eraseFeedback(lastRequest);
       }
       if (request !== null) {
-        request[COMMAND_TARGET].requestFeedback(request);
+        this.engine.editPolicy.requestFeedback(request);
       }
     }
   }, {
@@ -1380,11 +1456,11 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
         return;
       }
       var request = this.buildEndConnectRequest(e);
-      if (this.lastRequest !== null && this.lastRequest[COMMAND_TARGET] !== null) {
-        this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest);
+      if (this.lastRequest !== null) {
+        this.engine.editPolicy.eraseFeedback(this.lastRequest);
       }
-      if (request !== null && request[COMMAND_TARGET]) {
-        request[COMMAND_TARGET].perform(request);
+      if (request !== null) {
+        this.engine.editPolicy.perform(request);
       }
       this.progress = false;
     }
@@ -1422,14 +1498,18 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
   createClass(SingleSelectionMouseHandler, [{
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
-      var _ref2;
-
       var startLocation = this.startLocation,
           endLocation = this.endLocation,
           selection = this.selection,
           additional = this.additional;
 
-      return _ref2 = {}, defineProperty(_ref2, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref2, 'type', SELECT), defineProperty(_ref2, 'bounds', regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0))), defineProperty(_ref2, 'startLocation', startLocation), defineProperty(_ref2, 'endLocation', endLocation), defineProperty(_ref2, 'selection', additional ? this.engine.selection().concat(selection) : selection), _ref2;
+      return {
+        type: SELECT,
+        bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
+        startLocation: startLocation,
+        endLocation: endLocation,
+        selection: additional ? this.engine.selection().concat(selection) : selection
+      };
     }
   }, {
     key: 'cancel',
@@ -1463,9 +1543,9 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
     }
   }, {
     key: 'onMouseUp',
-    value: function onMouseUp(_ref3) {
-      var ctrlKey = _ref3.ctrlKey,
-          metaKey = _ref3.metaKey;
+    value: function onMouseUp(_ref2) {
+      var ctrlKey = _ref2.ctrlKey,
+          metaKey = _ref2.metaKey;
 
       if (!this.progress) {
         return;
@@ -1474,7 +1554,7 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
       if (this.possibleSingleSelection) {
         this.additional = metaKey || ctrlKey;
         var request = this.createSingleSelectionRequest();
-        request[COMMAND_TARGET].perform(request);
+        this.engine.editPolicy.perform(request);
         this.additional = false;
       }
     }
@@ -1531,8 +1611,6 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
   }, {
     key: 'createMultiSelectionRequest',
     value: function createMultiSelectionRequest() {
-      var _selection, _ref4, _mutatorMap;
-
       var startLocation = this.startLocation,
           endLocation = this.endLocation,
           toolkit = this.toolkit,
@@ -1540,25 +1618,31 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
           engine = this.engine;
 
       var bounds = buildBounds(startLocation, endLocation);
-      return _ref4 = {}, defineProperty(_ref4, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref4, 'type', SELECT), defineProperty(_ref4, 'bounds', bounds), defineProperty(_ref4, 'startLocation', startLocation), defineProperty(_ref4, 'endLocation', endLocation), _selection = 'selection', _mutatorMap = {}, _mutatorMap[_selection] = _mutatorMap[_selection] || {}, _mutatorMap[_selection].get = function () {
-        var selection = engine.selection();
-        var additionalFilter = additional ? function (node) {
-          return selection.indexOf(node) < 0;
-        } : function () {
-          return true;
-        };
-        var newSelection = toolkit.nodes().filter(additionalFilter).filter(function (node) {
-          return bounds.containsRectangle(toolkit.bounds(node));
-        });
-        return additional ? selection.concat(newSelection) : newSelection;
-      }, defineEnumerableProperties(_ref4, _mutatorMap), _ref4;
+      return {
+        type: SELECT,
+        bounds: bounds,
+        startLocation: startLocation,
+        endLocation: endLocation,
+        get selection() {
+          var selection = engine.selection();
+          var additionalFilter = additional ? function (node) {
+            return selection.indexOf(node) < 0;
+          } : function () {
+            return true;
+          };
+          var newSelection = toolkit.nodes().filter(additionalFilter).filter(function (node) {
+            return bounds.containsRectangle(toolkit.bounds(node));
+          });
+          return additional ? selection.concat(newSelection) : newSelection;
+        }
+      };
     }
   }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null) {
-          this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest);
+          this.engine.editPolicy.eraseFeedback(this.lastRequest);
         }
         this.startLocation = null;
         this.endLocation = null;
@@ -1586,7 +1670,7 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
       }
       this.endLocation = locationOf$1(e, this.registry.root.dom);
       var request = this.createMultiSelectionRequest();
-      request[COMMAND_TARGET].requestFeedback(request);
+      this.engine.editPolicy.requestFeedback(request);
       this.lastRequest = request;
     }
   }, {
@@ -1599,9 +1683,9 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
       this.additional = e.shiftKey;
       var request = this.createMultiSelectionRequest();
       if (this.lastRequest !== null) {
-        this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest);
+        this.engine.editPolicy.eraseFeedback(this.lastRequest);
       }
-      request[COMMAND_TARGET].perform(request);
+      this.engine.editPolicy.perform(request);
       this.progress = false;
       this.additional = false;
     }
@@ -1687,125 +1771,28 @@ var DeleteKeyHandler = function (_BaseKeyHandler) {
   createClass(DeleteKeyHandler, [{
     key: 'getDeleteRequest',
     value: function getDeleteRequest() {
-      var _ref;
-
-      return _ref = {}, defineProperty(_ref, COMMAND_TARGET, this.registry.root.component), defineProperty(_ref, 'type', DELETE), defineProperty(_ref, 'selection', this.currentSelection), _ref;
+      return {
+        type: DELETE,
+        selection: this.currentSelection
+      };
     }
   }, {
     key: 'onKeyDown',
-    value: function onKeyDown(_ref2) {
-      var key = _ref2.key,
-          target = _ref2.target;
+    value: function onKeyDown(_ref) {
+      var key = _ref.key,
+          target = _ref.target;
 
       if ((key === 'Backspace' || key === 'Delete') && this.domHelper.isInsideDiagram(target)) {
         this.currentSelection = this.engine.selection();
         if (this.currentSelection.length > 0) {
           var request = this.getDeleteRequest();
-          request[COMMAND_TARGET].perform(request);
+          this.engine.editPolicy.perform(request);
         }
       }
     }
   }]);
   return DeleteKeyHandler;
 }(BaseKeyHandler);
-
-var TOOLKIT = Symbol('TOOLKIT');
-var COMPONENT$1 = Symbol('COMPONENT');
-
-var CompositeEditPolicy = function (_EditPolicy) {
-  inherits(CompositeEditPolicy, _EditPolicy);
-
-  function CompositeEditPolicy() {
-    var policies = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    classCallCheck(this, CompositeEditPolicy);
-
-    var _this = possibleConstructorReturn(this, (CompositeEditPolicy.__proto__ || Object.getPrototypeOf(CompositeEditPolicy)).call(this));
-
-    _this.policies = policies;
-    _this[TOOLKIT] = null;
-    _this[COMPONENT$1] = null;
-    return _this;
-  }
-
-  createClass(CompositeEditPolicy, [{
-    key: 'perform',
-    value: function perform(request) {
-      for (var i = 0, len = this.policies.length; i < len; i += 1) {
-        var policy = this.policies[i];
-        policy.perform(request);
-      }
-    }
-  }, {
-    key: 'requestFeedback',
-    value: function requestFeedback(request) {
-      for (var i = 0, len = this.policies.length; i < len; i += 1) {
-        var policy = this.policies[i];
-        policy.requestFeedback(request);
-      }
-    }
-  }, {
-    key: 'eraseFeedback',
-    value: function eraseFeedback(request) {
-      for (var i = 0, len = this.policies.length; i < len; i += 1) {
-        var policy = this.policies[i];
-        policy.eraseFeedback(request);
-      }
-    }
-  }, {
-    key: 'toolkit',
-    get: function get$$1() {
-      return this[TOOLKIT];
-    },
-    set: function set$$1(toolkit) {
-      this._toolkit = toolkit;
-      if (this.policies === null || this.policies === undefined) {
-        return;
-      }
-      for (var i = 0, len = this.policies.length; i < len; i += 1) {
-        var policy = this.policies[i];
-        policy.toolkit = toolkit;
-      }
-    }
-  }, {
-    key: 'host',
-    get: function get$$1() {
-      return this[COMPONENT$1];
-    },
-    set: function set$$1(component) {
-      this._component = component;
-      if (this.policies === null || this.policies === undefined) {
-        return;
-      }
-      for (var i = 0, len = this.policies.length; i < len; i += 1) {
-        var policy = this.policies[i];
-        policy.host = component;
-      }
-    }
-  }]);
-  return CompositeEditPolicy;
-}(EditPolicy);
-
-
-var compose = function compose() {
-  for (var _len = arguments.length, Policies = Array(_len), _key = 0; _key < _len; _key++) {
-    Policies[_key] = arguments[_key];
-  }
-
-  var CustomizedCompositeEditPolicy = function (_CompositeEditPolicy) {
-    inherits(CustomizedCompositeEditPolicy, _CompositeEditPolicy);
-
-    function CustomizedCompositeEditPolicy() {
-      classCallCheck(this, CustomizedCompositeEditPolicy);
-      return possibleConstructorReturn(this, (CustomizedCompositeEditPolicy.__proto__ || Object.getPrototypeOf(CustomizedCompositeEditPolicy)).call(this, Policies.map(function (Policy) {
-        return new Policy();
-      })));
-    }
-
-    return CustomizedCompositeEditPolicy;
-  }(CompositeEditPolicy);
-
-  return CustomizedCompositeEditPolicy;
-};
 
 var matches = function matches(target, wrapper) {
   var userComponent = wrapper.userComponent,
@@ -1886,8 +1873,7 @@ var createDecorator = function createDecorator(_ref) {
       activate = _ref.activate,
       deactivate = _ref.deactivate;
   return function () {
-    var Policy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : EditPolicy;
-    var mergeProps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMergeProps;
+    var mergeProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultMergeProps;
     return function (Wrapped) {
       var _class;
 
@@ -1905,7 +1891,6 @@ var createDecorator = function createDecorator(_ref) {
 
           _this.registry = registry;
           _this.toolkit = toolkit;
-          _this.editPolicy = new Policy();
           _this.userComponent = null;
           _this.type = type;
           _this.childProps = { toolkit: toolkitResolver(_this, registry, toolkit) };
@@ -1926,21 +1911,6 @@ var createDecorator = function createDecorator(_ref) {
           key: 'componentWillUnmount',
           value: function componentWillUnmount() {
             deactivate(this);
-          }
-        }, {
-          key: 'perform',
-          value: function perform(request) {
-            return this.editPolicy.perform(request);
-          }
-        }, {
-          key: 'requestFeedback',
-          value: function requestFeedback(request) {
-            return this.editPolicy.requestFeedback(request);
-          }
-        }, {
-          key: 'eraseFeedback',
-          value: function eraseFeedback(request) {
-            return this.editPolicy.eraseFeedback(request);
           }
         }, {
           key: 'render',
@@ -1976,14 +1946,10 @@ var createDecorator = function createDecorator(_ref) {
 var defaultActivate = function defaultActivate(component) {
   var wrapper = fromComponent(component);
   component.registry.register(wrapper);
-  component.editPolicy.host = component.userComponent;
-  component.editPolicy.toolkit = component.toolkit;
 };
 
 var defaultDecativate = function defaultDecativate(component) {
   component.registry.unregister(component);
-  component.editPolicy.host = null;
-  component.editPolicy.toolkit = null;
 };
 
 var rootActivate = function rootActivate(component) {
@@ -2050,4 +2016,3 @@ exports.MOVE_CHILDREN = MOVE_CHILDREN;
 exports.ADD_CHILDREN = ADD_CHILDREN;
 exports.START_CONNECTION = START_CONNECTION;
 exports.END_CONNECTION = END_CONNECTION;
-exports.COMMAND_TARGET = COMMAND_TARGET;

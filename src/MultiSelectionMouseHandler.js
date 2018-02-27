@@ -1,5 +1,5 @@
 import { point, rectangle } from 'regef-geometry'
-import { COMMAND_TARGET, ROOT_TYPE, SELECT } from './constants'
+import { ROOT_TYPE, SELECT } from './constants'
 import BaseMouseHandler from './BaseMouseHandler'
 import Toolkit from './Toolkit'
 
@@ -35,7 +35,6 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
     const { startLocation, endLocation, toolkit, additional, engine } = this
     const bounds = buildBounds(startLocation, endLocation)
     return {
-      [COMMAND_TARGET]: this.registry.root.component,
       type: SELECT,
       bounds,
       startLocation,
@@ -56,7 +55,7 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
   cancel() {
     if (this.progress) {
       if (this.lastRequest !== null) {
-        this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
+        this.engine.editPolicy.eraseFeedback(this.lastRequest)
       }
       this.startLocation = null
       this.endLocation = null
@@ -82,7 +81,7 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
     }
     this.endLocation = locationOf(e, this.registry.root.dom)
     const request = this.createMultiSelectionRequest()
-    request[COMMAND_TARGET].requestFeedback(request)
+    this.engine.editPolicy.requestFeedback(request)
     this.lastRequest = request
   }
 
@@ -94,9 +93,9 @@ export default class MultiSelectionDragTracker extends BaseMouseHandler {
     this.additional = e.shiftKey
     const request = this.createMultiSelectionRequest()
     if (this.lastRequest !== null) {
-      this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
+      this.engine.editPolicy.eraseFeedback(this.lastRequest)
     }
-    request[COMMAND_TARGET].perform(request)
+    this.engine.editPolicy.perform(request)
     this.progress = false
     this.additional = false
   }

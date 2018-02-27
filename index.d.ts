@@ -63,7 +63,6 @@ export interface EndConnectionIntent extends Intent {
 }
 
 export class EditPolicy {
-  host: ReactComponent
   toolkit: Toolkit
 
   perform(intent: Intent): void
@@ -114,6 +113,7 @@ export interface EngineParams {
   mouseHandlers: MouseHandler[]
   keyHandlers: KeyHandler[]
   selectionProvider: SelectionProvider
+  editPolicies: EditPolicy[]
 }
 
 export class Engine {
@@ -126,10 +126,10 @@ interface DiagramProps {
 
 export class Diagram extends ReactComponent<DiagramProps, any> { /* empty */ }
 
-export function node(...policies: EditPolicy[]): (ReactConstructor: Function) => any
-export function port(...policies: EditPolicy[]): (ReactConstructor: Function) => any
-export function root(...policies: EditPolicy[]): (ReactConstructor: Function) => any
-export function connection(...policies: EditPolicy[]): (ReactConstructor: Function) => any
+export function node(propMapper?: Function): (ReactConstructor: Function) => any
+export function port(propMapper?: Function): (ReactConstructor: Function) => any
+export function root(propMapper?: Function): (ReactConstructor: Function) => any
+export function connection(propMapper?: Function): (ReactConstructor: Function) => any
 
 class ComponentWrapper {
   new(dom: Node, component: ReactComponent, userComponent: ReactComponent)

@@ -15,6 +15,3 @@ export const MOVE_CHILDREN = 'move-children'
 export const ADD_CHILDREN = 'add-children'
 export const START_CONNECTION = 'start-connection'
 export const END_CONNECTION = 'end-connection'
-
-// Request hidden target key
-export const COMMAND_TARGET = Symbol('command-target')

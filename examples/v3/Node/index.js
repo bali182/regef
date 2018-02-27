@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { node } from '../../../src/index'
 
 import NodeView from './NodeView'
-import NodeEditPolicy from './NodeEditPolicy'
 
 const stateToProps = ({ components, selection }, { id }) => ({
   node: components[id],
@@ -11,7 +10,7 @@ const stateToProps = ({ components, selection }, { id }) => ({
 })
 
 @connect(stateToProps)
-@node(NodeEditPolicy)
+@node()
 export default class Node extends React.Component {
   render() {
     const { id, selected } = this.props

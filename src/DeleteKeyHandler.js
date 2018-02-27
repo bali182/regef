@@ -1,5 +1,5 @@
 import BaseKeyHandler from './BaseKeyHandler'
-import { COMMAND_TARGET, DELETE } from './constants'
+import { DELETE } from './constants'
 
 export default class DeleteKeyHandler extends BaseKeyHandler {
   constructor() {
@@ -9,7 +9,6 @@ export default class DeleteKeyHandler extends BaseKeyHandler {
 
   getDeleteRequest() {
     return {
-      [COMMAND_TARGET]: this.registry.root.component,
       type: DELETE,
       selection: this.currentSelection,
     }
@@ -20,7 +19,7 @@ export default class DeleteKeyHandler extends BaseKeyHandler {
       this.currentSelection = this.engine.selection()
       if (this.currentSelection.length > 0) {
         const request = this.getDeleteRequest()
-        request[COMMAND_TARGET].perform(request)
+        this.engine.editPolicy.perform(request)
       }
     }
   }

@@ -1,14 +1,12 @@
 import EditPolicy from './EditPolicy'
 
 const TOOLKIT = Symbol('TOOLKIT')
-const COMPONENT = Symbol('COMPONENT')
 
 export default class CompositeEditPolicy extends EditPolicy {
   constructor(policies = []) {
     super()
     this.policies = policies
     this[TOOLKIT] = null
-    this[COMPONENT] = null
   }
 
   get toolkit() {
@@ -20,54 +18,43 @@ export default class CompositeEditPolicy extends EditPolicy {
     if (this.policies === null || this.policies === undefined) {
       return
     }
-    for (let i = 0, len = this.policies.length; i < len; i += 1) {
-      const policy = this.policies[i]
+    this.policies.forEach((policy) => {
+      // eslint-disable-next-line no-param-reassign
       policy.toolkit = toolkit
-    }
+    })
   }
 
-  get host() {
-    return this[COMPONENT]
+  perform(intent) {
+    this.policies.forEach((policy) => policy.perform(intent))
   }
 
-  set host(component) {
-    this._component = component
-    if (this.policies === null || this.policies === undefined) {
-      return
-    }
-    for (let i = 0, len = this.policies.length; i < len; i += 1) {
-      const policy = this.policies[i]
-      policy.host = component
-    }
+  requestFeedback(intent) {
+    this.policies.forEach((policy) => policy.requestFeedback(intent))
   }
 
-  perform(request) {
-    for (let i = 0, len = this.policies.length; i < len; i += 1) {
-      const policy = this.policies[i]
-      policy.perform(request)
-    }
-  }
-
-  requestFeedback(request) {
-    for (let i = 0, len = this.policies.length; i < len; i += 1) {
-      const policy = this.policies[i]
-      policy.requestFeedback(request)
-    }
-  }
-
-  eraseFeedback(request) {
-    for (let i = 0, len = this.policies.length; i < len; i += 1) {
-      const policy = this.policies[i]
-      policy.eraseFeedback(request)
-    }
+  eraseFeedback(intent) {
+    this.policies.forEach((policy) => policy.eraseFeedback(intent))
   }
 }
 
-export const compose = (...Policies) => {
-  class CustomizedCompositeEditPolicy extends CompositeEditPolicy {
-    constructor() {
-      super(Policies.map((Policy) => new Policy()))
+export const compose = (policies) => {
+  if (policies === null || policies === undefined) {
+    return new EditPolicy()
+  } else if (policies instanceof EditPolicy) {
+    return policies
+  } else if (Array.isArray(policies)) {
+    for (let i = 0, len = policies.length; i < len; i += 1) {
+      const element = policies[i]
+      if (!(element instanceof EditPolicy)) {
+        throw new TypeError(`Expected policies[${i}] to be an EditPolicy, got ${policies[0]} instead.`)
+      }
     }
+    switch (policies.length) {
+      case 0: return new EditPolicy()
+      case 1: return policies[0]
+      default: return new CompositeEditPolicy(policies)
+    }
+  } else {
+    throw new TypeError(`Expected EditPolicy or Array<EditPolicy>, got ${policies} instead.`)
   }
-  return CustomizedCompositeEditPolicy
 }

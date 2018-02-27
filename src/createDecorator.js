@@ -1,7 +1,6 @@
 import React from 'react'
 
 import bind from './bind'
-import EditPolicy from './EditPolicy'
 import { watchRegister } from './watchers'
 
 const defaultMergeProps = (regef) => ({ regef })
@@ -10,7 +9,7 @@ const toolkitResolver = (component, registry, toolkit) => () =>
   watchRegister(registry, component).then(() => toolkit)
 
 const createDecorator = ({ type, activate, deactivate }) =>
-  (Policy = EditPolicy, mergeProps = defaultMergeProps) =>
+  (mergeProps = defaultMergeProps) =>
     (Wrapped) => {
       class DecoratedComponent extends React.Component {
         constructor(props, context) {
@@ -18,7 +17,6 @@ const createDecorator = ({ type, activate, deactivate }) =>
           const { registry, toolkit } = context.regef
           this.registry = registry
           this.toolkit = toolkit
-          this.editPolicy = new Policy()
           this.userComponent = null
           this.type = type
           this.childProps = { toolkit: toolkitResolver(this, registry, toolkit) }
@@ -34,18 +32,6 @@ const createDecorator = ({ type, activate, deactivate }) =>
 
         componentWillUnmount() {
           deactivate(this)
-        }
-
-        perform(request) {
-          return this.editPolicy.perform(request)
-        }
-
-        requestFeedback(request) {
-          return this.editPolicy.requestFeedback(request)
-        }
-
-        eraseFeedback(request) {
-          return this.editPolicy.eraseFeedback(request)
         }
 
         render() {

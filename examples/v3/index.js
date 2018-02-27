@@ -15,7 +15,13 @@ import {
 
 import store from './redux/store'
 import Root from './Root'
+
 import DiagramSelectionProvider from './DiagramSelectionProvider'
+
+import RootEditPolicy from './policies/RootEditPolicy'
+import NodeEditPolicy from './policies/NodeEditPolicy'
+import StepEditPolicy from './policies/StepEditPolicy'
+import ContainerEditPolicy from './policies/ContainerEditPolicy'
 
 const engine = new Engine({
   mouseHandlers: [
@@ -29,6 +35,12 @@ const engine = new Engine({
     new DeleteKeyHandler(),
   ],
   selectionProvider: new DiagramSelectionProvider(),
+  editPolicies: [
+    new RootEditPolicy(),
+    new NodeEditPolicy(),
+    new StepEditPolicy(),
+    new ContainerEditPolicy(),
+  ],
 })
 
 render(

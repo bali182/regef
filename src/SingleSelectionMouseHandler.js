@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { COMMAND_TARGET, NODE_TYPE, SELECT } from './constants'
+import { NODE_TYPE, SELECT } from './constants'
 import BaseMouseHandler from './BaseMouseHandler'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
@@ -20,7 +20,6 @@ export default class SingleSelectionMouseHandler extends BaseMouseHandler {
   createSingleSelectionRequest() {
     const { startLocation, endLocation, selection, additional } = this
     return {
-      [COMMAND_TARGET]: this.registry.root.component,
       type: SELECT,
       bounds: rectangle(startLocation, dimension(0, 0)),
       startLocation,
@@ -66,7 +65,7 @@ export default class SingleSelectionMouseHandler extends BaseMouseHandler {
     if (this.possibleSingleSelection) {
       this.additional = metaKey || ctrlKey
       const request = this.createSingleSelectionRequest()
-      request[COMMAND_TARGET].perform(request)
+      this.engine.editPolicy.perform(request)
       this.additional = false
     }
   }

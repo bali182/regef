@@ -1,6 +1,6 @@
 import { point } from 'regef-geometry'
 import BaseMouseHandler from './BaseMouseHandler'
-import { COMMAND_TARGET, PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
+import { PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 
 export default class ConnectMouseHandler extends BaseMouseHandler {
   constructor() {
@@ -14,7 +14,7 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
   cancel() {
     if (this.progress) {
       if (this.lastRequest !== null) {
-        this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
+        this.engine.editPolicy.eraseFeedback(this.lastRequest)
       }
       this.source = null
       this.target = null
@@ -24,8 +24,6 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
 
   getStartConnectionRequest() {
     return {
-      // TODO think about this decision
-      [COMMAND_TARGET]: this.source.component,
       type: START_CONNECTION,
       source: this.source.component.userComponent,
       location: point(this.coordinates),
@@ -34,8 +32,6 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
 
   getEndConnectionRequest() {
     return {
-      // TODO think about this decision
-      [COMMAND_TARGET]: this.target.component,
       type: END_CONNECTION,
       source: this.source.component.userComponent,
       target: this.target.component.userComponent,
@@ -75,11 +71,11 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
 
   handleFeedback(lastRequest, request) {
     if (lastRequest !== null
-      && (request === null || request[COMMAND_TARGET] !== lastRequest[COMMAND_TARGET])) {
-      lastRequest[COMMAND_TARGET].eraseFeedback(lastRequest)
+      && (request === null || request.target !== lastRequest.target)) {
+      this.engine.editPolicy.eraseFeedback(lastRequest)
     }
     if (request !== null) {
-      request[COMMAND_TARGET].requestFeedback(request)
+      this.engine.editPolicy.requestFeedback(request)
     }
   }
 
@@ -106,11 +102,11 @@ export default class ConnectMouseHandler extends BaseMouseHandler {
       return
     }
     const request = this.buildEndConnectRequest(e)
-    if (this.lastRequest !== null && this.lastRequest[COMMAND_TARGET] !== null) {
-      this.lastRequest[COMMAND_TARGET].eraseFeedback(this.lastRequest)
+    if (this.lastRequest !== null) {
+      this.engine.editPolicy.eraseFeedback(this.lastRequest)
     }
-    if (request !== null && request[COMMAND_TARGET]) {
-      request[COMMAND_TARGET].perform(request)
+    if (request !== null) {
+      this.engine.editPolicy.perform(request)
     }
     this.progress = false
   }
