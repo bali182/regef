@@ -110,9 +110,8 @@ export class SelectionProvider {
 }
 
 export interface EngineParams {
-  mouseHandlers: MouseHandler[]
-  keyHandlers: KeyHandler[]
   selectionProvider: SelectionProvider
+  capabilities: Capability[]
   editPolicies: EditPolicy[]
 }
 
@@ -152,27 +151,24 @@ interface ComponentRegistry {
 }
 
 
-interface MouseHandler {
+export class Capability {
+  engine: Engine
+  progress: boolean
+  registry: ComponentRegistry
+
   setEngine(engine: Engine): void
   setComponentRegistry(registry: ComponentRegistry): void
   cancel(): void
   onMouseDown(e: Event): void
   onMouseMove(e: Event): void
   onMouseUp(e: Event): void
-}
-
-interface KeyHandler {
-  setEngine(engine: Engine): void
-  setComponentRegistry(registry: ComponentRegistry): void
-  cancel(): void
   onKeyDown(e: Event)
   onKeyUp(e: Event)
 }
 
-export class DragMouseHandler extends MouseHandler { /* implementation not relevant */ }
-export class ConnectMouseHandler extends MouseHandler { /* implementation not relevant */ }
-export class SingleSelectionMouseHandler extends MouseHandler { /* implementation not relevant */ }
-export class MultiSelectionMouseHandler extends MouseHandler { /* implementation not relevant */ }
-
-export class CancelMouseHandlersKeyHandler extends KeyHandler { /* implementation not relevant */ }
-export class DeleteKeyHandler extends KeyHandler { /* implementation not relevant */ }
+export class DragCapability extends Capability { /* implementation not relevant */ }
+export class ConnectCapability extends Capability { /* implementation not relevant */ }
+export class SingleSelectionCapability extends Capability { /* implementation not relevant */ }
+export class MultiSelectionCapability extends Capability { /* implementation not relevant */ }
+export class CancelCapability extends Capability { /* implementation not relevant */ }
+export class DeleteCapability extends Capability { /* implementation not relevant */ }

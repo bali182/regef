@@ -1,13 +1,13 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { NODE_TYPE, SELECT } from './constants'
-import BaseMouseHandler from './BaseMouseHandler'
+import Capability from './Capability'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
   return point(clientX - x, clientY - y)
 }
 
-export default class SingleSelectionMouseHandler extends BaseMouseHandler {
+export default class SingleSelectionCapability extends Capability {
   constructor() {
     super()
     this.startLocation = null

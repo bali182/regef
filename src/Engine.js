@@ -3,15 +3,13 @@ import { compose } from './CompositeEditPolicy'
 
 class Engine {
   constructor({
-    mouseHandlers = [],
-    keyHandlers = [],
+    capabilities = [],
     editPolicies = [],
     selectionProvider = new SelectionProvider(),
   }) {
     this.toolkit = null
     this.registry = null
-    this.mouseHandlers = mouseHandlers
-    this.keyHandlers = keyHandlers
+    this.capabilities = capabilities
     this.selectionProvider = selectionProvider
     this.editPolicy = compose(editPolicies)
   }
@@ -24,32 +22,28 @@ class Engine {
   }
   setComponentRegistry(registry) {
     this.registry = registry
-    this.mouseHandlers.forEach((tracker) => {
-      tracker.setComponentRegistry(registry)
-      tracker.setEngine(this)
-    })
-    this.keyHandlers.forEach((handler) => {
-      handler.setComponentRegistry(registry)
-      handler.setEngine(this)
+    this.capabilities.forEach((capability) => {
+      capability.setComponentRegistry(registry)
+      capability.setEngine(this)
     })
     if (this.selectionProvider instanceof SelectionProvider) {
       this.selectionProvider.setToolkit(this.toolkit)
     }
   }
   onKeyUp(e) {
-    this.keyHandlers.forEach((handler) => handler.onKeyUp(e))
+    this.capabilities.forEach((capability) => capability.onKeyUp(e))
   }
   onKeyDown(e) {
-    this.keyHandlers.forEach((handler) => handler.onKeyDown(e))
+    this.capabilities.forEach((capability) => capability.onKeyDown(e))
   }
   onMouseDown(e) {
-    this.mouseHandlers.forEach((tracker) => tracker.onMouseDown(e))
+    this.capabilities.forEach((capability) => capability.onMouseDown(e))
   }
   onMouseMove(e) {
-    this.mouseHandlers.forEach((tracker) => tracker.onMouseMove(e))
+    this.capabilities.forEach((capability) => capability.onMouseMove(e))
   }
   onMouseUp(e) {
-    this.mouseHandlers.forEach((tracker) => tracker.onMouseUp(e))
+    this.capabilities.forEach((capability) => capability.onMouseUp(e))
   }
   selection() {
     if (!(this.selectionProvider instanceof SelectionProvider)) {

@@ -867,10 +867,8 @@ var compose = function compose(policies) {
 
 var Engine = function () {
   function Engine(_ref) {
-    var _ref$mouseHandlers = _ref.mouseHandlers,
-        mouseHandlers = _ref$mouseHandlers === undefined ? [] : _ref$mouseHandlers,
-        _ref$keyHandlers = _ref.keyHandlers,
-        keyHandlers = _ref$keyHandlers === undefined ? [] : _ref$keyHandlers,
+    var _ref$capabilities = _ref.capabilities,
+        capabilities = _ref$capabilities === undefined ? [] : _ref$capabilities,
         _ref$editPolicies = _ref.editPolicies,
         editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
         _ref$selectionProvide = _ref.selectionProvider,
@@ -879,8 +877,7 @@ var Engine = function () {
 
     this.toolkit = null;
     this.registry = null;
-    this.mouseHandlers = mouseHandlers;
-    this.keyHandlers = keyHandlers;
+    this.capabilities = capabilities;
     this.selectionProvider = selectionProvider;
     this.editPolicy = compose(editPolicies);
   }
@@ -902,13 +899,9 @@ var Engine = function () {
       var _this = this;
 
       this.registry = registry;
-      this.mouseHandlers.forEach(function (tracker) {
-        tracker.setComponentRegistry(registry);
-        tracker.setEngine(_this);
-      });
-      this.keyHandlers.forEach(function (handler) {
-        handler.setComponentRegistry(registry);
-        handler.setEngine(_this);
+      this.capabilities.forEach(function (capability) {
+        capability.setComponentRegistry(registry);
+        capability.setEngine(_this);
       });
       if (this.selectionProvider instanceof SelectionProvider) {
         this.selectionProvider.setToolkit(this.toolkit);
@@ -917,36 +910,36 @@ var Engine = function () {
   }, {
     key: 'onKeyUp',
     value: function onKeyUp(e) {
-      this.keyHandlers.forEach(function (handler) {
-        return handler.onKeyUp(e);
+      this.capabilities.forEach(function (capability) {
+        return capability.onKeyUp(e);
       });
     }
   }, {
     key: 'onKeyDown',
     value: function onKeyDown(e) {
-      this.keyHandlers.forEach(function (handler) {
-        return handler.onKeyDown(e);
+      this.capabilities.forEach(function (capability) {
+        return capability.onKeyDown(e);
       });
     }
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      this.mouseHandlers.forEach(function (tracker) {
-        return tracker.onMouseDown(e);
+      this.capabilities.forEach(function (capability) {
+        return capability.onMouseDown(e);
       });
     }
   }, {
     key: 'onMouseMove',
     value: function onMouseMove(e) {
-      this.mouseHandlers.forEach(function (tracker) {
-        return tracker.onMouseMove(e);
+      this.capabilities.forEach(function (capability) {
+        return capability.onMouseMove(e);
       });
     }
   }, {
     key: 'onMouseUp',
     value: function onMouseUp(e) {
-      this.mouseHandlers.forEach(function (tracker) {
-        return tracker.onMouseUp(e);
+      this.capabilities.forEach(function (capability) {
+        return capability.onMouseUp(e);
       });
     }
   }, {
@@ -961,95 +954,17 @@ var Engine = function () {
   return Engine;
 }();
 
-var KeyHandler = function () {
-  function KeyHandler() {
-    classCallCheck(this, KeyHandler);
+var Capability = function () {
+  function Capability() {
+    classCallCheck(this, Capability);
+
+    this.engine = null;
+    this.progress = false;
+    this.registry = null;
+    this.domHelper = null;
   }
 
-  createClass(KeyHandler, [{
-    key: 'setEngine',
-    value: function setEngine() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp() {
-      throw new TypeError('not implemented');
-    }
-  }]);
-  return KeyHandler;
-}();
-
-var MouseHandler = function () {
-  function MouseHandler() {
-    classCallCheck(this, MouseHandler);
-  }
-
-  createClass(MouseHandler, [{
-    key: 'setEngine',
-    value: function setEngine() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove() {
-      throw new TypeError('not implemented');
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp() {
-      throw new TypeError('not implemented');
-    }
-  }]);
-  return MouseHandler;
-}();
-
-var BaseMouseHandler = function (_MouseHandler) {
-  inherits(BaseMouseHandler, _MouseHandler);
-
-  function BaseMouseHandler() {
-    classCallCheck(this, BaseMouseHandler);
-
-    var _this = possibleConstructorReturn(this, (BaseMouseHandler.__proto__ || Object.getPrototypeOf(BaseMouseHandler)).call(this));
-
-    _this.engine = null;
-    _this.progress = false;
-    _this.registry = null;
-    _this.domHelper = null;
-    return _this;
-  }
-
-  createClass(BaseMouseHandler, [{
+  createClass(Capability, [{
     key: 'setEngine',
     value: function setEngine(engine) {
       this.engine = engine;
@@ -1061,6 +976,16 @@ var BaseMouseHandler = function (_MouseHandler) {
       this.domHelper = registry === null ? null : new DomHelper(registry);
     }
   }, {
+    key: 'onKeyDown',
+    value: function onKeyDown() {
+      // emtpy
+    }
+  }, {
+    key: 'onKeyUp',
+    value: function onKeyUp() {
+      // empty
+    }
+  }, {
     key: 'onMouseDown',
     value: function onMouseDown() {
       // empty
@@ -1075,9 +1000,206 @@ var BaseMouseHandler = function (_MouseHandler) {
     value: function onMouseUp() {
       // empty
     }
+  }, {
+    key: 'cancel',
+    value: function cancel() {
+      // empty
+    }
   }]);
-  return BaseMouseHandler;
-}(MouseHandler);
+  return Capability;
+}();
+
+var matches = function matches(target, wrapper) {
+  var userComponent = wrapper.userComponent,
+      dom = wrapper.dom,
+      component = wrapper.component;
+
+  return wrapper === target || userComponent === target || dom === target || component === target;
+};
+
+var watchRegister = function watchRegister(registry, target) {
+  return new Promise(function (resolve, reject) {
+    if (!registry || !target) {
+      reject(new Error('registry or target was falsy value'));
+      return;
+    }
+    if (registry.has(target)) {
+      resolve();
+      return;
+    }
+    var listener = function listener(wrapper) {
+      if (wrapper && matches(target, wrapper)) {
+        try {
+          resolve();
+        } catch (e) {
+          reject(e);
+        } finally {
+          registry.removeRegisterListener(listener);
+        }
+      }
+    };
+    registry.addRegisterListener(listener);
+  });
+};
+
+function _applyDecoratedDescriptor$1(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object['ke' + 'ys'](descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+
+  if (desc.initializer === void 0) {
+    Object['define' + 'Property'](target, property, desc);
+    desc = null;
+  }
+
+  return desc;
+}
+
+var defaultMergeProps = function defaultMergeProps(regef) {
+  return { regef: regef };
+};
+
+var toolkitResolver = function toolkitResolver(component, registry, toolkit) {
+  return function () {
+    return watchRegister(registry, component).then(function () {
+      return toolkit;
+    });
+  };
+};
+
+var createDecorator = function createDecorator(_ref) {
+  var type = _ref.type,
+      activate = _ref.activate,
+      deactivate = _ref.deactivate;
+  return function () {
+    var mergeProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultMergeProps;
+    return function (Wrapped) {
+      var _class;
+
+      var DecoratedComponent = (_class = function (_React$Component) {
+        inherits(DecoratedComponent, _React$Component);
+
+        function DecoratedComponent(props, context) {
+          classCallCheck(this, DecoratedComponent);
+
+          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
+
+          var _context$regef = context.regef,
+              registry = _context$regef.registry,
+              toolkit = _context$regef.toolkit;
+
+          _this.registry = registry;
+          _this.toolkit = toolkit;
+          _this.userComponent = null;
+          _this.type = type;
+          _this.childProps = { toolkit: toolkitResolver(_this, registry, toolkit) };
+          return _this;
+        }
+
+        createClass(DecoratedComponent, [{
+          key: 'setUserComponent',
+          value: function setUserComponent(ref) {
+            this.userComponent = ref;
+          }
+        }, {
+          key: 'componentDidMount',
+          value: function componentDidMount() {
+            activate(this);
+          }
+        }, {
+          key: 'componentWillUnmount',
+          value: function componentWillUnmount() {
+            deactivate(this);
+          }
+        }, {
+          key: 'render',
+          value: function render() {
+            var _props = this.props,
+                children = _props.children,
+                rest = objectWithoutProperties(_props, ['children']);
+
+            var regefProps = mergeProps(this.childProps);
+            return React__default.createElement(
+              Wrapped,
+              _extends({}, rest, { ref: this.setUserComponent }, regefProps),
+              children
+            );
+          }
+        }]);
+        return DecoratedComponent;
+      }(React__default.Component), _applyDecoratedDescriptor$1(_class.prototype, 'setUserComponent', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'setUserComponent'), _class.prototype), _class);
+
+
+      DecoratedComponent.contextTypes = {
+        regef: function regef() {
+          return null;
+        }
+      };
+
+      return DecoratedComponent;
+    };
+  };
+};
+
+/* eslint-disable no-param-reassign */
+var defaultActivate = function defaultActivate(component) {
+  var wrapper = fromComponent(component);
+  component.registry.register(wrapper);
+};
+
+var defaultDecativate = function defaultDecativate(component) {
+  component.registry.unregister(component);
+};
+
+var rootActivate = function rootActivate(component) {
+  defaultActivate(component);
+  component.registry.setRoot(component.registry.get(component));
+};
+
+var rootDeactivate = function rootDeactivate(component) {
+  defaultDecativate(component);
+  component.registry.setRoot(null);
+};
+
+var node = createDecorator({
+  type: NODE_TYPE,
+  activate: defaultActivate,
+  deactivate: defaultDecativate
+});
+
+var port = createDecorator({
+  type: PORT_TYPE,
+  activate: defaultActivate,
+  deactivate: defaultDecativate
+});
+
+var root = createDecorator({
+  type: ROOT_TYPE,
+  activate: rootActivate,
+  deactivate: rootDeactivate
+});
+
+var connection = createDecorator({
+  type: CONNECTION_TYPE,
+  activate: defaultActivate,
+  deactivate: defaultDecativate
+});
 
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
@@ -1097,13 +1219,13 @@ var buildDeltas = function buildDeltas(_ref, element) {
   };
 };
 
-var DragMouseHandler = function (_BaseMouseHandler) {
-  inherits(DragMouseHandler, _BaseMouseHandler);
+var DragCapability = function (_Capability) {
+  inherits(DragCapability, _Capability);
 
-  function DragMouseHandler() {
-    classCallCheck(this, DragMouseHandler);
+  function DragCapability() {
+    classCallCheck(this, DragCapability);
 
-    var _this = possibleConstructorReturn(this, (DragMouseHandler.__proto__ || Object.getPrototypeOf(DragMouseHandler)).call(this));
+    var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this));
 
     _this.target = null;
     _this.lastTargetParent = null;
@@ -1117,7 +1239,7 @@ var DragMouseHandler = function (_BaseMouseHandler) {
     return _this;
   }
 
-  createClass(DragMouseHandler, [{
+  createClass(DragCapability, [{
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget) {
       var domHelper = this.domHelper,
@@ -1331,11 +1453,11 @@ var DragMouseHandler = function (_BaseMouseHandler) {
       this.progress = false;
     }
   }]);
-  return DragMouseHandler;
-}(BaseMouseHandler);
+  return DragCapability;
+}(Capability);
 
-var ConnectMouseHandler = function (_BaseMouseHandler) {
-  inherits(ConnectMouseHandler, _BaseMouseHandler);
+var ConnectMouseHandler = function (_Capability) {
+  inherits(ConnectMouseHandler, _Capability);
 
   function ConnectMouseHandler() {
     classCallCheck(this, ConnectMouseHandler);
@@ -1466,7 +1588,7 @@ var ConnectMouseHandler = function (_BaseMouseHandler) {
     }
   }]);
   return ConnectMouseHandler;
-}(BaseMouseHandler);
+}(Capability);
 
 var locationOf = function locationOf(_ref, rootDom) {
   var clientX = _ref.clientX,
@@ -1479,13 +1601,13 @@ var locationOf = function locationOf(_ref, rootDom) {
   return regefGeometry.point(clientX - x, clientY - y);
 };
 
-var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
-  inherits(SingleSelectionMouseHandler, _BaseMouseHandler);
+var SingleSelectionCapability = function (_Capability) {
+  inherits(SingleSelectionCapability, _Capability);
 
-  function SingleSelectionMouseHandler() {
-    classCallCheck(this, SingleSelectionMouseHandler);
+  function SingleSelectionCapability() {
+    classCallCheck(this, SingleSelectionCapability);
 
-    var _this = possibleConstructorReturn(this, (SingleSelectionMouseHandler.__proto__ || Object.getPrototypeOf(SingleSelectionMouseHandler)).call(this));
+    var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this));
 
     _this.startLocation = null;
     _this.endLocation = null;
@@ -1495,7 +1617,7 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
     return _this;
   }
 
-  createClass(SingleSelectionMouseHandler, [{
+  createClass(SingleSelectionCapability, [{
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1559,8 +1681,8 @@ var SingleSelectionMouseHandler = function (_BaseMouseHandler) {
       }
     }
   }]);
-  return SingleSelectionMouseHandler;
-}(BaseMouseHandler);
+  return SingleSelectionCapability;
+}(Capability);
 
 var buildBounds = function buildBounds(_ref, _ref2) {
   var x1 = _ref.x,
@@ -1586,13 +1708,13 @@ var locationOf$1 = function locationOf(_ref3, rootDom) {
   return regefGeometry.point(clientX - x, clientY - y);
 };
 
-var MultiSelectionDragTracker = function (_BaseMouseHandler) {
-  inherits(MultiSelectionDragTracker, _BaseMouseHandler);
+var MultiSelectionCapability = function (_Capability) {
+  inherits(MultiSelectionCapability, _Capability);
 
-  function MultiSelectionDragTracker() {
-    classCallCheck(this, MultiSelectionDragTracker);
+  function MultiSelectionCapability() {
+    classCallCheck(this, MultiSelectionCapability);
 
-    var _this = possibleConstructorReturn(this, (MultiSelectionDragTracker.__proto__ || Object.getPrototypeOf(MultiSelectionDragTracker)).call(this));
+    var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this));
 
     _this.startLocation = null;
     _this.endLocation = null;
@@ -1602,10 +1724,10 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
     return _this;
   }
 
-  createClass(MultiSelectionDragTracker, [{
+  createClass(MultiSelectionCapability, [{
     key: 'setComponentRegistry',
     value: function setComponentRegistry(registry) {
-      get(MultiSelectionDragTracker.prototype.__proto__ || Object.getPrototypeOf(MultiSelectionDragTracker.prototype), 'setComponentRegistry', this).call(this, registry);
+      get(MultiSelectionCapability.prototype.__proto__ || Object.getPrototypeOf(MultiSelectionCapability.prototype), 'setComponentRegistry', this).call(this, registry);
       this.toolkit = registry === null ? null : new Toolkit(registry);
     }
   }, {
@@ -1690,85 +1812,45 @@ var MultiSelectionDragTracker = function (_BaseMouseHandler) {
       this.additional = false;
     }
   }]);
-  return MultiSelectionDragTracker;
-}(BaseMouseHandler);
+  return MultiSelectionCapability;
+}(Capability);
 
-var BaseKeyHandler = function (_KeyHandler) {
-  inherits(BaseKeyHandler, _KeyHandler);
+var CancelCapability = function (_Capability) {
+  inherits(CancelCapability, _Capability);
 
-  function BaseKeyHandler() {
-    classCallCheck(this, BaseKeyHandler);
-
-    var _this = possibleConstructorReturn(this, (BaseKeyHandler.__proto__ || Object.getPrototypeOf(BaseKeyHandler)).call(this));
-
-    _this.engine = null;
-    _this.progress = false;
-    _this.registry = null;
-    _this.domHelper = null;
-    return _this;
+  function CancelCapability() {
+    classCallCheck(this, CancelCapability);
+    return possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).apply(this, arguments));
   }
 
-  createClass(BaseKeyHandler, [{
-    key: 'setEngine',
-    value: function setEngine(engine) {
-      this.engine = engine;
-    }
-  }, {
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry(registry) {
-      this.registry = registry;
-      this.domHelper = registry === null ? null : new DomHelper(registry);
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown() {
-      // emtpy
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp() {
-      // empty
-    }
-  }]);
-  return BaseKeyHandler;
-}(KeyHandler);
-
-var CancelMouseHandlersKeyHandler = function (_BaseKeyHandler) {
-  inherits(CancelMouseHandlersKeyHandler, _BaseKeyHandler);
-
-  function CancelMouseHandlersKeyHandler() {
-    classCallCheck(this, CancelMouseHandlersKeyHandler);
-    return possibleConstructorReturn(this, (CancelMouseHandlersKeyHandler.__proto__ || Object.getPrototypeOf(CancelMouseHandlersKeyHandler)).apply(this, arguments));
-  }
-
-  createClass(CancelMouseHandlersKeyHandler, [{
+  createClass(CancelCapability, [{
     key: 'onKeyDown',
     value: function onKeyDown(_ref) {
       var key = _ref.key;
 
       if (key === 'Escape') {
-        this.engine.mouseHandlers.forEach(function (tracker) {
+        this.engine.capabilities.forEach(function (tracker) {
           return tracker.cancel();
         });
       }
     }
   }]);
-  return CancelMouseHandlersKeyHandler;
-}(BaseKeyHandler);
+  return CancelCapability;
+}(Capability);
 
-var DeleteKeyHandler = function (_BaseKeyHandler) {
-  inherits(DeleteKeyHandler, _BaseKeyHandler);
+var DeleteCapability = function (_Capability) {
+  inherits(DeleteCapability, _Capability);
 
-  function DeleteKeyHandler() {
-    classCallCheck(this, DeleteKeyHandler);
+  function DeleteCapability() {
+    classCallCheck(this, DeleteCapability);
 
-    var _this = possibleConstructorReturn(this, (DeleteKeyHandler.__proto__ || Object.getPrototypeOf(DeleteKeyHandler)).call(this));
+    var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this));
 
     _this.currentSelection = [];
     return _this;
   }
 
-  createClass(DeleteKeyHandler, [{
+  createClass(DeleteCapability, [{
     key: 'getDeleteRequest',
     value: function getDeleteRequest() {
       return {
@@ -1791,219 +1873,26 @@ var DeleteKeyHandler = function (_BaseKeyHandler) {
       }
     }
   }]);
-  return DeleteKeyHandler;
-}(BaseKeyHandler);
-
-var matches = function matches(target, wrapper) {
-  var userComponent = wrapper.userComponent,
-      dom = wrapper.dom,
-      component = wrapper.component;
-
-  return wrapper === target || userComponent === target || dom === target || component === target;
-};
-
-var watchRegister = function watchRegister(registry, target) {
-  return new Promise(function (resolve, reject) {
-    if (!registry || !target) {
-      reject(new Error('registry or target was falsy value'));
-      return;
-    }
-    if (registry.has(target)) {
-      resolve();
-      return;
-    }
-    var listener = function listener(wrapper) {
-      if (wrapper && matches(target, wrapper)) {
-        try {
-          resolve();
-        } catch (e) {
-          reject(e);
-        } finally {
-          registry.removeRegisterListener(listener);
-        }
-      }
-    };
-    registry.addRegisterListener(listener);
-  });
-};
-
-function _applyDecoratedDescriptor$1(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
-var defaultMergeProps = function defaultMergeProps(regef) {
-  return { regef: regef };
-};
-
-var toolkitResolver = function toolkitResolver(component, registry, toolkit) {
-  return function () {
-    return watchRegister(registry, component).then(function () {
-      return toolkit;
-    });
-  };
-};
-
-var createDecorator = function createDecorator(_ref) {
-  var type = _ref.type,
-      activate = _ref.activate,
-      deactivate = _ref.deactivate;
-  return function () {
-    var mergeProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultMergeProps;
-    return function (Wrapped) {
-      var _class;
-
-      var DecoratedComponent = (_class = function (_React$Component) {
-        inherits(DecoratedComponent, _React$Component);
-
-        function DecoratedComponent(props, context) {
-          classCallCheck(this, DecoratedComponent);
-
-          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
-
-          var _context$regef = context.regef,
-              registry = _context$regef.registry,
-              toolkit = _context$regef.toolkit;
-
-          _this.registry = registry;
-          _this.toolkit = toolkit;
-          _this.userComponent = null;
-          _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, registry, toolkit) };
-          return _this;
-        }
-
-        createClass(DecoratedComponent, [{
-          key: 'setUserComponent',
-          value: function setUserComponent(ref) {
-            this.userComponent = ref;
-          }
-        }, {
-          key: 'componentDidMount',
-          value: function componentDidMount() {
-            activate(this);
-          }
-        }, {
-          key: 'componentWillUnmount',
-          value: function componentWillUnmount() {
-            deactivate(this);
-          }
-        }, {
-          key: 'render',
-          value: function render() {
-            var _props = this.props,
-                children = _props.children,
-                rest = objectWithoutProperties(_props, ['children']);
-
-            var regefProps = mergeProps(this.childProps);
-            return React__default.createElement(
-              Wrapped,
-              _extends({}, rest, { ref: this.setUserComponent }, regefProps),
-              children
-            );
-          }
-        }]);
-        return DecoratedComponent;
-      }(React__default.Component), _applyDecoratedDescriptor$1(_class.prototype, 'setUserComponent', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'setUserComponent'), _class.prototype), _class);
-
-
-      DecoratedComponent.contextTypes = {
-        regef: function regef() {
-          return null;
-        }
-      };
-
-      return DecoratedComponent;
-    };
-  };
-};
-
-/* eslint-disable no-param-reassign */
-var defaultActivate = function defaultActivate(component) {
-  var wrapper = fromComponent(component);
-  component.registry.register(wrapper);
-};
-
-var defaultDecativate = function defaultDecativate(component) {
-  component.registry.unregister(component);
-};
-
-var rootActivate = function rootActivate(component) {
-  defaultActivate(component);
-  component.registry.setRoot(component.registry.get(component));
-};
-
-var rootDeactivate = function rootDeactivate(component) {
-  defaultDecativate(component);
-  component.registry.setRoot(null);
-};
-
-var node = createDecorator({
-  type: NODE_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate
-});
-
-var port = createDecorator({
-  type: PORT_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate
-});
-
-var root = createDecorator({
-  type: ROOT_TYPE,
-  activate: rootActivate,
-  deactivate: rootDeactivate
-});
-
-var connection = createDecorator({
-  type: CONNECTION_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate
-});
+  return DeleteCapability;
+}(Capability);
 
 exports.Diagram = Diagram;
 exports.EditPolicy = EditPolicy;
 exports.DispatchingEditPolicy = DispatchingEditPolicy;
 exports.Engine = Engine;
-exports.KeyHandler = KeyHandler;
-exports.MouseHandler = MouseHandler;
-exports.DragMouseHandler = DragMouseHandler;
-exports.ConnectMouseHandler = ConnectMouseHandler;
-exports.SingleSelectionMouseHandler = SingleSelectionMouseHandler;
-exports.MultiSelectionMouseHandler = MultiSelectionDragTracker;
-exports.CancelMouseHandlersKeyHandler = CancelMouseHandlersKeyHandler;
-exports.DeleteKeyHandler = DeleteKeyHandler;
+exports.Capability = Capability;
 exports.SelectionProvider = SelectionProvider;
-exports.compose = compose;
 exports.root = root;
 exports.connection = connection;
 exports.node = node;
 exports.port = port;
+exports.DragCapability = DragCapability;
+exports.ConnectCapability = ConnectMouseHandler;
+exports.SingleSelectionCapability = SingleSelectionCapability;
+exports.MultiSelectionCapability = MultiSelectionCapability;
+exports.CancelCapability = CancelCapability;
+exports.DeleteCapability = DeleteCapability;
+exports.compose = compose;
 exports.DATA_ID = DATA_ID;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;

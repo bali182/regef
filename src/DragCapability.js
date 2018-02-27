@@ -1,6 +1,6 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { MOVE_CHILDREN, ADD_CHILDREN, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
-import BaseMouseHandler from './BaseMouseHandler'
+import Capability from './Capability'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -14,7 +14,7 @@ const buildDeltas = ({ clientX, clientY }, element) => {
   }
 }
 
-export default class DragMouseHandler extends BaseMouseHandler {
+export default class DragCapability extends Capability {
   constructor() {
     super()
     this.target = null

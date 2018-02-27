@@ -1,8 +1,8 @@
 import { point } from 'regef-geometry'
-import BaseMouseHandler from './BaseMouseHandler'
+import Capability from './Capability'
 import { PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
 
-export default class ConnectMouseHandler extends BaseMouseHandler {
+export default class ConnectMouseHandler extends Capability {
   constructor() {
     super()
     this.source = null

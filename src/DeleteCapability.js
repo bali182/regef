@@ -1,7 +1,7 @@
-import BaseKeyHandler from './BaseKeyHandler'
+import Capability from './Capability'
 import { DELETE } from './constants'
 
-export default class DeleteKeyHandler extends BaseKeyHandler {
+export default class DeleteCapability extends Capability {
   constructor() {
     super()
     this.currentSelection = []

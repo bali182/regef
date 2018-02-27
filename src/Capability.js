@@ -1,9 +1,7 @@
-import MouseHandler from './MouseHandler'
 import DomHelper from './DomHelper'
 
-class BaseMouseHandler extends MouseHandler {
+export default class Capability {
   constructor() {
-    super()
     this.engine = null
     this.progress = false
     this.registry = null
@@ -16,6 +14,12 @@ class BaseMouseHandler extends MouseHandler {
     this.registry = registry
     this.domHelper = registry === null ? null : new DomHelper(registry)
   }
+  onKeyDown() {
+    // emtpy
+  }
+  onKeyUp() {
+    // empty
+  }
   onMouseDown() {
     // empty
   }
@@ -25,6 +29,7 @@ class BaseMouseHandler extends MouseHandler {
   onMouseUp() {
     // empty
   }
+  cancel() {
+    // empty
+  }
 }
-
-export default BaseMouseHandler

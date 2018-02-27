@@ -5,12 +5,12 @@ import { Provider } from 'react-redux'
 import {
   Diagram,
   Engine,
-  DragMouseHandler,
-  ConnectMouseHandler,
-  SingleSelectionMouseHandler,
-  MultiSelectionMouseHandler,
-  CancelMouseHandlersKeyHandler,
-  DeleteKeyHandler,
+  DragCapability,
+  ConnectCapability,
+  SingleSelectionCapability,
+  MultiSelectionCapability,
+  CancelCapability,
+  DeleteCapability,
 } from '../../src/index'
 
 import store from './redux/store'
@@ -24,17 +24,15 @@ import StepEditPolicy from './policies/StepEditPolicy'
 import ContainerEditPolicy from './policies/ContainerEditPolicy'
 
 const engine = new Engine({
-  mouseHandlers: [
-    new DragMouseHandler(),
-    new ConnectMouseHandler(),
-    new SingleSelectionMouseHandler(),
-    new MultiSelectionMouseHandler(),
-  ],
-  keyHandlers: [
-    new CancelMouseHandlersKeyHandler(),
-    new DeleteKeyHandler(),
-  ],
   selectionProvider: new DiagramSelectionProvider(),
+  capabilities: [
+    new DragCapability(),
+    new ConnectCapability(),
+    new SingleSelectionCapability(),
+    new MultiSelectionCapability(),
+    new CancelCapability(),
+    new DeleteCapability(),
+  ],
   editPolicies: [
     new RootEditPolicy(),
     new NodeEditPolicy(),
