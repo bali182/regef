@@ -63,6 +63,7 @@ export interface EndConnectionIntent extends Intent {
 }
 
 export class EditPolicy {
+  constructor()
   toolkit: Toolkit
 
   perform(intent: Intent): void
@@ -92,6 +93,8 @@ export class DispatchingEditPolicy extends EditPolicy {
 }
 
 export class Toolkit {
+  constructor(registry: ComponentRegistry)
+
   root(): ReactComponent
   parent(component: ReactComponent): ReactComponent?
   children(component: ReactComponent): ReactComponent[]
@@ -104,7 +107,7 @@ export class Toolkit {
 }
 
 export class SelectionProvider {
-  new()
+  constructor()
   setToolkit(toolkit): Toolkit
   selection(): ReactComponent[]
 }
@@ -116,7 +119,7 @@ export interface EngineParams {
 }
 
 export class Engine {
-  new(params: EngineParams)
+  constructor(params: EngineParams)
 }
 
 interface DiagramProps {
@@ -152,6 +155,8 @@ interface ComponentRegistry {
 
 
 export class Capability {
+  constructor()
+
   engine: Engine
   progress: boolean
   registry: ComponentRegistry
