@@ -330,11 +330,10 @@ var PORT_TYPE = 'port';
 var CONNECTION_TYPE = 'connection';
 
 // Request types
-var SELECT = 'select';
+var ADD = 'add';
 var MOVE = 'move';
+var SELECT = 'select';
 var DELETE = 'delete';
-var MOVE_CHILDREN = 'move-children';
-var ADD_CHILDREN = 'add-children';
 var START_CONNECTION = 'start-connection';
 var END_CONNECTION = 'end-connection';
 
@@ -658,10 +657,10 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'perform',
     value: function perform(request) {
       switch (request.type) {
-        case ADD_CHILDREN:
-          return this.addChildren(request);
-        case MOVE_CHILDREN:
-          return this.moveChildren(request);
+        case ADD:
+          return this.add(request);
+        case MOVE:
+          return this.move(request);
         case START_CONNECTION:
           return this.startConnection(request);
         case END_CONNECTION:
@@ -678,10 +677,10 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'requestFeedback',
     value: function requestFeedback(request) {
       switch (request.type) {
-        case ADD_CHILDREN:
-          return this.requestAddChildrenFeedback(request);
-        case MOVE_CHILDREN:
-          return this.requestMoveChildrenFeedback(request);
+        case ADD:
+          return this.requestAddFeedback(request);
+        case MOVE:
+          return this.requestMoveFeedback(request);
         case START_CONNECTION:
           return this.requestStartConnectionFeedback(request);
         case END_CONNECTION:
@@ -696,10 +695,10 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'eraseFeedback',
     value: function eraseFeedback(request) {
       switch (request.type) {
-        case ADD_CHILDREN:
-          return this.eraseAddChildrenFeedback(request);
-        case MOVE_CHILDREN:
-          return this.eraseMoveChildrenFeedback(request);
+        case ADD:
+          return this.eraseAddFeedback(request);
+        case MOVE:
+          return this.eraseMoveFeedback(request);
         case START_CONNECTION:
           return this.eraseStartConnectionFeedback(request);
         case END_CONNECTION:
@@ -711,11 +710,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
       }
     }
   }, {
-    key: 'addChildren',
-    value: function addChildren() /* request */{}
+    key: 'add',
+    value: function add() /* request */{}
   }, {
-    key: 'moveChildren',
-    value: function moveChildren() /* request */{}
+    key: 'move',
+    value: function move() /* request */{}
   }, {
     key: 'startConnection',
     value: function startConnection() /* request */{}
@@ -729,11 +728,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'delete',
     value: function _delete() /* request */{}
   }, {
-    key: 'requestAddChildrenFeedback',
-    value: function requestAddChildrenFeedback() /* request */{}
+    key: 'requestAddFeedback',
+    value: function requestAddFeedback() /* request */{}
   }, {
-    key: 'requestMoveChildrenFeedback',
-    value: function requestMoveChildrenFeedback() /* request */{}
+    key: 'requestMoveFeedback',
+    value: function requestMoveFeedback() /* request */{}
   }, {
     key: 'requestStartConnectionFeedback',
     value: function requestStartConnectionFeedback() /* request */{}
@@ -744,11 +743,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'requestSelectFeedback',
     value: function requestSelectFeedback() /* request */{}
   }, {
-    key: 'eraseAddChildrenFeedback',
-    value: function eraseAddChildrenFeedback() /* request */{}
+    key: 'eraseAddFeedback',
+    value: function eraseAddFeedback() /* request */{}
   }, {
-    key: 'eraseMoveChildrenFeedback',
-    value: function eraseMoveChildrenFeedback() /* request */{}
+    key: 'eraseMoveFeedback',
+    value: function eraseMoveFeedback() /* request */{}
   }, {
     key: 'eraseStartConnectionFeedback',
     value: function eraseStartConnectionFeedback() /* request */{}
@@ -1305,7 +1304,7 @@ var DragCapability = function (_Capability) {
           delta = coordinates.delta;
 
       return {
-        type: MOVE_CHILDREN,
+        type: MOVE,
         components: this.getMovedComponents(),
         container: currentParent.component.userComponent,
         location: location,
@@ -1324,7 +1323,7 @@ var DragCapability = function (_Capability) {
           delta = coordinates.delta;
 
       return {
-        type: ADD_CHILDREN,
+        type: ADD,
         components: this.getMovedComponents(),
         targetContainer: targetParent.component.userComponent,
         container: currentParent.component.userComponent,
@@ -1898,10 +1897,9 @@ exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
-exports.SELECT = SELECT;
+exports.ADD = ADD;
 exports.MOVE = MOVE;
+exports.SELECT = SELECT;
 exports.DELETE = DELETE;
-exports.MOVE_CHILDREN = MOVE_CHILDREN;
-exports.ADD_CHILDREN = ADD_CHILDREN;
 exports.START_CONNECTION = START_CONNECTION;
 exports.END_CONNECTION = END_CONNECTION;

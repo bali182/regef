@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { MOVE_CHILDREN, ADD_CHILDREN, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
+import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import Capability from './Capability'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
@@ -77,7 +77,7 @@ export default class DragCapability extends Capability {
     const { currentParent, coordinates } = this
     const { location, offset, delta } = coordinates
     return {
-      type: MOVE_CHILDREN,
+      type: MOVE,
       components: this.getMovedComponents(),
       container: currentParent.component.userComponent,
       location,
@@ -90,7 +90,7 @@ export default class DragCapability extends Capability {
     const { targetParent, currentParent, coordinates } = this
     const { location, offset, delta } = coordinates
     return {
-      type: ADD_CHILDREN,
+      type: ADD,
       components: this.getMovedComponents(),
       targetContainer: targetParent.component.userComponent,
       container: currentParent.component.userComponent,

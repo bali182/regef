@@ -1,12 +1,12 @@
 import EditPolicy from './EditPolicy'
 
-import { ADD_CHILDREN, MOVE_CHILDREN, START_CONNECTION, END_CONNECTION, SELECT, DELETE } from './constants'
+import { ADD, MOVE, START_CONNECTION, END_CONNECTION, SELECT, DELETE } from './constants'
 
 export default class DispatchingEditPolicy extends EditPolicy {
   perform(request) {
     switch (request.type) {
-      case ADD_CHILDREN: return this.addChildren(request)
-      case MOVE_CHILDREN: return this.moveChildren(request)
+      case ADD: return this.add(request)
+      case MOVE: return this.move(request)
       case START_CONNECTION: return this.startConnection(request)
       case END_CONNECTION: return this.endConnection(request)
       case SELECT: return this.select(request)
@@ -17,8 +17,8 @@ export default class DispatchingEditPolicy extends EditPolicy {
 
   requestFeedback(request) {
     switch (request.type) {
-      case ADD_CHILDREN: return this.requestAddChildrenFeedback(request)
-      case MOVE_CHILDREN: return this.requestMoveChildrenFeedback(request)
+      case ADD: return this.requestAddFeedback(request)
+      case MOVE: return this.requestMoveFeedback(request)
       case START_CONNECTION: return this.requestStartConnectionFeedback(request)
       case END_CONNECTION: return this.requestEndConnectionFeedback(request)
       case SELECT: return this.requestSelectFeedback(request)
@@ -28,8 +28,8 @@ export default class DispatchingEditPolicy extends EditPolicy {
 
   eraseFeedback(request) {
     switch (request.type) {
-      case ADD_CHILDREN: return this.eraseAddChildrenFeedback(request)
-      case MOVE_CHILDREN: return this.eraseMoveChildrenFeedback(request)
+      case ADD: return this.eraseAddFeedback(request)
+      case MOVE: return this.eraseMoveFeedback(request)
       case START_CONNECTION: return this.eraseStartConnectionFeedback(request)
       case END_CONNECTION: return this.eraseEndConnectionFeedback(request)
       case SELECT: return this.eraseSelectFeedback(request)
@@ -37,21 +37,21 @@ export default class DispatchingEditPolicy extends EditPolicy {
     }
   }
 
-  addChildren(/* request */) { }
-  moveChildren(/* request */) { }
+  add(/* request */) { }
+  move(/* request */) { }
   startConnection(/* request */) { }
   endConnection(/* request */) { }
   select(/* request */) { }
   delete(/* request */) { }
 
-  requestAddChildrenFeedback(/* request */) { }
-  requestMoveChildrenFeedback(/* request */) { }
+  requestAddFeedback(/* request */) { }
+  requestMoveFeedback(/* request */) { }
   requestStartConnectionFeedback(/* request */) { }
   requestEndConnectionFeedback(/* request */) { }
   requestSelectFeedback(/* request */) { }
 
-  eraseAddChildrenFeedback(/* request */) { }
-  eraseMoveChildrenFeedback(/* request */) { }
+  eraseAddFeedback(/* request */) { }
+  eraseMoveFeedback(/* request */) { }
   eraseStartConnectionFeedback(/* request */) { }
   eraseEndConnectionFeedback(/* request */) { }
   eraseSelectFeedback(/* request */) { }

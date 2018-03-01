@@ -5,7 +5,7 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     return Boolean(component) && Boolean(component.props.root)
   }
 
-  moveChildren({ components, delta, container }) {
+  move({ components, delta, container }) {
     if (!this.checkRelevant(container)) {
       return
     }
@@ -29,7 +29,7 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     ids.forEach((id) => this.toolkit.root().props.deleteComponent({ id }))
   }
 
-  requestMoveChildrenFeedback({ components, delta, container }) {
+  requestMoveFeedback({ components, delta, container }) {
     if (!this.checkRelevant(container)) {
       return
     }
@@ -38,7 +38,7 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  eraseMoveChildrenFeedback({ container }) {
+  eraseMoveFeedback({ container }) {
     if (!this.checkRelevant(container)) {
       return
     }
@@ -57,7 +57,7 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  requestAddChildrenFeedback({ components, delta, targetContainer }) {
+  requestAddFeedback({ components, delta, targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
@@ -68,7 +68,7 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     }
   }
 
-  eraseAddChildrenFeedback({ targetContainer }) {
+  eraseAddFeedback({ targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }

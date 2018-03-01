@@ -4,7 +4,7 @@ export default class StepEditPolicy extends DispatchingEditPolicy {
   checkRelevant(component) {
     return Boolean(component) && Boolean(component.props.step)
   }
-  requestAddChildrenFeedback({ delta, components, targetContainer }) {
+  requestAddFeedback({ delta, components, targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
@@ -12,7 +12,7 @@ export default class StepEditPolicy extends DispatchingEditPolicy {
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
     toolkit.root().setState({ errorFeedback: bounds })
   }
-  eraseAddChildrenFeedback({ targetContainer }) {
+  eraseAddFeedback({ targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }

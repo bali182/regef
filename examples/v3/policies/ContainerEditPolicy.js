@@ -5,7 +5,7 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
     return Boolean(component) && Boolean(component.props.container)
   }
 
-  moveChildren({ components, container, location }) {
+  move({ components, container, location }) {
     if (!this.checkRelevant(container)) {
       return
     }
@@ -32,7 +32,7 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
     })
   }
 
-  requestMoveChildrenFeedback({ location, delta, container, components }) {
+  requestMoveFeedback({ location, delta, container, components }) {
     if (!this.checkRelevant(container)) {
       return
     }
@@ -48,7 +48,7 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
     }
   }
 
-  requestAddChildrenFeedback({ delta, components, targetContainer }) {
+  requestAddFeedback({ delta, components, targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
@@ -56,14 +56,14 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
     toolkit.root().setState({ errorFeedback: bounds })
   }
-  eraseAddChildrenFeedback({ targetContainer }) {
+  eraseAddFeedback({ targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
     this.toolkit.root().setState({ errorFeedback: null })
   }
 
-  eraseMoveChildrenFeedback({ container }) {
+  eraseMoveFeedback({ container }) {
     if (!this.checkRelevant(container)) {
       return
     }

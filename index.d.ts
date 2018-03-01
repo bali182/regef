@@ -10,7 +10,7 @@ declare export const ADD_CHILDREN
 declare export const START_CONNECTION
 declare export const END_CONNECTION
 
-export type IntentType = 'select' | 'delete' | 'move-children' | 'add-children' | 'start-connection' | 'end-connection'
+export type IntentType = 'select' | 'delete' | 'move' | 'add' | 'start-connection' | 'end-connection'
 
 export interface Intent {
   type: IntentType
@@ -24,8 +24,8 @@ export interface SelectionIntent extends Intent {
   selection: ReactComponent[]
 }
 
-export interface MoveChildrenIntent extends Intent {
-  type: 'move-child'
+export interface MoveIntent extends Intent {
+  type: 'move'
   components: ReactComponent[]
   container: ReactComponent
   location: Point
@@ -39,8 +39,8 @@ export interface DeleteIntent extends Intent {
 }
 
 
-export interface AddChildrenIntent extends Intent {
-  type: 'add-child',
+export interface AddIntent extends Intent {
+  type: 'add',
   components: ReactComponent[]
   targetContainer: ReactComponent
   container: ReactComponent
@@ -72,21 +72,21 @@ export class EditPolicy {
 }
 
 export class DispatchingEditPolicy extends EditPolicy {
-  addChildren(intent: AddChildrenIntent): void
-  moveChildren(intent: MoveChildrenIntent): void
+  add(intent: AddIntent): void
+  move(intent: MoveIntent): void
   startConnection(intent: StartConnectionIntent): void
   endConnection(intent: EndConnectionIntent): void
   select(intent: SelectionIntent): void
   delete(intent: DeleteIntent): void
 
-  requestAddChildrenFeedback(intent: AddChildrenIntent): void
-  requestMoveChildrenFeedback(intent: MoveChildrenIntent): void
+  requestAddFeedback(intent: AddIntent): void
+  requestMoveFeedback(intent: MoveIntent): void
   requestStartConnectionFeedback(intent: StartConnectionIntent): void
   requestEndConnectionFeedback(intent: EndConnectionIntent): void
   requestSelectFeedback(intent: SelectionIntent): void
 
-  eraseAddChildrenFeedback(intent: AddChildrenIntent): void
-  eraseMoveChildrenFeedback(intent: MoveChildrenIntent): void
+  eraseAddFeedback(intent: AddIntent): void
+  eraseMoveFeedback(intent: MoveIntent): void
   eraseStartConnectionFeedback(intent: StartConnectionIntent): void
   eraseEndConnectionFeedback(intent: EndConnectionIntent): void
   eraseSelectFeedback(intent: SelectionIntent): void
