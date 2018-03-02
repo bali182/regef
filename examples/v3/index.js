@@ -39,6 +39,9 @@ const engine = new Engine({
     new StepEditPolicy(),
     new ContainerEditPolicy(),
   ],
+  dependencies: {
+    hello: 'world',
+  },
 })
 
 render(

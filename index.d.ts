@@ -65,6 +65,7 @@ export interface EndConnectionIntent extends Intent {
 export class EditPolicy {
   constructor()
   toolkit: Toolkit
+  dependencies: { [key: string]: any }
 
   perform(intent: Intent): void
   requestFeedback(intent: Intent): void
@@ -107,8 +108,8 @@ export class Toolkit {
 }
 
 export class SelectionProvider {
+  toolkit: Toolkit
   constructor()
-  setToolkit(toolkit): Toolkit
   selection(): ReactComponent[]
 }
 
@@ -116,10 +117,16 @@ export interface EngineParams {
   selectionProvider: SelectionProvider
   capabilities: Capability[]
   editPolicies: EditPolicy[]
+  dependencies: { [key: string]: any }
 }
 
 export class Engine {
   constructor(params: EngineParams)
+  toolkit: Toolkit
+  selectionProvider: SelectionProvider
+  capabilities: Capability[]
+  editPolicies: EditPolicy[]
+  dependencies: { [key: string]: any }
 }
 
 interface DiagramProps {
@@ -153,16 +160,26 @@ interface ComponentRegistry {
   removeUnregisterListener(listener: Function): void
 }
 
-
-export class Capability {
-  constructor()
-
-  engine: Engine
-  progress: boolean
+class DomHelper {
   registry: ComponentRegistry
 
-  setEngine(engine: Engine): void
-  setComponentRegistry(registry: ComponentRegistry): void
+  constructor(registry: ComponentRegistry)
+
+  findClosest(dom: Node, type: string): ComponentWrapper
+  findRelevantChildren(element: Node): ComponentWrapper[]
+  findClosestParent(element: Node, type: string): ComponentWrapper
+  isInsideDiagram(element: Node): boolean
+  matchesType(component: ReactComponent, type: string): boolean
+}
+
+export class Capability {
+  progress: boolean
+  engine: Engine
+  registry: ComponentRegistry
+  domHelper: DomHelper
+
+  constructor()
+
   cancel(): void
   onMouseDown(e: Event): void
   onMouseMove(e: Event): void

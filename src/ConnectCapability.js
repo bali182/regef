@@ -1,6 +1,7 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
 import { PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
+import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
 export default class ConnectMouseHandler extends Capability {
   constructor() {
@@ -14,7 +15,7 @@ export default class ConnectMouseHandler extends Capability {
   cancel() {
     if (this.progress) {
       if (this.lastRequest !== null) {
-        this.engine.editPolicy.eraseFeedback(this.lastRequest)
+        eraseFeedback(this.engine.editPolicies, this.lastRequest)
       }
       this.source = null
       this.target = null
@@ -72,10 +73,10 @@ export default class ConnectMouseHandler extends Capability {
   handleFeedback(lastRequest, request) {
     if (lastRequest !== null
       && (request === null || request.target !== lastRequest.target)) {
-      this.engine.editPolicy.eraseFeedback(lastRequest)
+      eraseFeedback(this.engine.editPolicies, lastRequest)
     }
     if (request !== null) {
-      this.engine.editPolicy.requestFeedback(request)
+      requestFeedback(this.engine.editPolicies, request)
     }
   }
 
@@ -103,10 +104,10 @@ export default class ConnectMouseHandler extends Capability {
     }
     const request = this.buildEndConnectRequest(e)
     if (this.lastRequest !== null) {
-      this.engine.editPolicy.eraseFeedback(this.lastRequest)
+      eraseFeedback(this.engine.editPolicies, this.lastRequest)
     }
     if (request !== null) {
-      this.engine.editPolicy.perform(request)
+      perform(this.engine.editPolicies, request)
     }
     this.progress = false
   }

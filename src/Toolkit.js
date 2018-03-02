@@ -2,8 +2,8 @@ import { rectangle } from 'regef-geometry'
 import DomHelper from './DomHelper'
 import { NODE_TYPE, PORT_TYPE, CONNECTION_TYPE } from './constants'
 
-const REGISTRY = Symbol('registry')
-const DOM_HELPER = Symbol('dom-helper')
+const REGISTRY = Symbol('REGISTRY')
+const DOM_HELPER = Symbol('DOM_HELPER')
 
 export default class Toolkit {
   constructor(registry) {

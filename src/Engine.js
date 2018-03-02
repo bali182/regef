@@ -1,33 +1,52 @@
 import SelectionProvider from './SelectionProvider'
-import { compose } from './CompositeEditPolicy'
+import DomHelper from './DomHelper'
 
 class Engine {
   constructor({
+    dependencies = {},
     capabilities = [],
     editPolicies = [],
     selectionProvider = new SelectionProvider(),
   }) {
-    this.toolkit = null
-    this.registry = null
+    this._toolkit = null
+    this._registry = null
     this.capabilities = capabilities
     this.selectionProvider = selectionProvider
-    this.editPolicy = compose(editPolicies)
+    this.editPolicies = editPolicies
+    this.dependencies = dependencies
+    this.editPolicies.forEach((policy) => {
+      // eslint-disable-next-line no-param-reassign
+      policy.dependencies = dependencies
+    })
   }
-  setToolkit(toolkit) {
-    this.toolkit = toolkit
-    this.editPolicy.toolkit = toolkit
+  get toolkit() {
+    return this._toolkit
   }
-  getComponentRegistry() {
-    return this.registry
-  }
-  setComponentRegistry(registry) {
-    this.registry = registry
+  set toolkit(toolkit) {
+    this._toolkit = toolkit
+    this.editPolicies.forEach((policy) => {
+      // eslint-disable-next-line no-param-reassign
+      policy.toolkit = toolkit
+    })
     this.capabilities.forEach((capability) => {
-      capability.setComponentRegistry(registry)
-      capability.setEngine(this)
+      // eslint-disable-next-line no-param-reassign
+      capability.toolkit = toolkit
+    })
+  }
+  get registry() {
+    return this._registry
+  }
+  set registry(registry) {
+    this._registry = registry
+    this.capabilities.forEach((capability) => {
+      /* eslint-disable no-param-reassign */
+      capability.registry = registry
+      capability.domHelper = registry ? new DomHelper(registry) : null
+      capability.engine = this
+      /* eslint-enable no-param-reassign */
     })
     if (this.selectionProvider instanceof SelectionProvider) {
-      this.selectionProvider.setToolkit(this.toolkit)
+      this.selectionProvider.toolkit = this.toolkit
     }
   }
   onKeyUp(e) {
@@ -46,9 +65,6 @@ class Engine {
     this.capabilities.forEach((capability) => capability.onMouseUp(e))
   }
   selection() {
-    if (!(this.selectionProvider instanceof SelectionProvider)) {
-      return []
-    }
     return this.selectionProvider.selection()
   }
 }

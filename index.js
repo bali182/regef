@@ -47,31 +47,6 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
@@ -337,8 +312,8 @@ var DELETE = 'delete';
 var START_CONNECTION = 'start-connection';
 var END_CONNECTION = 'end-connection';
 
-var REGISTRY = Symbol('registry');
-var DOM_HELPER = Symbol('dom-helper');
+var REGISTRY = Symbol('REGISTRY');
+var DOM_HELPER = Symbol('DOM_HELPER');
 
 var Toolkit = function () {
   function Toolkit(registry) {
@@ -538,8 +513,8 @@ var Diagram = (_class = function (_React$Component) {
       var engine = this.props.engine;
 
       if (engine) {
-        engine.setToolkit(this.toolkit);
-        engine.setComponentRegistry(this.registry);
+        engine.toolkit = this.toolkit;
+        engine.registry = this.registry;
       }
 
       document.addEventListener('mousedown', this.onMouseDown);
@@ -555,8 +530,10 @@ var Diagram = (_class = function (_React$Component) {
       var currentEngine = this.props.engine;
 
       if (newEngine !== currentEngine) {
-        newEngine.setToolkit(this.toolkit);
-        newEngine.setComponentRegistry(this.registry);
+        /* eslint-disable no-param-reassign */
+        newEngine.toolkit = this.toolkit;
+        newEngine.toolkit = this.registry;
+        /* eslint-enable no-param-reassign */
       }
     }
   }, {
@@ -603,7 +580,6 @@ var Diagram = (_class = function (_React$Component) {
       return {
         regef: {
           registry: this.registry,
-          idGenerator: this.idGenerator,
           toolkit: this.toolkit
         }
       };
@@ -630,20 +606,40 @@ var EditPolicy = function () {
     classCallCheck(this, EditPolicy);
 
     this.toolkit = null;
+    this.dependencies = {};
   }
 
   createClass(EditPolicy, [{
     key: "perform",
-    value: function perform() /* request */{}
+    value: function perform() /* intent */{}
   }, {
     key: "requestFeedback",
-    value: function requestFeedback() /* request */{}
+    value: function requestFeedback() /* intent */{}
   }, {
     key: "eraseFeedback",
-    value: function eraseFeedback() /* request */{}
+    value: function eraseFeedback() /* intent */{}
   }]);
   return EditPolicy;
 }();
+
+
+var perform = function perform(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.perform(intent);
+  });
+};
+
+var requestFeedback = function requestFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.requestFeedback(intent);
+  });
+};
+
+var eraseFeedback = function eraseFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.eraseFeedback(intent);
+  });
+};
 
 var DispatchingEditPolicy = function (_EditPolicy) {
   inherits(DispatchingEditPolicy, _EditPolicy);
@@ -655,7 +651,7 @@ var DispatchingEditPolicy = function (_EditPolicy) {
 
   createClass(DispatchingEditPolicy, [{
     key: 'perform',
-    value: function perform(request) {
+    value: function perform$$1(request) {
       switch (request.type) {
         case ADD:
           return this.add(request);
@@ -675,7 +671,7 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     }
   }, {
     key: 'requestFeedback',
-    value: function requestFeedback(request) {
+    value: function requestFeedback$$1(request) {
       switch (request.type) {
         case ADD:
           return this.requestAddFeedback(request);
@@ -693,7 +689,7 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     }
   }, {
     key: 'eraseFeedback',
-    value: function eraseFeedback(request) {
+    value: function eraseFeedback$$1(request) {
       switch (request.type) {
         case ADD:
           return this.eraseAddFeedback(request);
@@ -769,11 +765,6 @@ var SelectionProvider = function () {
   }
 
   createClass(SelectionProvider, [{
-    key: "setToolkit",
-    value: function setToolkit(toolkit) {
-      this.toolkit = toolkit;
-    }
-  }, {
     key: "selection",
     value: function selection() {
       return [];
@@ -782,91 +773,11 @@ var SelectionProvider = function () {
   return SelectionProvider;
 }();
 
-var TOOLKIT = Symbol('TOOLKIT');
-
-var CompositeEditPolicy = function (_EditPolicy) {
-  inherits(CompositeEditPolicy, _EditPolicy);
-
-  function CompositeEditPolicy() {
-    var policies = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    classCallCheck(this, CompositeEditPolicy);
-
-    var _this = possibleConstructorReturn(this, (CompositeEditPolicy.__proto__ || Object.getPrototypeOf(CompositeEditPolicy)).call(this));
-
-    _this.policies = policies;
-    _this[TOOLKIT] = null;
-    return _this;
-  }
-
-  createClass(CompositeEditPolicy, [{
-    key: 'perform',
-    value: function perform(intent) {
-      this.policies.forEach(function (policy) {
-        return policy.perform(intent);
-      });
-    }
-  }, {
-    key: 'requestFeedback',
-    value: function requestFeedback(intent) {
-      this.policies.forEach(function (policy) {
-        return policy.requestFeedback(intent);
-      });
-    }
-  }, {
-    key: 'eraseFeedback',
-    value: function eraseFeedback(intent) {
-      this.policies.forEach(function (policy) {
-        return policy.eraseFeedback(intent);
-      });
-    }
-  }, {
-    key: 'toolkit',
-    get: function get$$1() {
-      return this[TOOLKIT];
-    },
-    set: function set$$1(toolkit) {
-      this._toolkit = toolkit;
-      if (this.policies === null || this.policies === undefined) {
-        return;
-      }
-      this.policies.forEach(function (policy) {
-        // eslint-disable-next-line no-param-reassign
-        policy.toolkit = toolkit;
-      });
-    }
-  }]);
-  return CompositeEditPolicy;
-}(EditPolicy);
-
-
-var compose = function compose(policies) {
-  if (policies === null || policies === undefined) {
-    return new EditPolicy();
-  } else if (policies instanceof EditPolicy) {
-    return policies;
-  } else if (Array.isArray(policies)) {
-    for (var i = 0, len = policies.length; i < len; i += 1) {
-      var element = policies[i];
-      if (!(element instanceof EditPolicy)) {
-        throw new TypeError('Expected policies[' + i + '] to be an EditPolicy, got ' + policies[0] + ' instead.');
-      }
-    }
-    switch (policies.length) {
-      case 0:
-        return new EditPolicy();
-      case 1:
-        return policies[0];
-      default:
-        return new CompositeEditPolicy(policies);
-    }
-  } else {
-    throw new TypeError('Expected EditPolicy or Array<EditPolicy>, got ' + policies + ' instead.');
-  }
-};
-
 var Engine = function () {
   function Engine(_ref) {
-    var _ref$capabilities = _ref.capabilities,
+    var _ref$dependencies = _ref.dependencies,
+        dependencies = _ref$dependencies === undefined ? {} : _ref$dependencies,
+        _ref$capabilities = _ref.capabilities,
         capabilities = _ref$capabilities === undefined ? [] : _ref$capabilities,
         _ref$editPolicies = _ref.editPolicies,
         editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
@@ -874,39 +785,19 @@ var Engine = function () {
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
 
-    this.toolkit = null;
-    this.registry = null;
+    this._toolkit = null;
+    this._registry = null;
     this.capabilities = capabilities;
     this.selectionProvider = selectionProvider;
-    this.editPolicy = compose(editPolicies);
+    this.editPolicies = editPolicies;
+    this.dependencies = dependencies;
+    this.editPolicies.forEach(function (policy) {
+      // eslint-disable-next-line no-param-reassign
+      policy.dependencies = dependencies;
+    });
   }
 
   createClass(Engine, [{
-    key: 'setToolkit',
-    value: function setToolkit(toolkit) {
-      this.toolkit = toolkit;
-      this.editPolicy.toolkit = toolkit;
-    }
-  }, {
-    key: 'getComponentRegistry',
-    value: function getComponentRegistry() {
-      return this.registry;
-    }
-  }, {
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry(registry) {
-      var _this = this;
-
-      this.registry = registry;
-      this.capabilities.forEach(function (capability) {
-        capability.setComponentRegistry(registry);
-        capability.setEngine(_this);
-      });
-      if (this.selectionProvider instanceof SelectionProvider) {
-        this.selectionProvider.setToolkit(this.toolkit);
-      }
-    }
-  }, {
     key: 'onKeyUp',
     value: function onKeyUp(e) {
       this.capabilities.forEach(function (capability) {
@@ -944,10 +835,43 @@ var Engine = function () {
   }, {
     key: 'selection',
     value: function selection() {
-      if (!(this.selectionProvider instanceof SelectionProvider)) {
-        return [];
-      }
       return this.selectionProvider.selection();
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this._toolkit;
+    },
+    set: function set$$1(toolkit) {
+      this._toolkit = toolkit;
+      this.editPolicies.forEach(function (policy) {
+        // eslint-disable-next-line no-param-reassign
+        policy.toolkit = toolkit;
+      });
+      this.capabilities.forEach(function (capability) {
+        // eslint-disable-next-line no-param-reassign
+        capability.toolkit = toolkit;
+      });
+    }
+  }, {
+    key: 'registry',
+    get: function get$$1() {
+      return this._registry;
+    },
+    set: function set$$1(registry) {
+      var _this = this;
+
+      this._registry = registry;
+      this.capabilities.forEach(function (capability) {
+        /* eslint-disable no-param-reassign */
+        capability.registry = registry;
+        capability.domHelper = registry ? new DomHelper(registry) : null;
+        capability.engine = _this;
+        /* eslint-enable no-param-reassign */
+      });
+      if (this.selectionProvider instanceof SelectionProvider) {
+        this.selectionProvider.toolkit = this.toolkit;
+      }
     }
   }]);
   return Engine;
@@ -957,50 +881,40 @@ var Capability = function () {
   function Capability() {
     classCallCheck(this, Capability);
 
-    this.engine = null;
     this.progress = false;
+    this.engine = null;
     this.registry = null;
     this.domHelper = null;
+    this.toolkit = null;
   }
 
   createClass(Capability, [{
-    key: 'setEngine',
-    value: function setEngine(engine) {
-      this.engine = engine;
-    }
-  }, {
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry(registry) {
-      this.registry = registry;
-      this.domHelper = registry === null ? null : new DomHelper(registry);
-    }
-  }, {
-    key: 'onKeyDown',
+    key: "onKeyDown",
     value: function onKeyDown() {
       // emtpy
     }
   }, {
-    key: 'onKeyUp',
+    key: "onKeyUp",
     value: function onKeyUp() {
       // empty
     }
   }, {
-    key: 'onMouseDown',
+    key: "onMouseDown",
     value: function onMouseDown() {
       // empty
     }
   }, {
-    key: 'onMouseMove',
+    key: "onMouseMove",
     value: function onMouseMove() {
       // empty
     }
   }, {
-    key: 'onMouseUp',
+    key: "onMouseUp",
     value: function onMouseUp() {
       // empty
     }
   }, {
-    key: 'cancel',
+    key: "cancel",
     value: function cancel() {
       // empty
     }
@@ -1353,10 +1267,10 @@ var DragCapability = function (_Capability) {
           targetParent = this.targetParent;
 
       if (lastRequest !== null && lastTargetParent.dom !== targetParent.dom && lastTargetParent.component !== null) {
-        this.engine.editPolicy.eraseFeedback(lastRequest);
+        eraseFeedback(this.engine.editPolicies, lastRequest);
       }
       if (request !== null) {
-        this.engine.editPolicy.requestFeedback(request);
+        requestFeedback(this.engine.editPolicies, request);
       }
     }
   }, {
@@ -1391,7 +1305,7 @@ var DragCapability = function (_Capability) {
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null && this.targetParent !== null) {
-          this.engine.editPolicy.eraseFeedback(this.lastRequest);
+          eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
         this.progress = false;
         this.lastRequest = null;
@@ -1428,8 +1342,7 @@ var DragCapability = function (_Capability) {
       var request = this.buildDragRequest(e);
       var selection = this.engine.selection();
       if (selection.indexOf(this.target.userComponent) < 0) {
-        var selectionReq = this.getSelectionRequest();
-        this.engine.editPolicy.perform(selectionReq);
+        perform(this.engine.editPolicies, this.getSelectionRequest());
       }
       this.handleFeedback(this.lastRequest, request);
       if (request !== null) {
@@ -1444,10 +1357,10 @@ var DragCapability = function (_Capability) {
       }
       var request = this.buildDragRequest(e);
       if (this.targetParent !== null && this.lastRequest !== null) {
-        this.engine.editPolicy.eraseFeedback(this.lastRequest);
+        eraseFeedback(this.engine.editPolicies, this.lastRequest);
       }
       if (request !== null && this.mouseMoved) {
-        this.engine.editPolicy.perform(request);
+        perform(this.engine.editPolicies, request);
       }
       this.progress = false;
     }
@@ -1475,7 +1388,7 @@ var ConnectMouseHandler = function (_Capability) {
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null) {
-          this.engine.editPolicy.eraseFeedback(this.lastRequest);
+          eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
         this.source = null;
         this.target = null;
@@ -1544,10 +1457,10 @@ var ConnectMouseHandler = function (_Capability) {
     key: 'handleFeedback',
     value: function handleFeedback(lastRequest, request) {
       if (lastRequest !== null && (request === null || request.target !== lastRequest.target)) {
-        this.engine.editPolicy.eraseFeedback(lastRequest);
+        eraseFeedback(this.engine.editPolicies, lastRequest);
       }
       if (request !== null) {
-        this.engine.editPolicy.requestFeedback(request);
+        requestFeedback(this.engine.editPolicies, request);
       }
     }
   }, {
@@ -1578,10 +1491,10 @@ var ConnectMouseHandler = function (_Capability) {
       }
       var request = this.buildEndConnectRequest(e);
       if (this.lastRequest !== null) {
-        this.engine.editPolicy.eraseFeedback(this.lastRequest);
+        eraseFeedback(this.engine.editPolicies, this.lastRequest);
       }
       if (request !== null) {
-        this.engine.editPolicy.perform(request);
+        perform(this.engine.editPolicies, request);
       }
       this.progress = false;
     }
@@ -1674,8 +1587,7 @@ var SingleSelectionCapability = function (_Capability) {
       this.endLocation = this.startLocation;
       if (this.possibleSingleSelection) {
         this.additional = metaKey || ctrlKey;
-        var request = this.createSingleSelectionRequest();
-        this.engine.editPolicy.perform(request);
+        perform(this.engine.editPolicies, this.createSingleSelectionRequest());
         this.additional = false;
       }
     }
@@ -1718,18 +1630,11 @@ var MultiSelectionCapability = function (_Capability) {
     _this.startLocation = null;
     _this.endLocation = null;
     _this.lastRequest = null;
-    _this.toolkit = null;
     _this.additional = false;
     return _this;
   }
 
   createClass(MultiSelectionCapability, [{
-    key: 'setComponentRegistry',
-    value: function setComponentRegistry(registry) {
-      get(MultiSelectionCapability.prototype.__proto__ || Object.getPrototypeOf(MultiSelectionCapability.prototype), 'setComponentRegistry', this).call(this, registry);
-      this.toolkit = registry === null ? null : new Toolkit(registry);
-    }
-  }, {
     key: 'createMultiSelectionRequest',
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1763,7 +1668,7 @@ var MultiSelectionCapability = function (_Capability) {
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null) {
-          this.engine.editPolicy.eraseFeedback(this.lastRequest);
+          eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
         this.startLocation = null;
         this.endLocation = null;
@@ -1791,7 +1696,7 @@ var MultiSelectionCapability = function (_Capability) {
       }
       this.endLocation = locationOf$1(e, this.registry.root.dom);
       var request = this.createMultiSelectionRequest();
-      this.engine.editPolicy.requestFeedback(request);
+      requestFeedback(this.engine.editPolicies, request);
       this.lastRequest = request;
     }
   }, {
@@ -1804,9 +1709,9 @@ var MultiSelectionCapability = function (_Capability) {
       this.additional = e.shiftKey;
       var request = this.createMultiSelectionRequest();
       if (this.lastRequest !== null) {
-        this.engine.editPolicy.eraseFeedback(this.lastRequest);
+        eraseFeedback(this.engine.editPolicies, this.lastRequest);
       }
-      this.engine.editPolicy.perform(request);
+      perform(this.engine.editPolicies, request);
       this.progress = false;
       this.additional = false;
     }
@@ -1866,8 +1771,7 @@ var DeleteCapability = function (_Capability) {
       if ((key === 'Backspace' || key === 'Delete') && this.domHelper.isInsideDiagram(target)) {
         this.currentSelection = this.engine.selection();
         if (this.currentSelection.length > 0) {
-          var request = this.getDeleteRequest();
-          this.engine.editPolicy.perform(request);
+          perform(this.engine.editPolicies, this.getDeleteRequest());
         }
       }
     }
@@ -1891,7 +1795,6 @@ exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
-exports.compose = compose;
 exports.DATA_ID = DATA_ID;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;

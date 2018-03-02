@@ -14,8 +14,8 @@ export default class Diagram extends React.Component {
   componentDidMount() {
     const { engine } = this.props
     if (engine) {
-      engine.setToolkit(this.toolkit)
-      engine.setComponentRegistry(this.registry)
+      engine.toolkit = this.toolkit
+      engine.registry = this.registry
     }
 
     document.addEventListener('mousedown', this.onMouseDown)
@@ -28,8 +28,10 @@ export default class Diagram extends React.Component {
   componentWillReceiveProps({ engine: newEngine }) {
     const { engine: currentEngine } = this.props
     if (newEngine !== currentEngine) {
-      newEngine.setToolkit(this.toolkit)
-      newEngine.setComponentRegistry(this.registry)
+      /* eslint-disable no-param-reassign */
+      newEngine.toolkit = this.toolkit
+      newEngine.toolkit = this.registry
+      /* eslint-enable no-param-reassign */
     }
   }
 
@@ -69,7 +71,6 @@ export default class Diagram extends React.Component {
     return {
       regef: {
         registry: this.registry,
-        idGenerator: this.idGenerator,
         toolkit: this.toolkit,
       },
     }

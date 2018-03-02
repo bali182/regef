@@ -14,5 +14,4 @@ export { default as MultiSelectionCapability } from './MultiSelectionCapability'
 export { default as CancelCapability } from './CancelCapability'
 export { default as DeleteCapability } from './DeleteCapability'
 
-export { compose } from './CompositeEditPolicy'
 export * from './constants'

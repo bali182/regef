@@ -1,6 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import Capability from './Capability'
+import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -118,10 +119,10 @@ export default class DragCapability extends Capability {
       lastTargetParent.dom !== targetParent.dom &&
       lastTargetParent.component !== null
     ) {
-      this.engine.editPolicy.eraseFeedback(lastRequest)
+      eraseFeedback(this.engine.editPolicies, lastRequest)
     }
     if (request !== null) {
-      this.engine.editPolicy.requestFeedback(request)
+      requestFeedback(this.engine.editPolicies, request)
     }
   }
 
@@ -152,7 +153,7 @@ export default class DragCapability extends Capability {
   cancel() {
     if (this.progress) {
       if (this.lastRequest !== null && this.targetParent !== null) {
-        this.engine.editPolicy.eraseFeedback(this.lastRequest)
+        eraseFeedback(this.engine.editPolicies, this.lastRequest)
       }
       this.progress = false
       this.lastRequest = null
@@ -187,8 +188,7 @@ export default class DragCapability extends Capability {
     const request = this.buildDragRequest(e)
     const selection = this.engine.selection()
     if (selection.indexOf(this.target.userComponent) < 0) {
-      const selectionReq = this.getSelectionRequest()
-      this.engine.editPolicy.perform(selectionReq)
+      perform(this.engine.editPolicies, this.getSelectionRequest())
     }
     this.handleFeedback(this.lastRequest, request)
     if (request !== null) {
@@ -202,10 +202,10 @@ export default class DragCapability extends Capability {
     }
     const request = this.buildDragRequest(e)
     if (this.targetParent !== null && this.lastRequest !== null) {
-      this.engine.editPolicy.eraseFeedback(this.lastRequest)
+      eraseFeedback(this.engine.editPolicies, this.lastRequest)
     }
     if (request !== null && this.mouseMoved) {
-      this.engine.editPolicy.perform(request)
+      perform(this.engine.editPolicies, request)
     }
     this.progress = false
   }

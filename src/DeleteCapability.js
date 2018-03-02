@@ -1,5 +1,6 @@
 import Capability from './Capability'
 import { DELETE } from './constants'
+import { perform } from './EditPolicy'
 
 export default class DeleteCapability extends Capability {
   constructor() {
@@ -18,8 +19,7 @@ export default class DeleteCapability extends Capability {
     if ((key === 'Backspace' || key === 'Delete') && this.domHelper.isInsideDiagram(target)) {
       this.currentSelection = this.engine.selection()
       if (this.currentSelection.length > 0) {
-        const request = this.getDeleteRequest()
-        this.engine.editPolicy.perform(request)
+        perform(this.engine.editPolicies, this.getDeleteRequest())
       }
     }
   }

@@ -1,6 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { NODE_TYPE, SELECT } from './constants'
 import Capability from './Capability'
+import { perform } from './EditPolicy'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
@@ -64,8 +65,7 @@ export default class SingleSelectionCapability extends Capability {
     this.endLocation = this.startLocation
     if (this.possibleSingleSelection) {
       this.additional = metaKey || ctrlKey
-      const request = this.createSingleSelectionRequest()
-      this.engine.editPolicy.perform(request)
+      perform(this.engine.editPolicies, this.createSingleSelectionRequest())
       this.additional = false
     }
   }

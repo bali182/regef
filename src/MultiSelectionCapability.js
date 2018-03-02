@@ -1,7 +1,7 @@
 import { point, rectangle } from 'regef-geometry'
 import { ROOT_TYPE, SELECT } from './constants'
-import Toolkit from './Toolkit'
 import Capability from './Capability'
+import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
 const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   const x = Math.min(x1, x2)
@@ -22,13 +22,7 @@ export default class MultiSelectionCapability extends Capability {
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null
-    this.toolkit = null
     this.additional = false
-  }
-
-  setComponentRegistry(registry) {
-    super.setComponentRegistry(registry)
-    this.toolkit = registry === null ? null : new Toolkit(registry)
   }
 
   createMultiSelectionRequest() {
@@ -55,7 +49,7 @@ export default class MultiSelectionCapability extends Capability {
   cancel() {
     if (this.progress) {
       if (this.lastRequest !== null) {
-        this.engine.editPolicy.eraseFeedback(this.lastRequest)
+        eraseFeedback(this.engine.editPolicies, this.lastRequest)
       }
       this.startLocation = null
       this.endLocation = null
@@ -81,7 +75,7 @@ export default class MultiSelectionCapability extends Capability {
     }
     this.endLocation = locationOf(e, this.registry.root.dom)
     const request = this.createMultiSelectionRequest()
-    this.engine.editPolicy.requestFeedback(request)
+    requestFeedback(this.engine.editPolicies, request)
     this.lastRequest = request
   }
 
@@ -93,9 +87,9 @@ export default class MultiSelectionCapability extends Capability {
     this.additional = e.shiftKey
     const request = this.createMultiSelectionRequest()
     if (this.lastRequest !== null) {
-      this.engine.editPolicy.eraseFeedback(this.lastRequest)
+      eraseFeedback(this.engine.editPolicies, this.lastRequest)
     }
-    this.engine.editPolicy.perform(request)
+    perform(this.engine.editPolicies, request)
     this.progress = false
     this.additional = false
   }
