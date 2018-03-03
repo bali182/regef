@@ -1,5 +1,14 @@
 import SelectionProvider from './SelectionProvider'
 import DomHelper from './DomHelper'
+import ComponentRegistry from './ComponentRegistry'
+import Toolkit from './Toolkit'
+
+const TOOLKIT = Symbol('TOOLKIT')
+const REGISTRY = Symbol('REGISTRY')
+const CAPABILITIES = Symbol('CAPABILITIES')
+const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
+const EDIT_POLICIES = Symbol('EDIT_POLICIES')
+const DEPENDENCIES = Symbol('DEPENDENCIES')
 
 class Engine {
   constructor({
@@ -8,55 +17,36 @@ class Engine {
     editPolicies = [],
     selectionProvider = new SelectionProvider(),
   }) {
-    this._toolkit = null
-    this._registry = null
-    this.capabilities = capabilities
-    this.selectionProvider = selectionProvider
-    this.editPolicies = editPolicies
-    this.dependencies = dependencies
-
+    this[REGISTRY] = new ComponentRegistry()
+    this[TOOLKIT] = new Toolkit(this.registry)
+    this[CAPABILITIES] = capabilities
+    this[SELECTION_PROVIDER] = selectionProvider
+    this[EDIT_POLICIES] = editPolicies
+    this[DEPENDENCIES] = dependencies
+    /* eslint-disable no-param-reassign */
     this.editPolicies.forEach((policy) => {
-      // eslint-disable-next-line no-param-reassign
       policy.dependencies = dependencies
+      policy.toolkit = this.toolkit
     })
-
     this.capabilities.forEach((capability) => {
-      // eslint-disable-next-line no-param-reassign
       capability.dependencies = dependencies
-    })
-
-    this.selectionProvider.dependencies = dependencies
-  }
-  get toolkit() {
-    return this._toolkit
-  }
-  set toolkit(toolkit) {
-    this._toolkit = toolkit
-    this.editPolicies.forEach((policy) => {
-      // eslint-disable-next-line no-param-reassign
-      policy.toolkit = toolkit
-    })
-    this.capabilities.forEach((capability) => {
-      // eslint-disable-next-line no-param-reassign
-      capability.toolkit = toolkit
-    })
-  }
-  get registry() {
-    return this._registry
-  }
-  set registry(registry) {
-    this._registry = registry
-    this.capabilities.forEach((capability) => {
-      /* eslint-disable no-param-reassign */
-      capability.registry = registry
-      capability.domHelper = registry ? new DomHelper(registry) : null
+      capability.toolkit = this.toolkit
+      capability.registry = this.registry
+      capability.domHelper = new DomHelper(this.registry)
       capability.engine = this
-      /* eslint-enable no-param-reassign */
     })
-    if (this.selectionProvider instanceof SelectionProvider) {
-      this.selectionProvider.toolkit = this.toolkit
-    }
+    /* eslint-enable no-param-reassign */
+    this.selectionProvider.dependencies = dependencies
+    this.selectionProvider.toolkit = this.toolkit
   }
+
+  get toolkit() { return this[TOOLKIT] }
+  get registry() { return this[REGISTRY] }
+  get capabilities() { return this[CAPABILITIES] }
+  get selectionProvider() { return this[SELECTION_PROVIDER] }
+  get editPolicies() { return this[EDIT_POLICIES] }
+  get dependencies() { return this[DEPENDENCIES] }
+
   onKeyUp(e) {
     this.capabilities.forEach((capability) => capability.onKeyUp(e))
   }

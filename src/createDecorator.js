@@ -13,28 +13,22 @@ const createDecorator = ({ type, activate, deactivate }) =>
       class DecoratedComponent extends React.Component {
         constructor(props, context) {
           super(props, context)
-          const { registry, toolkit } = context.regef
-          this.registry = registry
-          this.toolkit = toolkit
+          const { engine } = context.regef
           this.userComponent = null
           this.type = type
-          this.childProps = { toolkit: toolkitResolver(this, registry, toolkit) }
+          this.childProps = { toolkit: toolkitResolver(this, engine.registry, engine.toolkit) }
           // binding methods
           this.setUserComponent = this.setUserComponent.bind(this)
         }
-
         setUserComponent(ref) {
           this.userComponent = ref
         }
-
         componentDidMount() {
-          activate(this)
+          activate(this, this.context.regef.engine)
         }
-
         componentWillUnmount() {
-          deactivate(this)
+          deactivate(this, this.context.regef.engine)
         }
-
         render() {
           const { children, ...rest } = this.props
           const regefProps = mergeProps(this.childProps)

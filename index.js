@@ -4,10 +4,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var reactDom = require('react-dom');
-var regefGeometry = require('regef-geometry');
 var React = require('react');
 var React__default = _interopDefault(React);
+var reactDom = require('react-dom');
+var regefGeometry = require('regef-geometry');
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -83,362 +83,15 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-var DOM = Symbol('DOM');
-var COMPONENT = Symbol('COMPONENT');
-var USER_COMPONENT = Symbol('USER_COMPONENT');
-
-var ComponentWrapper = function () {
-  function ComponentWrapper(dom, component, userComponent) {
-    classCallCheck(this, ComponentWrapper);
-
-    this[DOM] = dom;
-    this[COMPONENT] = component;
-    this[USER_COMPONENT] = userComponent;
-  }
-
-  createClass(ComponentWrapper, [{
-    key: 'dom',
-    get: function get$$1() {
-      return this[DOM];
-    }
-  }, {
-    key: 'component',
-    get: function get$$1() {
-      return this[COMPONENT];
-    }
-  }, {
-    key: 'userComponent',
-    get: function get$$1() {
-      return this[USER_COMPONENT];
-    }
-  }]);
-  return ComponentWrapper;
-}();
-
-
-var fromComponent = function fromComponent(component) {
-  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
-};
-
-var ComponentRegistry = function () {
-  function ComponentRegistry() {
-    classCallCheck(this, ComponentRegistry);
-
-    this.mapping = new Map();
-    this.wrappers = new Set();
-    this.root = null;
-    this.registerListeners = [];
-    this.unregisterListeners = [];
-  }
-
-  createClass(ComponentRegistry, [{
-    key: 'setRoot',
-    value: function setRoot(root) {
-      this.root = root;
-      if (root === null || root === undefined) {
-        this.mapping.clear();
-      }
-    }
-  }, {
-    key: 'register',
-    value: function register(wrapper) {
-      if (!(wrapper instanceof ComponentWrapper)) {
-        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
-      }
-      this.mapping.set(wrapper.dom, wrapper);
-      this.mapping.set(wrapper.component, wrapper);
-      this.mapping.set(wrapper.userComponent, wrapper);
-      this.wrappers.add(wrapper);
-      this.registerListeners.forEach(function (listener) {
-        return listener(wrapper);
-      });
-    }
-  }, {
-    key: 'unregister',
-    value: function unregister(input) {
-      var wrapper = this.get(input);
-      if (wrapper !== undefined) {
-        this.mapping.delete(wrapper.dom);
-        this.mapping.delete(wrapper.component);
-        this.mapping.delete(wrapper.userComponent);
-        this.wrappers.delete(wrapper);
-        this.unregisterListeners.forEach(function (listener) {
-          return listener(wrapper);
-        });
-      }
-    }
-  }, {
-    key: 'get',
-    value: function get$$1(input) {
-      return this.mapping.get(input);
-    }
-  }, {
-    key: 'all',
-    value: function all() {
-      return Array.from(this.wrappers);
-    }
-  }, {
-    key: 'has',
-    value: function has(input) {
-      return this.mapping.has(input);
-    }
-  }, {
-    key: 'addRegisterListener',
-    value: function addRegisterListener(listener) {
-      this.registerListeners.push(listener);
-    }
-  }, {
-    key: 'addUnregisterListener',
-    value: function addUnregisterListener(listener) {
-      this.unregisterListeners.push(listener);
-    }
-  }, {
-    key: 'removeRegisterListener',
-    value: function removeRegisterListener(listener) {
-      this.registerListeners = this.registerListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }, {
-    key: 'removeUnregisterListener',
-    value: function removeUnregisterListener(listener) {
-      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }]);
-  return ComponentRegistry;
-}();
-
-var DomHelper = function () {
-  function DomHelper(registry) {
-    classCallCheck(this, DomHelper);
-
-    this.registry = registry;
-  }
-
-  createClass(DomHelper, [{
-    key: "findClosest",
-    value: function findClosest(dom) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      var root = this.registry.root.dom;
-      for (var it = dom; it !== null; it = it.parentNode) {
-        var wrapper = this.registry.get(it);
-        if (wrapper !== undefined && wrapper !== null) {
-          return this.matchesType(wrapper.component, type) ? wrapper : null;
-        }
-        if (it === root) {
-          return null;
-        }
-      }
-      return null;
-    }
-  }, {
-    key: "findRelevantChildrenIntenal",
-    value: function findRelevantChildrenIntenal(node) {
-      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      if (node !== null && node.hasChildNodes()) {
-        var childNodes = node.childNodes;
-        for (var i = 0, len = childNodes.length; i < len; i += 1) {
-          var childNode = childNodes[i];
-          if (this.registry.has(childNode)) {
-            children.push(childNode);
-          } else {
-            this.findRelevantChildrenIntenal(childNode, children);
-          }
-        }
-      }
-      return children;
-    }
-  }, {
-    key: "findRelevantChildren",
-    value: function findRelevantChildren(element) {
-      return this.findRelevantChildrenIntenal(element, []);
-    }
-  }, {
-    key: "findClosestParent",
-    value: function findClosestParent(element) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (element === this.registry.root.dom) {
-        return element;
-      }
-      return this.findClosestElement(element.parentNode, type);
-    }
-  }, {
-    key: "isInsideDiagram",
-    value: function isInsideDiagram(element) {
-      return this.registry.root.dom.contains(element);
-    }
-  }, {
-    key: "matchesType",
-    value: function matchesType(component, type) {
-      if (component === null) {
-        return false;
-      }
-      if (type === null) {
-        return true;
-      }
-      if (Array.isArray(type)) {
-        for (var i = 0, len = type.length; i < len; i += 1) {
-          var it = type[i];
-          if (it === component.type) {
-            return true;
-          }
-        }
-      }
-      return type === component.type;
-    }
-  }]);
-  return DomHelper;
-}();
-
-// Data attribute keys
-var DATA_ID = 'data-regef-id';
-
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-
-// Request types
-var ADD = 'add';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
-
-var REGISTRY = Symbol('REGISTRY');
-var DOM_HELPER = Symbol('DOM_HELPER');
-
-var Toolkit = function () {
-  function Toolkit(registry) {
-    classCallCheck(this, Toolkit);
-
-    this[REGISTRY] = registry;
-    this[DOM_HELPER] = new DomHelper(registry);
-  }
-
-  createClass(Toolkit, [{
-    key: 'root',
-    value: function root() {
-      var root = this[REGISTRY].root;
-      if (root === undefined || root === null) {
-        throw new Error('No root component!');
-      }
-      return this[REGISTRY].root.component.userComponent;
-    }
-  }, {
-    key: 'parent',
-    value: function parent(component) {
-      var domHelper = this[DOM_HELPER];
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      } else if (wrapper === registry.root) {
-        return null;
-      }
-      var parent = domHelper.findClosest(wrapper.dom.parentNode, null);
-      return parent === null ? null : parent.userComponent;
-    }
-  }, {
-    key: 'children',
-    value: function children(component) {
-      var registry = this[REGISTRY];
-      var domHelper = this[DOM_HELPER];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-      var domChildren = domHelper.findRelevantChildren(wrapper.dom);
-      var children = [];
-      for (var i = 0, length = domChildren.length; i < length; i += 1) {
-        var child = registry.get(domChildren[i]);
-        if (child !== undefined && child !== null) {
-          children.push(child.userComponent);
-        }
-      }
-      return children;
-    }
-  }, {
-    key: 'editPolicy',
-    value: function editPolicy(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-      return wrapper.component.editPolicy;
-    }
-  }, {
-    key: 'ofType',
-    value: function ofType(type) {
-      var all = this[REGISTRY].all();
-      var ofType = [];
-      for (var i = 0, length = all.length; i < length; i += 1) {
-        var wrapper = all[i];
-        if (wrapper.component.type === type) {
-          ofType.push(wrapper.userComponent);
-        }
-      }
-      return ofType;
-    }
-  }, {
-    key: 'nodes',
-    value: function nodes() {
-      return this.ofType(NODE_TYPE);
-    }
-  }, {
-    key: 'ports',
-    value: function ports() {
-      return this.ofType(PORT_TYPE);
-    }
-  }, {
-    key: 'connections',
-    value: function connections() {
-      return this.ofType(CONNECTION_TYPE);
-    }
-  }, {
-    key: 'bounds',
-    value: function bounds(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-
-      var _registry$root$dom$ge = registry.root.dom.getBoundingClientRect(),
-          rLeft = _registry$root$dom$ge.left,
-          rTop = _registry$root$dom$ge.top;
-
-      var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
-          left = _wrapper$dom$getBound.left,
-          top = _wrapper$dom$getBound.top,
-          width = _wrapper$dom$getBound.width,
-          height = _wrapper$dom$getBound.height;
-
-      return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
-    }
-  }]);
-  return Toolkit;
-}();
-
 var Diagram = function (_React$Component) {
   inherits(Diagram, _React$Component);
 
-  function Diagram(props, context) {
+  function Diagram() {
     classCallCheck(this, Diagram);
 
-    var _this = possibleConstructorReturn(this, (Diagram.__proto__ || Object.getPrototypeOf(Diagram)).call(this, props, context));
-
-    _this.registry = new ComponentRegistry();
-    _this.toolkit = new Toolkit(_this.registry);
     // binding methods
+    var _this = possibleConstructorReturn(this, (Diagram.__proto__ || Object.getPrototypeOf(Diagram)).call(this));
+
     _this.onMouseDown = _this.onMouseDown.bind(_this);
     _this.onMouseMove = _this.onMouseMove.bind(_this);
     _this.onMouseUp = _this.onMouseUp.bind(_this);
@@ -450,31 +103,11 @@ var Diagram = function (_React$Component) {
   createClass(Diagram, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var engine = this.props.engine;
-
-      if (engine) {
-        engine.toolkit = this.toolkit;
-        engine.registry = this.registry;
-      }
-
       document.addEventListener('mousedown', this.onMouseDown);
       document.addEventListener('mousemove', this.onMouseMove);
       document.addEventListener('mouseup', this.onMouseUp);
       document.addEventListener('keydown', this.onKeyDown);
       document.addEventListener('keyup', this.onKeyUp);
-    }
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(_ref) {
-      var newEngine = _ref.engine;
-      var currentEngine = this.props.engine;
-
-      if (newEngine !== currentEngine) {
-        /* eslint-disable no-param-reassign */
-        newEngine.toolkit = this.toolkit;
-        newEngine.toolkit = this.registry;
-        /* eslint-enable no-param-reassign */
-      }
     }
   }, {
     key: 'componentWillUnmount',
@@ -517,12 +150,9 @@ var Diagram = function (_React$Component) {
   }, {
     key: 'getChildContext',
     value: function getChildContext() {
-      return {
-        regef: {
-          registry: this.registry,
-          toolkit: this.toolkit
-        }
-      };
+      var engine = this.props.engine;
+
+      return { regef: { engine: engine } };
     }
   }, {
     key: 'render',
@@ -580,6 +210,26 @@ var eraseFeedback = function eraseFeedback(policies, intent) {
     return policy.eraseFeedback(intent);
   });
 };
+
+// Data attribute keys
+var DATA_ID = 'data-regef-id';
+
+// Diagram participant types
+var ROOT_TYPE = 'root';
+var NODE_TYPE = 'node';
+var PORT_TYPE = 'port';
+var CONNECTION_TYPE = 'connection';
+var PALETTE_ROOT_TYPE = 'palette-root';
+var PALETTE_ENTRY_TYPE = 'palette-entry';
+
+// Request types
+var ADD = 'add';
+var CREATE = 'create';
+var MOVE = 'move';
+var SELECT = 'select';
+var DELETE = 'delete';
+var START_CONNECTION = 'start-connection';
+var END_CONNECTION = 'end-connection';
 
 var DispatchingEditPolicy = function (_EditPolicy) {
   inherits(DispatchingEditPolicy, _EditPolicy);
@@ -714,8 +364,345 @@ var SelectionProvider = function () {
   return SelectionProvider;
 }();
 
+var DomHelper = function () {
+  function DomHelper(registry) {
+    classCallCheck(this, DomHelper);
+
+    this.registry = registry;
+  }
+
+  createClass(DomHelper, [{
+    key: "findClosest",
+    value: function findClosest(dom) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      var root = this.registry.root.dom;
+      for (var it = dom; it !== null; it = it.parentNode) {
+        var wrapper = this.registry.get(it);
+        if (wrapper !== undefined && wrapper !== null) {
+          return this.matchesType(wrapper.component, type) ? wrapper : null;
+        }
+        if (it === root) {
+          return null;
+        }
+      }
+      return null;
+    }
+  }, {
+    key: "findRelevantChildrenIntenal",
+    value: function findRelevantChildrenIntenal(node) {
+      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      if (node !== null && node.hasChildNodes()) {
+        var childNodes = node.childNodes;
+        for (var i = 0, len = childNodes.length; i < len; i += 1) {
+          var childNode = childNodes[i];
+          if (this.registry.has(childNode)) {
+            children.push(childNode);
+          } else {
+            this.findRelevantChildrenIntenal(childNode, children);
+          }
+        }
+      }
+      return children;
+    }
+  }, {
+    key: "findRelevantChildren",
+    value: function findRelevantChildren(element) {
+      return this.findRelevantChildrenIntenal(element, []);
+    }
+  }, {
+    key: "findClosestParent",
+    value: function findClosestParent(element) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (element === this.registry.root.dom) {
+        return element;
+      }
+      return this.findClosestElement(element.parentNode, type);
+    }
+  }, {
+    key: "isInsideDiagram",
+    value: function isInsideDiagram(element) {
+      return this.registry.root.dom.contains(element);
+    }
+  }, {
+    key: "matchesType",
+    value: function matchesType(component, type) {
+      if (component === null) {
+        return false;
+      }
+      if (type === null) {
+        return true;
+      }
+      if (Array.isArray(type)) {
+        for (var i = 0, len = type.length; i < len; i += 1) {
+          var it = type[i];
+          if (it === component.type) {
+            return true;
+          }
+        }
+      }
+      return type === component.type;
+    }
+  }]);
+  return DomHelper;
+}();
+
+var DOM = Symbol('DOM');
+var COMPONENT = Symbol('COMPONENT');
+var USER_COMPONENT = Symbol('USER_COMPONENT');
+
+var ComponentWrapper = function () {
+  function ComponentWrapper(dom, component, userComponent) {
+    classCallCheck(this, ComponentWrapper);
+
+    this[DOM] = dom;
+    this[COMPONENT] = component;
+    this[USER_COMPONENT] = userComponent;
+  }
+
+  createClass(ComponentWrapper, [{
+    key: 'dom',
+    get: function get$$1() {
+      return this[DOM];
+    }
+  }, {
+    key: 'component',
+    get: function get$$1() {
+      return this[COMPONENT];
+    }
+  }, {
+    key: 'userComponent',
+    get: function get$$1() {
+      return this[USER_COMPONENT];
+    }
+  }]);
+  return ComponentWrapper;
+}();
+
+
+var fromComponent = function fromComponent(component) {
+  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
+};
+
+var ComponentRegistry = function () {
+  function ComponentRegistry() {
+    classCallCheck(this, ComponentRegistry);
+
+    this.mapping = new Map();
+    this.wrappers = new Set();
+    this.root = null;
+    this.registerListeners = [];
+    this.unregisterListeners = [];
+  }
+
+  createClass(ComponentRegistry, [{
+    key: 'setRoot',
+    value: function setRoot(root) {
+      this.root = root;
+      if (root === null || root === undefined) {
+        this.mapping.clear();
+      }
+    }
+  }, {
+    key: 'register',
+    value: function register(wrapper) {
+      if (!(wrapper instanceof ComponentWrapper)) {
+        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
+      }
+      this.mapping.set(wrapper.dom, wrapper);
+      this.mapping.set(wrapper.component, wrapper);
+      this.mapping.set(wrapper.userComponent, wrapper);
+      this.wrappers.add(wrapper);
+      this.registerListeners.forEach(function (listener) {
+        return listener(wrapper);
+      });
+    }
+  }, {
+    key: 'unregister',
+    value: function unregister(input) {
+      var wrapper = this.get(input);
+      if (wrapper !== undefined) {
+        this.mapping.delete(wrapper.dom);
+        this.mapping.delete(wrapper.component);
+        this.mapping.delete(wrapper.userComponent);
+        this.wrappers.delete(wrapper);
+        this.unregisterListeners.forEach(function (listener) {
+          return listener(wrapper);
+        });
+      }
+    }
+  }, {
+    key: 'get',
+    value: function get$$1(input) {
+      return this.mapping.get(input);
+    }
+  }, {
+    key: 'all',
+    value: function all() {
+      return Array.from(this.wrappers);
+    }
+  }, {
+    key: 'has',
+    value: function has(input) {
+      return this.mapping.has(input);
+    }
+  }, {
+    key: 'addRegisterListener',
+    value: function addRegisterListener(listener) {
+      this.registerListeners.push(listener);
+    }
+  }, {
+    key: 'addUnregisterListener',
+    value: function addUnregisterListener(listener) {
+      this.unregisterListeners.push(listener);
+    }
+  }, {
+    key: 'removeRegisterListener',
+    value: function removeRegisterListener(listener) {
+      this.registerListeners = this.registerListeners.filter(function (e) {
+        return e !== listener;
+      });
+    }
+  }, {
+    key: 'removeUnregisterListener',
+    value: function removeUnregisterListener(listener) {
+      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
+        return e !== listener;
+      });
+    }
+  }]);
+  return ComponentRegistry;
+}();
+
+var REGISTRY = Symbol('REGISTRY');
+var DOM_HELPER = Symbol('DOM_HELPER');
+
+var Toolkit = function () {
+  function Toolkit(registry) {
+    classCallCheck(this, Toolkit);
+
+    this[REGISTRY] = registry;
+    this[DOM_HELPER] = new DomHelper(registry);
+  }
+
+  createClass(Toolkit, [{
+    key: 'root',
+    value: function root() {
+      var root = this[REGISTRY].root;
+      if (root === undefined || root === null) {
+        throw new Error('No root component!');
+      }
+      return this[REGISTRY].root.component.userComponent;
+    }
+  }, {
+    key: 'parent',
+    value: function parent(component) {
+      var domHelper = this[DOM_HELPER];
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      } else if (wrapper === registry.root) {
+        return null;
+      }
+      var parent = domHelper.findClosest(wrapper.dom.parentNode, null);
+      return parent === null ? null : parent.userComponent;
+    }
+  }, {
+    key: 'children',
+    value: function children(component) {
+      var registry = this[REGISTRY];
+      var domHelper = this[DOM_HELPER];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+      var domChildren = domHelper.findRelevantChildren(wrapper.dom);
+      var children = [];
+      for (var i = 0, length = domChildren.length; i < length; i += 1) {
+        var child = registry.get(domChildren[i]);
+        if (child !== undefined && child !== null) {
+          children.push(child.userComponent);
+        }
+      }
+      return children;
+    }
+  }, {
+    key: 'editPolicy',
+    value: function editPolicy(component) {
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+      return wrapper.component.editPolicy;
+    }
+  }, {
+    key: 'ofType',
+    value: function ofType(type) {
+      var all = this[REGISTRY].all();
+      var ofType = [];
+      for (var i = 0, length = all.length; i < length; i += 1) {
+        var wrapper = all[i];
+        if (wrapper.component.type === type) {
+          ofType.push(wrapper.userComponent);
+        }
+      }
+      return ofType;
+    }
+  }, {
+    key: 'nodes',
+    value: function nodes() {
+      return this.ofType(NODE_TYPE);
+    }
+  }, {
+    key: 'ports',
+    value: function ports() {
+      return this.ofType(PORT_TYPE);
+    }
+  }, {
+    key: 'connections',
+    value: function connections() {
+      return this.ofType(CONNECTION_TYPE);
+    }
+  }, {
+    key: 'bounds',
+    value: function bounds(component) {
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+
+      var _registry$root$dom$ge = registry.root.dom.getBoundingClientRect(),
+          rLeft = _registry$root$dom$ge.left,
+          rTop = _registry$root$dom$ge.top;
+
+      var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
+          left = _wrapper$dom$getBound.left,
+          top = _wrapper$dom$getBound.top,
+          width = _wrapper$dom$getBound.width,
+          height = _wrapper$dom$getBound.height;
+
+      return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
+    }
+  }]);
+  return Toolkit;
+}();
+
+var TOOLKIT = Symbol('TOOLKIT');
+var REGISTRY$1 = Symbol('REGISTRY');
+var CAPABILITIES = Symbol('CAPABILITIES');
+var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
+var EDIT_POLICIES = Symbol('EDIT_POLICIES');
+var DEPENDENCIES = Symbol('DEPENDENCIES');
+
 var Engine = function () {
   function Engine(_ref) {
+    var _this = this;
+
     var _ref$dependencies = _ref.dependencies,
         dependencies = _ref$dependencies === undefined ? {} : _ref$dependencies,
         _ref$capabilities = _ref.capabilities,
@@ -726,24 +713,27 @@ var Engine = function () {
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
 
-    this._toolkit = null;
-    this._registry = null;
-    this.capabilities = capabilities;
-    this.selectionProvider = selectionProvider;
-    this.editPolicies = editPolicies;
-    this.dependencies = dependencies;
-
+    this[REGISTRY$1] = new ComponentRegistry();
+    this[TOOLKIT] = new Toolkit(this.registry);
+    this[CAPABILITIES] = capabilities;
+    this[SELECTION_PROVIDER] = selectionProvider;
+    this[EDIT_POLICIES] = editPolicies;
+    this[DEPENDENCIES] = dependencies;
+    /* eslint-disable no-param-reassign */
     this.editPolicies.forEach(function (policy) {
-      // eslint-disable-next-line no-param-reassign
       policy.dependencies = dependencies;
+      policy.toolkit = _this.toolkit;
     });
-
     this.capabilities.forEach(function (capability) {
-      // eslint-disable-next-line no-param-reassign
       capability.dependencies = dependencies;
+      capability.toolkit = _this.toolkit;
+      capability.registry = _this.registry;
+      capability.domHelper = new DomHelper(_this.registry);
+      capability.engine = _this;
     });
-
+    /* eslint-enable no-param-reassign */
     this.selectionProvider.dependencies = dependencies;
+    this.selectionProvider.toolkit = this.toolkit;
   }
 
   createClass(Engine, [{
@@ -789,38 +779,32 @@ var Engine = function () {
   }, {
     key: 'toolkit',
     get: function get$$1() {
-      return this._toolkit;
-    },
-    set: function set$$1(toolkit) {
-      this._toolkit = toolkit;
-      this.editPolicies.forEach(function (policy) {
-        // eslint-disable-next-line no-param-reassign
-        policy.toolkit = toolkit;
-      });
-      this.capabilities.forEach(function (capability) {
-        // eslint-disable-next-line no-param-reassign
-        capability.toolkit = toolkit;
-      });
+      return this[TOOLKIT];
     }
   }, {
     key: 'registry',
     get: function get$$1() {
-      return this._registry;
-    },
-    set: function set$$1(registry) {
-      var _this = this;
-
-      this._registry = registry;
-      this.capabilities.forEach(function (capability) {
-        /* eslint-disable no-param-reassign */
-        capability.registry = registry;
-        capability.domHelper = registry ? new DomHelper(registry) : null;
-        capability.engine = _this;
-        /* eslint-enable no-param-reassign */
-      });
-      if (this.selectionProvider instanceof SelectionProvider) {
-        this.selectionProvider.toolkit = this.toolkit;
-      }
+      return this[REGISTRY$1];
+    }
+  }, {
+    key: 'capabilities',
+    get: function get$$1() {
+      return this[CAPABILITIES];
+    }
+  }, {
+    key: 'selectionProvider',
+    get: function get$$1() {
+      return this[SELECTION_PROVIDER];
+    }
+  }, {
+    key: 'editPolicies',
+    get: function get$$1() {
+      return this[EDIT_POLICIES];
+    }
+  }, {
+    key: 'dependencies',
+    get: function get$$1() {
+      return this[DEPENDENCIES];
     }
   }]);
   return Engine;
@@ -932,15 +916,11 @@ var createDecorator = function createDecorator(_ref) {
 
           var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
 
-          var _context$regef = context.regef,
-              registry = _context$regef.registry,
-              toolkit = _context$regef.toolkit;
+          var engine = context.regef.engine;
 
-          _this.registry = registry;
-          _this.toolkit = toolkit;
           _this.userComponent = null;
           _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, registry, toolkit)
+          _this.childProps = { toolkit: toolkitResolver(_this, engine.registry, engine.toolkit)
             // binding methods
           };_this.setUserComponent = _this.setUserComponent.bind(_this);
           return _this;
@@ -954,12 +934,12 @@ var createDecorator = function createDecorator(_ref) {
         }, {
           key: 'componentDidMount',
           value: function componentDidMount() {
-            activate(this);
+            activate(this, this.context.regef.engine);
           }
         }, {
           key: 'componentWillUnmount',
           value: function componentWillUnmount() {
-            deactivate(this);
+            deactivate(this, this.context.regef.engine);
           }
         }, {
           key: 'render',
@@ -990,24 +970,23 @@ var createDecorator = function createDecorator(_ref) {
   };
 };
 
-/* eslint-disable no-param-reassign */
-var defaultActivate = function defaultActivate(component) {
+var defaultActivate = function defaultActivate(component, engine) {
   var wrapper = fromComponent(component);
-  component.registry.register(wrapper);
+  engine.registry.register(wrapper);
 };
 
-var defaultDecativate = function defaultDecativate(component) {
-  component.registry.unregister(component);
+var defaultDecativate = function defaultDecativate(component, engine) {
+  engine.registry.unregister(component);
 };
 
-var rootActivate = function rootActivate(component) {
-  defaultActivate(component);
-  component.registry.setRoot(component.registry.get(component));
+var rootActivate = function rootActivate(component, engine) {
+  defaultActivate(component, engine);
+  engine.registry.setRoot(engine.registry.get(component));
 };
 
-var rootDeactivate = function rootDeactivate(component) {
-  defaultDecativate(component);
-  component.registry.setRoot(null);
+var rootDeactivate = function rootDeactivate(component, engine) {
+  defaultDecativate(component, engine);
+  engine.registry.setRoot(null);
 };
 
 var node = createDecorator({
@@ -1720,7 +1699,10 @@ exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
+exports.PALETTE_ROOT_TYPE = PALETTE_ROOT_TYPE;
+exports.PALETTE_ENTRY_TYPE = PALETTE_ENTRY_TYPE;
 exports.ADD = ADD;
+exports.CREATE = CREATE;
 exports.MOVE = MOVE;
 exports.SELECT = SELECT;
 exports.DELETE = DELETE;
