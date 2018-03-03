@@ -109,7 +109,10 @@ export class Toolkit {
 
 export class SelectionProvider {
   toolkit: Toolkit
+  dependencies: { [key: string]: any }
+
   constructor()
+
   selection(): ReactComponent[]
 }
 
@@ -177,6 +180,7 @@ export class Capability {
   engine: Engine
   registry: ComponentRegistry
   domHelper: DomHelper
+  dependencies: { [key: string]: any }
 
   constructor()
 

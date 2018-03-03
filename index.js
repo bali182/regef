@@ -762,6 +762,7 @@ var SelectionProvider = function () {
     classCallCheck(this, SelectionProvider);
 
     this.toolkit = null;
+    this.dependencies = {};
   }
 
   createClass(SelectionProvider, [{
@@ -791,10 +792,18 @@ var Engine = function () {
     this.selectionProvider = selectionProvider;
     this.editPolicies = editPolicies;
     this.dependencies = dependencies;
+
     this.editPolicies.forEach(function (policy) {
       // eslint-disable-next-line no-param-reassign
       policy.dependencies = dependencies;
     });
+
+    this.capabilities.forEach(function (capability) {
+      // eslint-disable-next-line no-param-reassign
+      capability.dependencies = dependencies;
+    });
+
+    this.selectionProvider.dependencies = dependencies;
   }
 
   createClass(Engine, [{
@@ -886,6 +895,7 @@ var Capability = function () {
     this.registry = null;
     this.domHelper = null;
     this.toolkit = null;
+    this.dependencies = {};
   }
 
   createClass(Capability, [{

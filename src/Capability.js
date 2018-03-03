@@ -5,6 +5,7 @@ export default class Capability {
     this.registry = null
     this.domHelper = null
     this.toolkit = null
+    this.dependencies = {}
   }
   onKeyDown() {
     // emtpy

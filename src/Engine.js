@@ -14,10 +14,18 @@ class Engine {
     this.selectionProvider = selectionProvider
     this.editPolicies = editPolicies
     this.dependencies = dependencies
+
     this.editPolicies.forEach((policy) => {
       // eslint-disable-next-line no-param-reassign
       policy.dependencies = dependencies
     })
+
+    this.capabilities.forEach((capability) => {
+      // eslint-disable-next-line no-param-reassign
+      capability.dependencies = dependencies
+    })
+
+    this.selectionProvider.dependencies = dependencies
   }
   get toolkit() {
     return this._toolkit
