@@ -2,13 +2,18 @@ import React, { Children } from 'react'
 
 import ComponentRegistry from './ComponentRegistry'
 import Toolkit from './Toolkit'
-import bind from './bind'
 
 export default class Diagram extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.registry = new ComponentRegistry()
     this.toolkit = new Toolkit(this.registry)
+    // binding methods
+    this.onMouseDown = this.onMouseDown.bind(this)
+    this.onMouseMove = this.onMouseMove.bind(this)
+    this.onMouseUp = this.onMouseUp.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
   }
 
   componentDidMount() {
@@ -47,23 +52,23 @@ export default class Diagram extends React.Component {
     }
   }
 
-  @bind onKeyDown(e) {
+  onKeyDown(e) {
     this.props.engine.onKeyDown(e)
   }
 
-  @bind onKeyUp(e) {
+  onKeyUp(e) {
     this.props.engine.onKeyUp(e)
   }
 
-  @bind onMouseDown(e) {
+  onMouseDown(e) {
     this.props.engine.onMouseDown(e)
   }
 
-  @bind onMouseMove(e) {
+  onMouseMove(e) {
     this.props.engine.onMouseMove(e)
   }
 
-  @bind onMouseUp(e) {
+  onMouseUp(e) {
     this.props.engine.onMouseUp(e)
   }
 

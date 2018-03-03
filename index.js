@@ -428,73 +428,7 @@ var Toolkit = function () {
   return Toolkit;
 }();
 
-var has = function has(object, key) {
-  return Object.prototype.hasOwnProperty.call(object, key);
-};
-
-function bind(target, key, descriptor) {
-  var fn = descriptor.value;
-  var definingProperty = false;
-
-  return {
-    configurable: true,
-    get: function get() {
-      if (definingProperty || this === target.prototype || has(this, key) || typeof fn !== 'function') {
-        return fn;
-      }
-      var boundFn = fn.bind(this);
-      definingProperty = true;
-      Object.defineProperty(this, key, {
-        configurable: true,
-        get: function get() {
-          return boundFn;
-        },
-        set: function set(value) {
-          fn = value;
-          delete this[key];
-        }
-      });
-      definingProperty = false;
-      return boundFn;
-    },
-    set: function set(value) {
-      fn = value;
-    }
-  };
-}
-
-var _class;
-
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
-var Diagram = (_class = function (_React$Component) {
+var Diagram = function (_React$Component) {
   inherits(Diagram, _React$Component);
 
   function Diagram(props, context) {
@@ -504,6 +438,12 @@ var Diagram = (_class = function (_React$Component) {
 
     _this.registry = new ComponentRegistry();
     _this.toolkit = new Toolkit(_this.registry);
+    // binding methods
+    _this.onMouseDown = _this.onMouseDown.bind(_this);
+    _this.onMouseMove = _this.onMouseMove.bind(_this);
+    _this.onMouseUp = _this.onMouseUp.bind(_this);
+    _this.onKeyDown = _this.onKeyDown.bind(_this);
+    _this.onKeyUp = _this.onKeyUp.bind(_this);
     return _this;
   }
 
@@ -592,7 +532,7 @@ var Diagram = (_class = function (_React$Component) {
     }
   }]);
   return Diagram;
-}(React__default.Component), _applyDecoratedDescriptor(_class.prototype, 'onKeyDown', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'onKeyDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onKeyUp', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'onKeyUp'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseDown', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseDown'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseMove', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseMove'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'onMouseUp', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'onMouseUp'), _class.prototype), _class);
+}(React__default.Component);
 
 
 Diagram.childContextTypes = {
@@ -965,35 +905,6 @@ var watchRegister = function watchRegister(registry, target) {
   });
 };
 
-function _applyDecoratedDescriptor$1(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
 var defaultMergeProps = function defaultMergeProps(regef) {
   return { regef: regef };
 };
@@ -1013,9 +924,7 @@ var createDecorator = function createDecorator(_ref) {
   return function () {
     var mergeProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultMergeProps;
     return function (Wrapped) {
-      var _class;
-
-      var DecoratedComponent = (_class = function (_React$Component) {
+      var DecoratedComponent = function (_React$Component) {
         inherits(DecoratedComponent, _React$Component);
 
         function DecoratedComponent(props, context) {
@@ -1031,7 +940,9 @@ var createDecorator = function createDecorator(_ref) {
           _this.toolkit = toolkit;
           _this.userComponent = null;
           _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, registry, toolkit) };
+          _this.childProps = { toolkit: toolkitResolver(_this, registry, toolkit)
+            // binding methods
+          };_this.setUserComponent = _this.setUserComponent.bind(_this);
           return _this;
         }
 
@@ -1066,8 +977,7 @@ var createDecorator = function createDecorator(_ref) {
           }
         }]);
         return DecoratedComponent;
-      }(React__default.Component), _applyDecoratedDescriptor$1(_class.prototype, 'setUserComponent', [bind], Object.getOwnPropertyDescriptor(_class.prototype, 'setUserComponent'), _class.prototype), _class);
-
+      }(React__default.Component);
 
       DecoratedComponent.contextTypes = {
         regef: function regef() {

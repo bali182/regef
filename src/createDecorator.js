@@ -1,6 +1,5 @@
 import React from 'react'
 
-import bind from './bind'
 import { watchRegister } from './watchers'
 
 const defaultMergeProps = (regef) => ({ regef })
@@ -20,9 +19,11 @@ const createDecorator = ({ type, activate, deactivate }) =>
           this.userComponent = null
           this.type = type
           this.childProps = { toolkit: toolkitResolver(this, registry, toolkit) }
+          // binding methods
+          this.setUserComponent = this.setUserComponent.bind(this)
         }
 
-        @bind setUserComponent(ref) {
+        setUserComponent(ref) {
           this.userComponent = ref
         }
 
