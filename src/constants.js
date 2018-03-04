@@ -6,8 +6,8 @@ export const ROOT_TYPE = 'root'
 export const NODE_TYPE = 'node'
 export const PORT_TYPE = 'port'
 export const CONNECTION_TYPE = 'connection'
-export const PALETTE_ROOT_TYPE = 'palette-root'
-export const PALETTE_ENTRY_TYPE = 'palette-entry'
+export const ATTACHMENT_TYPE = 'attachment'
+export const CREATOR_TYPE = 'palette-entry'
 
 // Request types
 export const ADD = 'add'

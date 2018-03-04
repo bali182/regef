@@ -1,30 +1,26 @@
 import SelectionProvider from './SelectionProvider'
-import DomHelper from './DomHelper'
-import ComponentRegistry from './ComponentRegistry'
-import Toolkit from './Toolkit'
+import AttachmentWrapper from './AttachmentWrapper'
 
-const TOOLKIT = Symbol('TOOLKIT')
-const REGISTRY = Symbol('REGISTRY')
 const CAPABILITIES = Symbol('CAPABILITIES')
 const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
 const EDIT_POLICIES = Symbol('EDIT_POLICIES')
 const DEPENDENCIES = Symbol('DEPENDENCIES')
-const DOM_HELPER = Symbol('DOM_HELPER')
+const ATTACHMENTS = Symbol('ATTACHMENTS')
+const DIAGRAM = Symbol('DIAGRAM')
 
-class Engine {
+export default class Engine {
   constructor({
     dependencies = {},
     capabilities = [],
     editPolicies = [],
     selectionProvider = new SelectionProvider(),
   }) {
-    this[REGISTRY] = new ComponentRegistry()
-    this[TOOLKIT] = new Toolkit(this.registry)
-    this[DOM_HELPER] = new DomHelper(this.registry)
+    this[DIAGRAM] = new AttachmentWrapper(DIAGRAM, this)
     this[CAPABILITIES] = capabilities
     this[SELECTION_PROVIDER] = selectionProvider
     this[EDIT_POLICIES] = editPolicies
     this[DEPENDENCIES] = dependencies
+    this[ATTACHMENTS] = new Map()
 
     /* eslint-disable no-param-reassign */
     this.editPolicies.forEach((policy) => {
@@ -39,13 +35,26 @@ class Engine {
     this.selectionProvider.toolkit = this.toolkit
   }
 
-  get toolkit() { return this[TOOLKIT] }
-  get registry() { return this[REGISTRY] }
+  attachment(id) {
+    if (id === null || id === undefined) {
+      throw new TypeError(`Attachment id cannot be ${id}`)
+    }
+    const attachmentMap = this[ATTACHMENTS]
+    if (!attachmentMap.has(id)) {
+      attachmentMap.set(id, new AttachmentWrapper(id, this))
+    }
+    return attachmentMap.get(id)
+  }
+
+  get attachments() { return Array.from(this[ATTACHMENTS].values()) }
+  get registry() { return this[DIAGRAM].registry }
+  get toolkit() { return this[DIAGRAM].toolkit }
+  get domHelper() { return this[DIAGRAM].domHelper }
+
   get capabilities() { return this[CAPABILITIES] }
   get selectionProvider() { return this[SELECTION_PROVIDER] }
   get editPolicies() { return this[EDIT_POLICIES] }
   get dependencies() { return this[DEPENDENCIES] }
-  get domHelper() { return this[DOM_HELPER] }
 
   onKeyUp(e) {
     this.capabilities.forEach((capability) => capability.onKeyUp(e))
@@ -66,5 +75,3 @@ class Engine {
     return this.selectionProvider.selection()
   }
 }
-
-export default Engine

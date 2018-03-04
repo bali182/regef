@@ -124,12 +124,16 @@ export interface EngineParams {
 }
 
 export class Engine {
-  constructor(params: EngineParams)
   toolkit: Toolkit
   selectionProvider: SelectionProvider
   capabilities: Capability[]
   editPolicies: EditPolicy[]
   dependencies: { [key: string]: any }
+  attachments: AttachmentWrapper[]
+
+  constructor(params: EngineParams)
+
+  attachment(id: string): AttachmentWrapper
 }
 
 interface DiagramProps {
@@ -138,16 +142,34 @@ interface DiagramProps {
 
 export class Diagram extends ReactComponent<DiagramProps, any> { /* empty */ }
 
+interface AttachmentProps {
+  engine: Engine
+  id: string
+}
+
+export class Attachment extends ReactComponent<AttachmentProps, any> { /* empty */ }
+
 export function node(propMapper?: Function): (ReactConstructor: Function) => any
 export function port(propMapper?: Function): (ReactConstructor: Function) => any
 export function root(propMapper?: Function): (ReactConstructor: Function) => any
 export function connection(propMapper?: Function): (ReactConstructor: Function) => any
 
 class ComponentWrapper {
-  new(dom: Node, component: ReactComponent, userComponent: ReactComponent)
   dom: Node
   component: ReactComponent
   userComponent: ReactComponent
+
+  constructor(dom: Node, component: ReactComponent, userComponent: ReactComponent)
+}
+
+class AttachmentWrapper {
+  id: string
+  registry: ComponentRegistry
+  toolkit: Toolkit
+  engine: Engine
+  domHelper: DomHelper
+
+  constructor(id: string, engine: Engine)
 }
 
 interface ComponentRegistry {

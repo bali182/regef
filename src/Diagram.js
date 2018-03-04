@@ -1,6 +1,8 @@
-import React, { Children } from 'react'
+import { Children, PureComponent } from 'react'
+import { instanceOf, shape } from 'prop-types'
+import Engine from './Engine'
 
-export default class Diagram extends React.Component {
+export default class Diagram extends PureComponent {
   constructor() {
     super()
     // binding methods
@@ -23,10 +25,6 @@ export default class Diagram extends React.Component {
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('keyup', this.onKeyUp)
-
-    if (this.registry.root !== null) {
-      this.registry.setRoot(null)
-    }
   }
   onKeyDown(e) {
     this.props.engine.onKeyDown(e)
@@ -44,8 +42,7 @@ export default class Diagram extends React.Component {
     this.props.engine.onMouseUp(e)
   }
   getChildContext() {
-    const { engine } = this.props
-    return { regef: { engine } }
+    return { regef: { engine: this.props.engine } }
   }
   render() {
     // TODO check if it's node a root node, which is difficult because of other decorators
@@ -53,6 +50,12 @@ export default class Diagram extends React.Component {
   }
 }
 
+Diagram.propTypes = {
+  engine: instanceOf(Engine).isRequired,
+}
+
 Diagram.childContextTypes = {
-  regef: () => null,
+  regef: shape({
+    engine: instanceOf(Engine).isRequired,
+  }),
 }

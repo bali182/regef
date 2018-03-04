@@ -9,9 +9,13 @@ export default class ComponentRegistry {
     this.unregisterListeners = []
   }
   setRoot(root) {
+    if (root && this.root) {
+      throw new Error(`Diagram can only contain a single root. ${this.root} is already registered.`)
+    }
     this.root = root
-    if (root === null || root === undefined) {
+    if (!root) {
       this.mapping.clear()
+      this.wrappers.clear()
     }
   }
   register(wrapper) {

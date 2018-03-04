@@ -4,10 +4,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var React = require('react');
-var React__default = _interopDefault(React);
 var reactDom = require('react-dom');
 var regefGeometry = require('regef-geometry');
+var React = require('react');
+var React__default = _interopDefault(React);
+var propTypes = require('prop-types');
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -83,270 +84,6 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-var Diagram = function (_React$Component) {
-  inherits(Diagram, _React$Component);
-
-  function Diagram() {
-    classCallCheck(this, Diagram);
-
-    // binding methods
-    var _this = possibleConstructorReturn(this, (Diagram.__proto__ || Object.getPrototypeOf(Diagram)).call(this));
-
-    _this.onMouseDown = _this.onMouseDown.bind(_this);
-    _this.onMouseMove = _this.onMouseMove.bind(_this);
-    _this.onMouseUp = _this.onMouseUp.bind(_this);
-    _this.onKeyDown = _this.onKeyDown.bind(_this);
-    _this.onKeyUp = _this.onKeyUp.bind(_this);
-    return _this;
-  }
-
-  createClass(Diagram, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      document.addEventListener('mousedown', this.onMouseDown);
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
-      document.addEventListener('keydown', this.onKeyDown);
-      document.addEventListener('keyup', this.onKeyUp);
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      document.removeEventListener('mousedown', this.onMouseDown);
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
-      document.removeEventListener('keydown', this.onKeyDown);
-      document.removeEventListener('keyup', this.onKeyUp);
-
-      if (this.registry.root !== null) {
-        this.registry.setRoot(null);
-      }
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(e) {
-      this.props.engine.onKeyDown(e);
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp(e) {
-      this.props.engine.onKeyUp(e);
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.props.engine.onMouseDown(e);
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      this.props.engine.onMouseMove(e);
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      this.props.engine.onMouseUp(e);
-    }
-  }, {
-    key: 'getChildContext',
-    value: function getChildContext() {
-      var engine = this.props.engine;
-
-      return { regef: { engine: engine } };
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      // TODO check if it's node a root node, which is difficult because of other decorators
-      return React.Children.only(this.props.children);
-    }
-  }]);
-  return Diagram;
-}(React__default.Component);
-
-
-Diagram.childContextTypes = {
-  regef: function regef() {
-    return null;
-  }
-};
-
-var EditPolicy = function () {
-  function EditPolicy() {
-    classCallCheck(this, EditPolicy);
-
-    this.toolkit = null;
-    this.dependencies = {};
-  }
-
-  createClass(EditPolicy, [{
-    key: "perform",
-    value: function perform() /* intent */{}
-  }, {
-    key: "requestFeedback",
-    value: function requestFeedback() /* intent */{}
-  }, {
-    key: "eraseFeedback",
-    value: function eraseFeedback() /* intent */{}
-  }]);
-  return EditPolicy;
-}();
-
-
-var perform = function perform(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.perform(intent);
-  });
-};
-
-var requestFeedback = function requestFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.requestFeedback(intent);
-  });
-};
-
-var eraseFeedback = function eraseFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.eraseFeedback(intent);
-  });
-};
-
-// Data attribute keys
-var DATA_ID = 'data-regef-id';
-
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-var PALETTE_ROOT_TYPE = 'palette-root';
-var PALETTE_ENTRY_TYPE = 'palette-entry';
-
-// Request types
-var ADD = 'add';
-var CREATE = 'create';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
-
-var DispatchingEditPolicy = function (_EditPolicy) {
-  inherits(DispatchingEditPolicy, _EditPolicy);
-
-  function DispatchingEditPolicy() {
-    classCallCheck(this, DispatchingEditPolicy);
-    return possibleConstructorReturn(this, (DispatchingEditPolicy.__proto__ || Object.getPrototypeOf(DispatchingEditPolicy)).apply(this, arguments));
-  }
-
-  createClass(DispatchingEditPolicy, [{
-    key: 'perform',
-    value: function perform$$1(request) {
-      switch (request.type) {
-        case ADD:
-          return this.add(request);
-        case MOVE:
-          return this.move(request);
-        case START_CONNECTION:
-          return this.startConnection(request);
-        case END_CONNECTION:
-          return this.endConnection(request);
-        case SELECT:
-          return this.select(request);
-        case DELETE:
-          return this.delete(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'requestFeedback',
-    value: function requestFeedback$$1(request) {
-      switch (request.type) {
-        case ADD:
-          return this.requestAddFeedback(request);
-        case MOVE:
-          return this.requestMoveFeedback(request);
-        case START_CONNECTION:
-          return this.requestStartConnectionFeedback(request);
-        case END_CONNECTION:
-          return this.requestEndConnectionFeedback(request);
-        case SELECT:
-          return this.requestSelectFeedback(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'eraseFeedback',
-    value: function eraseFeedback$$1(request) {
-      switch (request.type) {
-        case ADD:
-          return this.eraseAddFeedback(request);
-        case MOVE:
-          return this.eraseMoveFeedback(request);
-        case START_CONNECTION:
-          return this.eraseStartConnectionFeedback(request);
-        case END_CONNECTION:
-          return this.eraseEndConnectionFeedback(request);
-        case SELECT:
-          return this.eraseSelectFeedback(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'add',
-    value: function add() /* request */{}
-  }, {
-    key: 'move',
-    value: function move() /* request */{}
-  }, {
-    key: 'startConnection',
-    value: function startConnection() /* request */{}
-  }, {
-    key: 'endConnection',
-    value: function endConnection() /* request */{}
-  }, {
-    key: 'select',
-    value: function select() /* request */{}
-  }, {
-    key: 'delete',
-    value: function _delete() /* request */{}
-  }, {
-    key: 'requestAddFeedback',
-    value: function requestAddFeedback() /* request */{}
-  }, {
-    key: 'requestMoveFeedback',
-    value: function requestMoveFeedback() /* request */{}
-  }, {
-    key: 'requestStartConnectionFeedback',
-    value: function requestStartConnectionFeedback() /* request */{}
-  }, {
-    key: 'requestEndConnectionFeedback',
-    value: function requestEndConnectionFeedback() /* request */{}
-  }, {
-    key: 'requestSelectFeedback',
-    value: function requestSelectFeedback() /* request */{}
-  }, {
-    key: 'eraseAddFeedback',
-    value: function eraseAddFeedback() /* request */{}
-  }, {
-    key: 'eraseMoveFeedback',
-    value: function eraseMoveFeedback() /* request */{}
-  }, {
-    key: 'eraseStartConnectionFeedback',
-    value: function eraseStartConnectionFeedback() /* request */{}
-  }, {
-    key: 'eraseEndConnectionFeedback',
-    value: function eraseEndConnectionFeedback() /* request */{}
-  }, {
-    key: 'eraseSelectFeedback',
-    value: function eraseSelectFeedback() /* request */{}
-  }]);
-  return DispatchingEditPolicy;
-}(EditPolicy);
-
 var SelectionProvider = function () {
   function SelectionProvider() {
     classCallCheck(this, SelectionProvider);
@@ -362,6 +99,137 @@ var SelectionProvider = function () {
     }
   }]);
   return SelectionProvider;
+}();
+
+var DOM = Symbol('DOM');
+var COMPONENT = Symbol('COMPONENT');
+var USER_COMPONENT = Symbol('USER_COMPONENT');
+
+var ComponentWrapper = function () {
+  function ComponentWrapper(dom, component, userComponent) {
+    classCallCheck(this, ComponentWrapper);
+
+    this[DOM] = dom;
+    this[COMPONENT] = component;
+    this[USER_COMPONENT] = userComponent;
+  }
+
+  createClass(ComponentWrapper, [{
+    key: 'dom',
+    get: function get$$1() {
+      return this[DOM];
+    }
+  }, {
+    key: 'component',
+    get: function get$$1() {
+      return this[COMPONENT];
+    }
+  }, {
+    key: 'userComponent',
+    get: function get$$1() {
+      return this[USER_COMPONENT];
+    }
+  }]);
+  return ComponentWrapper;
+}();
+
+
+var fromComponent = function fromComponent(component) {
+  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
+};
+
+var ComponentRegistry = function () {
+  function ComponentRegistry() {
+    classCallCheck(this, ComponentRegistry);
+
+    this.mapping = new Map();
+    this.wrappers = new Set();
+    this.root = null;
+    this.registerListeners = [];
+    this.unregisterListeners = [];
+  }
+
+  createClass(ComponentRegistry, [{
+    key: 'setRoot',
+    value: function setRoot(root) {
+      if (root && this.root) {
+        throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
+      }
+      this.root = root;
+      if (!root) {
+        this.mapping.clear();
+        this.wrappers.clear();
+      }
+    }
+  }, {
+    key: 'register',
+    value: function register(wrapper) {
+      if (!(wrapper instanceof ComponentWrapper)) {
+        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
+      }
+      this.mapping.set(wrapper.dom, wrapper);
+      this.mapping.set(wrapper.component, wrapper);
+      this.mapping.set(wrapper.userComponent, wrapper);
+      this.wrappers.add(wrapper);
+      this.registerListeners.forEach(function (listener) {
+        return listener(wrapper);
+      });
+    }
+  }, {
+    key: 'unregister',
+    value: function unregister(input) {
+      var wrapper = this.get(input);
+      if (wrapper !== undefined) {
+        this.mapping.delete(wrapper.dom);
+        this.mapping.delete(wrapper.component);
+        this.mapping.delete(wrapper.userComponent);
+        this.wrappers.delete(wrapper);
+        this.unregisterListeners.forEach(function (listener) {
+          return listener(wrapper);
+        });
+      }
+    }
+  }, {
+    key: 'get',
+    value: function get$$1(input) {
+      return this.mapping.get(input);
+    }
+  }, {
+    key: 'all',
+    value: function all() {
+      return Array.from(this.wrappers);
+    }
+  }, {
+    key: 'has',
+    value: function has(input) {
+      return this.mapping.has(input);
+    }
+  }, {
+    key: 'addRegisterListener',
+    value: function addRegisterListener(listener) {
+      this.registerListeners.push(listener);
+    }
+  }, {
+    key: 'addUnregisterListener',
+    value: function addUnregisterListener(listener) {
+      this.unregisterListeners.push(listener);
+    }
+  }, {
+    key: 'removeRegisterListener',
+    value: function removeRegisterListener(listener) {
+      this.registerListeners = this.registerListeners.filter(function (e) {
+        return e !== listener;
+      });
+    }
+  }, {
+    key: 'removeUnregisterListener',
+    value: function removeUnregisterListener(listener) {
+      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
+        return e !== listener;
+      });
+    }
+  }]);
+  return ComponentRegistry;
 }();
 
 var DomHelper = function () {
@@ -449,132 +317,25 @@ var DomHelper = function () {
   return DomHelper;
 }();
 
-var DOM = Symbol('DOM');
-var COMPONENT = Symbol('COMPONENT');
-var USER_COMPONENT = Symbol('USER_COMPONENT');
+// Data attribute keys
+var DATA_ID = 'data-regef-id';
 
-var ComponentWrapper = function () {
-  function ComponentWrapper(dom, component, userComponent) {
-    classCallCheck(this, ComponentWrapper);
+// Diagram participant types
+var ROOT_TYPE = 'root';
+var NODE_TYPE = 'node';
+var PORT_TYPE = 'port';
+var CONNECTION_TYPE = 'connection';
+var ATTACHMENT_TYPE = 'attachment';
+var CREATOR_TYPE = 'palette-entry';
 
-    this[DOM] = dom;
-    this[COMPONENT] = component;
-    this[USER_COMPONENT] = userComponent;
-  }
-
-  createClass(ComponentWrapper, [{
-    key: 'dom',
-    get: function get$$1() {
-      return this[DOM];
-    }
-  }, {
-    key: 'component',
-    get: function get$$1() {
-      return this[COMPONENT];
-    }
-  }, {
-    key: 'userComponent',
-    get: function get$$1() {
-      return this[USER_COMPONENT];
-    }
-  }]);
-  return ComponentWrapper;
-}();
-
-
-var fromComponent = function fromComponent(component) {
-  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
-};
-
-var ComponentRegistry = function () {
-  function ComponentRegistry() {
-    classCallCheck(this, ComponentRegistry);
-
-    this.mapping = new Map();
-    this.wrappers = new Set();
-    this.root = null;
-    this.registerListeners = [];
-    this.unregisterListeners = [];
-  }
-
-  createClass(ComponentRegistry, [{
-    key: 'setRoot',
-    value: function setRoot(root) {
-      this.root = root;
-      if (root === null || root === undefined) {
-        this.mapping.clear();
-      }
-    }
-  }, {
-    key: 'register',
-    value: function register(wrapper) {
-      if (!(wrapper instanceof ComponentWrapper)) {
-        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
-      }
-      this.mapping.set(wrapper.dom, wrapper);
-      this.mapping.set(wrapper.component, wrapper);
-      this.mapping.set(wrapper.userComponent, wrapper);
-      this.wrappers.add(wrapper);
-      this.registerListeners.forEach(function (listener) {
-        return listener(wrapper);
-      });
-    }
-  }, {
-    key: 'unregister',
-    value: function unregister(input) {
-      var wrapper = this.get(input);
-      if (wrapper !== undefined) {
-        this.mapping.delete(wrapper.dom);
-        this.mapping.delete(wrapper.component);
-        this.mapping.delete(wrapper.userComponent);
-        this.wrappers.delete(wrapper);
-        this.unregisterListeners.forEach(function (listener) {
-          return listener(wrapper);
-        });
-      }
-    }
-  }, {
-    key: 'get',
-    value: function get$$1(input) {
-      return this.mapping.get(input);
-    }
-  }, {
-    key: 'all',
-    value: function all() {
-      return Array.from(this.wrappers);
-    }
-  }, {
-    key: 'has',
-    value: function has(input) {
-      return this.mapping.has(input);
-    }
-  }, {
-    key: 'addRegisterListener',
-    value: function addRegisterListener(listener) {
-      this.registerListeners.push(listener);
-    }
-  }, {
-    key: 'addUnregisterListener',
-    value: function addUnregisterListener(listener) {
-      this.unregisterListeners.push(listener);
-    }
-  }, {
-    key: 'removeRegisterListener',
-    value: function removeRegisterListener(listener) {
-      this.registerListeners = this.registerListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }, {
-    key: 'removeUnregisterListener',
-    value: function removeUnregisterListener(listener) {
-      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }]);
-  return ComponentRegistry;
-}();
+// Request types
+var ADD = 'add';
+var CREATE = 'create';
+var MOVE = 'move';
+var SELECT = 'select';
+var DELETE = 'delete';
+var START_CONNECTION = 'start-connection';
+var END_CONNECTION = 'end-connection';
 
 var REGISTRY = Symbol('REGISTRY');
 var DOM_HELPER = Symbol('DOM_HELPER');
@@ -692,13 +453,59 @@ var Toolkit = function () {
   return Toolkit;
 }();
 
-var TOOLKIT = Symbol('TOOLKIT');
+var ID = Symbol('id');
+var ENGINE = Symbol('ENGINE');
 var REGISTRY$1 = Symbol('REGISTRY');
+var TOOLKIT = Symbol('TOOLKIT');
+var DOM_HELPER$1 = Symbol('DOM_HELPER');
+
+var AttachmentWrapper = function () {
+  function AttachmentWrapper(id, engine) {
+    classCallCheck(this, AttachmentWrapper);
+
+    this[ID] = id;
+    this[ENGINE] = engine;
+
+    this[REGISTRY$1] = new ComponentRegistry();
+    this[TOOLKIT] = new Toolkit(this.registry);
+    this[DOM_HELPER$1] = new DomHelper(this.registry);
+  }
+
+  createClass(AttachmentWrapper, [{
+    key: 'id',
+    get: function get$$1() {
+      return this[ID];
+    }
+  }, {
+    key: 'registry',
+    get: function get$$1() {
+      return this[REGISTRY$1];
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this[TOOLKIT];
+    }
+  }, {
+    key: 'engine',
+    get: function get$$1() {
+      return this[ENGINE];
+    }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DOM_HELPER$1];
+    }
+  }]);
+  return AttachmentWrapper;
+}();
+
 var CAPABILITIES = Symbol('CAPABILITIES');
 var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var DEPENDENCIES = Symbol('DEPENDENCIES');
-var DOM_HELPER$1 = Symbol('DOM_HELPER');
+var ATTACHMENTS = Symbol('ATTACHMENTS');
+var DIAGRAM = Symbol('DIAGRAM');
 
 var Engine = function () {
   function Engine(_ref) {
@@ -714,13 +521,12 @@ var Engine = function () {
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
 
-    this[REGISTRY$1] = new ComponentRegistry();
-    this[TOOLKIT] = new Toolkit(this.registry);
-    this[DOM_HELPER$1] = new DomHelper(this.registry);
+    this[DIAGRAM] = new AttachmentWrapper(DIAGRAM, this);
     this[CAPABILITIES] = capabilities;
     this[SELECTION_PROVIDER] = selectionProvider;
     this[EDIT_POLICIES] = editPolicies;
     this[DEPENDENCIES] = dependencies;
+    this[ATTACHMENTS] = new Map();
 
     /* eslint-disable no-param-reassign */
     this.editPolicies.forEach(function (policy) {
@@ -736,6 +542,18 @@ var Engine = function () {
   }
 
   createClass(Engine, [{
+    key: 'attachment',
+    value: function attachment(id) {
+      if (id === null || id === undefined) {
+        throw new TypeError('Attachment id cannot be ' + id);
+      }
+      var attachmentMap = this[ATTACHMENTS];
+      if (!attachmentMap.has(id)) {
+        attachmentMap.set(id, new AttachmentWrapper(id, this));
+      }
+      return attachmentMap.get(id);
+    }
+  }, {
     key: 'onKeyUp',
     value: function onKeyUp(e) {
       this.capabilities.forEach(function (capability) {
@@ -776,14 +594,24 @@ var Engine = function () {
       return this.selectionProvider.selection();
     }
   }, {
-    key: 'toolkit',
+    key: 'attachments',
     get: function get$$1() {
-      return this[TOOLKIT];
+      return Array.from(this[ATTACHMENTS].values());
     }
   }, {
     key: 'registry',
     get: function get$$1() {
-      return this[REGISTRY$1];
+      return this[DIAGRAM].registry;
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this[DIAGRAM].toolkit;
+    }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DIAGRAM].domHelper;
     }
   }, {
     key: 'capabilities',
@@ -805,14 +633,302 @@ var Engine = function () {
     get: function get$$1() {
       return this[DEPENDENCIES];
     }
-  }, {
-    key: 'domHelper',
-    get: function get$$1() {
-      return this[DOM_HELPER$1];
-    }
   }]);
   return Engine;
 }();
+
+var Diagram = function (_PureComponent) {
+  inherits(Diagram, _PureComponent);
+
+  function Diagram() {
+    classCallCheck(this, Diagram);
+
+    // binding methods
+    var _this = possibleConstructorReturn(this, (Diagram.__proto__ || Object.getPrototypeOf(Diagram)).call(this));
+
+    _this.onMouseDown = _this.onMouseDown.bind(_this);
+    _this.onMouseMove = _this.onMouseMove.bind(_this);
+    _this.onMouseUp = _this.onMouseUp.bind(_this);
+    _this.onKeyDown = _this.onKeyDown.bind(_this);
+    _this.onKeyUp = _this.onKeyUp.bind(_this);
+    return _this;
+  }
+
+  createClass(Diagram, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      document.addEventListener('mousedown', this.onMouseDown);
+      document.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
+      document.addEventListener('keydown', this.onKeyDown);
+      document.addEventListener('keyup', this.onKeyUp);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      document.removeEventListener('mousedown', this.onMouseDown);
+      document.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseup', this.onMouseUp);
+      document.removeEventListener('keydown', this.onKeyDown);
+      document.removeEventListener('keyup', this.onKeyUp);
+    }
+  }, {
+    key: 'onKeyDown',
+    value: function onKeyDown(e) {
+      this.props.engine.onKeyDown(e);
+    }
+  }, {
+    key: 'onKeyUp',
+    value: function onKeyUp(e) {
+      this.props.engine.onKeyUp(e);
+    }
+  }, {
+    key: 'onMouseDown',
+    value: function onMouseDown(e) {
+      this.props.engine.onMouseDown(e);
+    }
+  }, {
+    key: 'onMouseMove',
+    value: function onMouseMove(e) {
+      this.props.engine.onMouseMove(e);
+    }
+  }, {
+    key: 'onMouseUp',
+    value: function onMouseUp(e) {
+      this.props.engine.onMouseUp(e);
+    }
+  }, {
+    key: 'getChildContext',
+    value: function getChildContext() {
+      return { regef: { engine: this.props.engine } };
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      // TODO check if it's node a root node, which is difficult because of other decorators
+      return React.Children.only(this.props.children);
+    }
+  }]);
+  return Diagram;
+}(React.PureComponent);
+
+
+Diagram.propTypes = {
+  engine: propTypes.instanceOf(Engine).isRequired
+};
+
+Diagram.childContextTypes = {
+  regef: propTypes.shape({
+    engine: propTypes.instanceOf(Engine).isRequired
+  })
+};
+
+var Attachment = function (_PureComponent) {
+  inherits(Attachment, _PureComponent);
+
+  function Attachment() {
+    classCallCheck(this, Attachment);
+    return possibleConstructorReturn(this, (Attachment.__proto__ || Object.getPrototypeOf(Attachment)).apply(this, arguments));
+  }
+
+  createClass(Attachment, [{
+    key: 'getChildContext',
+    value: function getChildContext() {
+      return { regef: { engine: this.props.engine, id: this.props.id } };
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      // TODO check type (no solution yet)
+      return React.Children.only(this.props.children);
+    }
+  }]);
+  return Attachment;
+}(React.PureComponent);
+
+
+Attachment.childContextTypes = {
+  regef: propTypes.shape({
+    engine: propTypes.instanceOf(Engine).isRequired,
+    id: propTypes.string.isRequired
+  })
+};
+
+Attachment.propTypes = {
+  engine: propTypes.instanceOf(Engine).isRequired,
+  id: propTypes.string.isRequired
+};
+
+var EditPolicy = function () {
+  function EditPolicy() {
+    classCallCheck(this, EditPolicy);
+
+    this.toolkit = null;
+    this.dependencies = {};
+  }
+
+  createClass(EditPolicy, [{
+    key: "perform",
+    value: function perform() /* intent */{}
+  }, {
+    key: "requestFeedback",
+    value: function requestFeedback() /* intent */{}
+  }, {
+    key: "eraseFeedback",
+    value: function eraseFeedback() /* intent */{}
+  }]);
+  return EditPolicy;
+}();
+
+
+var perform = function perform(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.perform(intent);
+  });
+};
+
+var requestFeedback = function requestFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.requestFeedback(intent);
+  });
+};
+
+var eraseFeedback = function eraseFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.eraseFeedback(intent);
+  });
+};
+
+var DispatchingEditPolicy = function (_EditPolicy) {
+  inherits(DispatchingEditPolicy, _EditPolicy);
+
+  function DispatchingEditPolicy() {
+    classCallCheck(this, DispatchingEditPolicy);
+    return possibleConstructorReturn(this, (DispatchingEditPolicy.__proto__ || Object.getPrototypeOf(DispatchingEditPolicy)).apply(this, arguments));
+  }
+
+  createClass(DispatchingEditPolicy, [{
+    key: 'perform',
+    value: function perform$$1(request) {
+      switch (request.type) {
+        case ADD:
+          return this.add(request);
+        case MOVE:
+          return this.move(request);
+        case START_CONNECTION:
+          return this.startConnection(request);
+        case END_CONNECTION:
+          return this.endConnection(request);
+        case SELECT:
+          return this.select(request);
+        case DELETE:
+          return this.delete(request);
+        case CREATE:
+          return this.create(request);
+        default:
+          throw new Error('Unknown request type ' + request.type);
+      }
+    }
+  }, {
+    key: 'requestFeedback',
+    value: function requestFeedback$$1(request) {
+      switch (request.type) {
+        case ADD:
+          return this.requestAddFeedback(request);
+        case MOVE:
+          return this.requestMoveFeedback(request);
+        case START_CONNECTION:
+          return this.requestStartConnectionFeedback(request);
+        case END_CONNECTION:
+          return this.requestEndConnectionFeedback(request);
+        case SELECT:
+          return this.requestSelectFeedback(request);
+        case CREATE:
+          return this.requestCreateFeedback(request);
+        default:
+          throw new Error('Unknown request type ' + request.type);
+      }
+    }
+  }, {
+    key: 'eraseFeedback',
+    value: function eraseFeedback$$1(request) {
+      switch (request.type) {
+        case ADD:
+          return this.eraseAddFeedback(request);
+        case MOVE:
+          return this.eraseMoveFeedback(request);
+        case START_CONNECTION:
+          return this.eraseStartConnectionFeedback(request);
+        case END_CONNECTION:
+          return this.eraseEndConnectionFeedback(request);
+        case SELECT:
+          return this.eraseSelectFeedback(request);
+        case CREATE:
+          return this.eraseCreateFeedback(request);
+        default:
+          throw new Error('Unknown request type ' + request.type);
+      }
+    }
+  }, {
+    key: 'add',
+    value: function add() /* request */{}
+  }, {
+    key: 'move',
+    value: function move() /* request */{}
+  }, {
+    key: 'startConnection',
+    value: function startConnection() /* request */{}
+  }, {
+    key: 'endConnection',
+    value: function endConnection() /* request */{}
+  }, {
+    key: 'select',
+    value: function select() /* request */{}
+  }, {
+    key: 'delete',
+    value: function _delete() /* request */{}
+  }, {
+    key: 'create',
+    value: function create() /* request */{}
+  }, {
+    key: 'requestAddFeedback',
+    value: function requestAddFeedback() /* request */{}
+  }, {
+    key: 'requestMoveFeedback',
+    value: function requestMoveFeedback() /* request */{}
+  }, {
+    key: 'requestStartConnectionFeedback',
+    value: function requestStartConnectionFeedback() /* request */{}
+  }, {
+    key: 'requestEndConnectionFeedback',
+    value: function requestEndConnectionFeedback() /* request */{}
+  }, {
+    key: 'requestSelectFeedback',
+    value: function requestSelectFeedback() /* request */{}
+  }, {
+    key: 'requestCreateFeedback',
+    value: function requestCreateFeedback() /* request */{}
+  }, {
+    key: 'eraseAddFeedback',
+    value: function eraseAddFeedback() /* request */{}
+  }, {
+    key: 'eraseMoveFeedback',
+    value: function eraseMoveFeedback() /* request */{}
+  }, {
+    key: 'eraseStartConnectionFeedback',
+    value: function eraseStartConnectionFeedback() /* request */{}
+  }, {
+    key: 'eraseEndConnectionFeedback',
+    value: function eraseEndConnectionFeedback() /* request */{}
+  }, {
+    key: 'eraseSelectFeedback',
+    value: function eraseSelectFeedback() /* request */{}
+  }, {
+    key: 'eraseCreateFeedback',
+    value: function eraseCreateFeedback() /* request */{}
+  }]);
+  return DispatchingEditPolicy;
+}(EditPolicy);
 
 var Capability = function () {
   function Capability() {
@@ -856,6 +972,76 @@ var Capability = function () {
   return Capability;
 }();
 
+function createDecorator(_ref) {
+  var type = _ref.type,
+      activate = _ref.activate,
+      deactivate = _ref.deactivate,
+      toolkitResolver = _ref.toolkitResolver;
+
+  return function () {
+    return function (Wrapped) {
+      var DecoratedComponent = function (_PureComponent) {
+        inherits(DecoratedComponent, _PureComponent);
+
+        function DecoratedComponent(props, context) {
+          classCallCheck(this, DecoratedComponent);
+
+          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
+
+          var id = _this.context.regef.id;
+
+          _this.attachmentId = id;
+          _this.userComponent = null;
+          _this.type = type;
+          _this.childProps = { toolkit: toolkitResolver(_this, context.regef)
+            // binding methods
+          };_this.setUserComponent = _this.setUserComponent.bind(_this);
+          return _this;
+        }
+
+        createClass(DecoratedComponent, [{
+          key: 'setUserComponent',
+          value: function setUserComponent(ref) {
+            this.userComponent = ref;
+          }
+        }, {
+          key: 'componentDidMount',
+          value: function componentDidMount() {
+            activate(this, this.context.regef);
+          }
+        }, {
+          key: 'componentWillUnmount',
+          value: function componentWillUnmount() {
+            deactivate(this, this.context.regef);
+          }
+        }, {
+          key: 'render',
+          value: function render() {
+            var _props = this.props,
+                children = _props.children,
+                rest = objectWithoutProperties(_props, ['children']);
+
+            return React__default.createElement(
+              Wrapped,
+              _extends({}, rest, { ref: this.setUserComponent, regef: this.childProps }),
+              children
+            );
+          }
+        }]);
+        return DecoratedComponent;
+      }(React.PureComponent);
+
+      DecoratedComponent.contextTypes = {
+        regef: function regef() {
+          return null;
+        }
+      };
+
+      return DecoratedComponent;
+    };
+  };
+}
+
 var matches = function matches(target, wrapper) {
   var userComponent = wrapper.userComponent,
       dom = wrapper.dom,
@@ -889,128 +1075,85 @@ var watchRegister = function watchRegister(registry, target) {
   });
 };
 
-var defaultMergeProps = function defaultMergeProps(regef) {
-  return { regef: regef };
+var registryFrom = function registryFrom(_ref) {
+  var engine = _ref.engine,
+      id = _ref.id;
+  return id === undefined ? engine.registry : engine.attachment(id).registry;
 };
 
-var toolkitResolver = function toolkitResolver(component, registry, toolkit) {
+var toolkitFrom = function toolkitFrom(_ref2) {
+  var engine = _ref2.engine,
+      id = _ref2.id;
+  return id === undefined ? engine.toolkit : engine.attachment(id).toolkit;
+};
+
+function defaultToolkitResolver(component, context) {
   return function () {
-    return watchRegister(registry, component).then(function () {
-      return toolkit;
+    return watchRegister(registryFrom(context), component).then(function () {
+      return toolkitFrom(context);
     });
   };
+}
+
+var defaultActivate = function defaultActivate(component, context) {
+  registryFrom(context).register(fromComponent(component));
 };
 
-var createDecorator = function createDecorator(_ref) {
-  var type = _ref.type,
-      activate = _ref.activate,
-      deactivate = _ref.deactivate;
-  return function () {
-    var mergeProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultMergeProps;
-    return function (Wrapped) {
-      var DecoratedComponent = function (_React$Component) {
-        inherits(DecoratedComponent, _React$Component);
-
-        function DecoratedComponent(props, context) {
-          classCallCheck(this, DecoratedComponent);
-
-          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
-
-          var engine = context.regef.engine;
-
-          _this.userComponent = null;
-          _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, engine.registry, engine.toolkit)
-            // binding methods
-          };_this.setUserComponent = _this.setUserComponent.bind(_this);
-          return _this;
-        }
-
-        createClass(DecoratedComponent, [{
-          key: 'setUserComponent',
-          value: function setUserComponent(ref) {
-            this.userComponent = ref;
-          }
-        }, {
-          key: 'componentDidMount',
-          value: function componentDidMount() {
-            activate(this, this.context.regef.engine);
-          }
-        }, {
-          key: 'componentWillUnmount',
-          value: function componentWillUnmount() {
-            deactivate(this, this.context.regef.engine);
-          }
-        }, {
-          key: 'render',
-          value: function render() {
-            var _props = this.props,
-                children = _props.children,
-                rest = objectWithoutProperties(_props, ['children']);
-
-            var regefProps = mergeProps(this.childProps);
-            return React__default.createElement(
-              Wrapped,
-              _extends({}, rest, { ref: this.setUserComponent }, regefProps),
-              children
-            );
-          }
-        }]);
-        return DecoratedComponent;
-      }(React__default.Component);
-
-      DecoratedComponent.contextTypes = {
-        regef: function regef() {
-          return null;
-        }
-      };
-
-      return DecoratedComponent;
-    };
-  };
+var defaultDecativate = function defaultDecativate(component, context) {
+  registryFrom(context).unregister(component);
 };
 
-var defaultActivate = function defaultActivate(component, engine) {
-  var wrapper = fromComponent(component);
-  engine.registry.register(wrapper);
+var rootActivate = function rootActivate(component, context) {
+  defaultActivate(component, context);
+  var registry = registryFrom(context);
+  registry.setRoot(registry.get(component));
 };
 
-var defaultDecativate = function defaultDecativate(component, engine) {
-  engine.registry.unregister(component);
-};
-
-var rootActivate = function rootActivate(component, engine) {
-  defaultActivate(component, engine);
-  engine.registry.setRoot(engine.registry.get(component));
-};
-
-var rootDeactivate = function rootDeactivate(component, engine) {
-  defaultDecativate(component, engine);
-  engine.registry.setRoot(null);
+var rootDeactivate = function rootDeactivate(component, context) {
+  defaultDecativate(component, context);
+  registryFrom(context).setRoot(null);
 };
 
 var node = createDecorator({
   type: NODE_TYPE,
   activate: defaultActivate,
-  deactivate: defaultDecativate
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var port = createDecorator({
   type: PORT_TYPE,
   activate: defaultActivate,
-  deactivate: defaultDecativate
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var root = createDecorator({
   type: ROOT_TYPE,
   activate: rootActivate,
-  deactivate: rootDeactivate
+  deactivate: rootDeactivate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var connection = createDecorator({
   type: CONNECTION_TYPE,
   activate: defaultActivate,
-  deactivate: defaultDecativate
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
+});
+
+var attachment = createDecorator({
+  type: ATTACHMENT_TYPE,
+  activate: rootActivate,
+  deactivate: rootDeactivate,
+  toolkitResolver: defaultToolkitResolver
+});
+
+var creator = createDecorator({
+  type: CREATOR_TYPE,
+  activate: defaultActivate,
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
@@ -1677,7 +1820,197 @@ var DeleteCapability = function (_Capability) {
   return DeleteCapability;
 }(Capability);
 
+var ACCEPTED_TYPES$1 = [NODE_TYPE, ROOT_TYPE];
+
+var buildOffset = function buildOffset(_ref, element) {
+  var clientX = _ref.clientX,
+      clientY = _ref.clientY;
+
+  var _element$getBoundingC = element.getBoundingClientRect(),
+      x = _element$getBoundingC.x,
+      y = _element$getBoundingC.y;
+
+  return {
+    x: clientX - x,
+    y: clientY - y
+  };
+};
+
+var CreationCapability = function (_Capability) {
+  inherits(CreationCapability, _Capability);
+
+  function CreationCapability() {
+    classCallCheck(this, CreationCapability);
+
+    var _this = possibleConstructorReturn(this, (CreationCapability.__proto__ || Object.getPrototypeOf(CreationCapability)).call(this));
+
+    _this.target = null;
+    _this.targetParent = null;
+    _this.lastTargetParent = null;
+    _this.coordinates = null;
+    _this.offset = null;
+    _this.lastRequest = null;
+    _this.startLocation = null;
+    return _this;
+  }
+
+  createClass(CreationCapability, [{
+    key: 'findTargetedParent',
+    value: function findTargetedParent(eventTarget) {
+      return this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES$1);
+    }
+  }, {
+    key: 'findTargetedCreator',
+    value: function findTargetedCreator(eventTarget) {
+      var attachments = this.engine.attachments;
+      for (var i = 0, len = attachments.length; i < len; i += 1) {
+        var attachment = attachments[i];
+        var creator = attachment.domHelper.findClosest(eventTarget, CREATOR_TYPE);
+        if (creator !== null) {
+          return creator;
+        }
+      }
+      return null;
+    }
+  }, {
+    key: 'updateTargetParent',
+    value: function updateTargetParent(e) {
+      var newTargetParent = this.findTargetedParent(e.target);
+      var targetParent = this.targetParent;
+      if (targetParent !== newTargetParent) {
+        this.lastTargetParent = targetParent;
+        this.targetParent = newTargetParent;
+      } else {
+        this.lastTargetParent = targetParent;
+      }
+    }
+  }, {
+    key: 'updateCoordinates',
+    value: function updateCoordinates(e) {
+      var clientX = e.clientX,
+          clientY = e.clientY;
+
+      var screenLocation = regefGeometry.point(clientX, clientY);
+      var offset = regefGeometry.point(this.offset);
+      if (this.targetParent !== null) {
+        var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
+            rootX = _engine$registry$root.x,
+            rootY = _engine$registry$root.y;
+
+        this.coordinates = {
+          offset: offset,
+          location: regefGeometry.point(clientX - rootX, clientY - rootY),
+          screenLocation: screenLocation
+        };
+      } else {
+        this.coordinates = {
+          offset: offset,
+          location: null,
+          screenLocation: screenLocation
+        };
+      }
+    }
+  }, {
+    key: 'getCreateChildRequest',
+    value: function getCreateChildRequest() {
+      var targetParent = this.targetParent,
+          coordinates = this.coordinates,
+          target = this.target;
+      var location = coordinates.location,
+          offset = coordinates.offset,
+          screenLocation = coordinates.screenLocation;
+
+      return {
+        type: CREATE,
+        component: target.userComponent,
+        targetContainer: targetParent === null ? null : targetParent.userComponent,
+        screenLocation: screenLocation,
+        location: location,
+        offset: offset
+      };
+    }
+  }, {
+    key: 'handleFeedback',
+    value: function handleFeedback(lastRequest, request) {
+      var lastTargetParent = this.lastTargetParent,
+          targetParent = this.targetParent;
+
+      if (lastRequest !== null && lastTargetParent !== targetParent) {
+        eraseFeedback(this.engine.editPolicies, lastRequest);
+      }
+      if (request !== null) {
+        requestFeedback(this.engine.editPolicies, request);
+      }
+    }
+  }, {
+    key: 'cleanupFeedback',
+    value: function cleanupFeedback() {
+      if (this.lastRequest !== null) {
+        eraseFeedback(this.engine.editPolicies, this.lastRequest);
+      }
+    }
+  }, {
+    key: 'buildDragRequest',
+    value: function buildDragRequest(e) {
+      this.updateTargetParent(e);
+      this.updateCoordinates(e);
+      return this.getCreateChildRequest();
+    }
+  }, {
+    key: 'cancel',
+    value: function cancel() {
+      if (this.progress) {
+        this.cleanupFeedback();
+        this.progress = false;
+        this.lastRequest = null;
+        this.eventDeltas = null;
+        this.coordinates = null;
+        this.targetParent = null;
+        this.target = null;
+      }
+    }
+  }, {
+    key: 'onMouseDown',
+    value: function onMouseDown(e) {
+      this.target = this.findTargetedCreator(e.target);
+      if (this.target === null || this.target === undefined) {
+        return;
+      }
+      this.startLocation = regefGeometry.point(e.clientX, e.clientY);
+      this.offset = buildOffset(e, this.target.dom);
+      this.progress = true;
+    }
+  }, {
+    key: 'onMouseMove',
+    value: function onMouseMove(e) {
+      if (!this.progress) {
+        return;
+      }
+      var request = this.buildDragRequest(e);
+      this.handleFeedback(this.lastRequest, request);
+      if (request !== null) {
+        this.lastRequest = request;
+      }
+    }
+  }, {
+    key: 'onMouseUp',
+    value: function onMouseUp(e) {
+      if (!this.progress) {
+        return;
+      }
+      var request = this.buildDragRequest(e);
+      this.cleanupFeedback();
+      if (request !== null) {
+        perform(this.engine.editPolicies, request);
+      }
+      this.progress = false;
+    }
+  }]);
+  return CreationCapability;
+}(Capability);
+
 exports.Diagram = Diagram;
+exports.Attachment = Attachment;
 exports.EditPolicy = EditPolicy;
 exports.DispatchingEditPolicy = DispatchingEditPolicy;
 exports.Engine = Engine;
@@ -1687,19 +2020,22 @@ exports.root = root;
 exports.connection = connection;
 exports.node = node;
 exports.port = port;
+exports.attachment = attachment;
+exports.creator = creator;
 exports.DragCapability = DragCapability;
 exports.ConnectCapability = ConnectMouseHandler;
 exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
+exports.CreationCapability = CreationCapability;
 exports.DATA_ID = DATA_ID;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
-exports.PALETTE_ROOT_TYPE = PALETTE_ROOT_TYPE;
-exports.PALETTE_ENTRY_TYPE = PALETTE_ENTRY_TYPE;
+exports.ATTACHMENT_TYPE = ATTACHMENT_TYPE;
+exports.CREATOR_TYPE = CREATOR_TYPE;
 exports.ADD = ADD;
 exports.CREATE = CREATE;
 exports.MOVE = MOVE;
