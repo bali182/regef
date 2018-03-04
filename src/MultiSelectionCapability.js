@@ -26,7 +26,8 @@ export default class MultiSelectionCapability extends Capability {
   }
 
   createMultiSelectionRequest() {
-    const { startLocation, endLocation, toolkit, additional, engine } = this
+    const { startLocation, endLocation, additional, engine } = this
+    const { toolkit } = this.engine
     const bounds = buildBounds(startLocation, endLocation)
     return {
       type: SELECT,
@@ -59,12 +60,12 @@ export default class MultiSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.domHelper.isInsideDiagram(e.target)) {
+    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.domHelper.findClosest(e.target, ROOT_TYPE)
+    const target = this.engine.domHelper.findClosest(e.target, ROOT_TYPE)
     if (target !== null) {
-      this.startLocation = locationOf(e, this.registry.root.dom)
+      this.startLocation = locationOf(e, this.engine.registry.root.dom)
       this.progress = true
     }
   }
@@ -73,7 +74,7 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = locationOf(e, this.registry.root.dom)
+    this.endLocation = locationOf(e, this.engine.registry.root.dom)
     const request = this.createMultiSelectionRequest()
     requestFeedback(this.engine.editPolicies, request)
     this.lastRequest = request
@@ -83,7 +84,7 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = locationOf(e, this.registry.root.dom)
+    this.endLocation = locationOf(e, this.engine.registry.root.dom)
     this.additional = e.shiftKey
     const request = this.createMultiSelectionRequest()
     if (this.lastRequest !== null) {

@@ -178,9 +178,6 @@ class DomHelper {
 export class Capability {
   progress: boolean
   engine: Engine
-  registry: ComponentRegistry
-  domHelper: DomHelper
-  dependencies: { [key: string]: any }
 
   constructor()
 

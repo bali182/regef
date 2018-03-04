@@ -16,7 +16,7 @@ export default class DeleteCapability extends Capability {
   }
 
   onKeyDown({ key, target }) {
-    if ((key === 'Backspace' || key === 'Delete') && this.domHelper.isInsideDiagram(target)) {
+    if ((key === 'Backspace' || key === 'Delete') && this.engine.domHelper.isInsideDiagram(target)) {
       this.currentSelection = this.engine.selection()
       if (this.currentSelection.length > 0) {
         perform(this.engine.editPolicies, this.getDeleteRequest())

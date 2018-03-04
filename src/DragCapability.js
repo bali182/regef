@@ -30,8 +30,8 @@ export default class DragCapability extends Capability {
   }
 
   findTargetedParent(eventTarget) {
-    const { domHelper, target, currentParent } = this
-    const newTarget = domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    const { target, currentParent } = this
+    const newTarget = this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
     if (newTarget === null
       || newTarget === target
       || target.dom.contains(newTarget.dom)
@@ -44,7 +44,7 @@ export default class DragCapability extends Capability {
   updateCoordinates(e) {
     const { deltaX, deltaY } = this.eventDeltas
     const { clientX, clientY } = e
-    const { x: rootX, y: rootY } = this.registry.root.dom.getBoundingClientRect()
+    const { x: rootX, y: rootY } = this.engine.registry.root.dom.getBoundingClientRect()
     const location = point(clientX - rootX, clientY - rootY)
     const offset = point(deltaX, deltaY)
     const delta = point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y)
@@ -135,7 +135,7 @@ export default class DragCapability extends Capability {
   }
 
   buildDragRequest(e) {
-    if (!this.domHelper.isInsideDiagram(e.target)) {
+    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
       return null
     }
 
@@ -166,13 +166,13 @@ export default class DragCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.domHelper.isInsideDiagram(e.target)) {
+    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
       return
     }
-    this.target = this.domHelper.findClosest(e.target, NODE_TYPE)
+    this.target = this.engine.domHelper.findClosest(e.target, NODE_TYPE)
     if (this.target !== null) {
-      const parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
-      this.currentParent = parent || this.registry.root
+      const parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
+      this.currentParent = parent || this.engine.registry.root
       this.eventDeltas = buildDeltas(e, this.target.dom)
       this.startLocation = point(e.clientX, e.clientY)
       this.mouseMoved = false

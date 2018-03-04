@@ -41,27 +41,27 @@ export default class ConnectMouseHandler extends Capability {
   }
 
   buildCoordinates({ clientX, clientY }) {
-    const { top, left } = this.registry.root.dom.getBoundingClientRect()
+    const { top, left } = this.engine.registry.root.dom.getBoundingClientRect()
     const x = clientX - left
     const y = clientY - top
     return { x, y }
   }
 
   buildEndConnectRequest(e) {
-    if (!this.domHelper.isInsideDiagram(e.target)) {
+    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
       return null
     }
 
-    this.target = this.domHelper.findClosest(e.target)
+    this.target = this.engine.domHelper.findClosest(e.target)
     this.coordinates = this.buildCoordinates(e)
     return this.getEndConnectionRequest()
   }
 
   buildStartConnectionRequest(e) {
-    if (!this.domHelper.isInsideDiagram(e.target)) {
+    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
       return null
     }
-    const source = this.domHelper.findClosest(e.target, PORT_TYPE)
+    const source = this.engine.domHelper.findClosest(e.target, PORT_TYPE)
     if (source !== null) {
       this.source = source
       this.coordinates = this.buildCoordinates(e)

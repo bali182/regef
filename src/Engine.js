@@ -9,6 +9,7 @@ const CAPABILITIES = Symbol('CAPABILITIES')
 const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
 const EDIT_POLICIES = Symbol('EDIT_POLICIES')
 const DEPENDENCIES = Symbol('DEPENDENCIES')
+const DOM_HELPER = Symbol('DOM_HELPER')
 
 class Engine {
   constructor({
@@ -19,20 +20,18 @@ class Engine {
   }) {
     this[REGISTRY] = new ComponentRegistry()
     this[TOOLKIT] = new Toolkit(this.registry)
+    this[DOM_HELPER] = new DomHelper(this.registry)
     this[CAPABILITIES] = capabilities
     this[SELECTION_PROVIDER] = selectionProvider
     this[EDIT_POLICIES] = editPolicies
     this[DEPENDENCIES] = dependencies
+
     /* eslint-disable no-param-reassign */
     this.editPolicies.forEach((policy) => {
       policy.dependencies = dependencies
       policy.toolkit = this.toolkit
     })
     this.capabilities.forEach((capability) => {
-      capability.dependencies = dependencies
-      capability.toolkit = this.toolkit
-      capability.registry = this.registry
-      capability.domHelper = new DomHelper(this.registry)
       capability.engine = this
     })
     /* eslint-enable no-param-reassign */
@@ -46,6 +45,7 @@ class Engine {
   get selectionProvider() { return this[SELECTION_PROVIDER] }
   get editPolicies() { return this[EDIT_POLICIES] }
   get dependencies() { return this[DEPENDENCIES] }
+  get domHelper() { return this[DOM_HELPER] }
 
   onKeyUp(e) {
     this.capabilities.forEach((capability) => capability.onKeyUp(e))

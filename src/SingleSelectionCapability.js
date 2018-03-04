@@ -42,12 +42,12 @@ export default class SingleSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.domHelper.isInsideDiagram(e.target)) {
+    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.domHelper.findClosest(e.target, NODE_TYPE)
+    const target = this.engine.domHelper.findClosest(e.target, NODE_TYPE)
     if (target !== null) {
-      this.startLocation = locationOf(e, this.registry.root.dom)
+      this.startLocation = locationOf(e, this.engine.registry.root.dom)
       this.selection = [target.userComponent]
       this.possibleSingleSelection = true
       this.progress = true

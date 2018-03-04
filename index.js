@@ -698,6 +698,7 @@ var CAPABILITIES = Symbol('CAPABILITIES');
 var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var DEPENDENCIES = Symbol('DEPENDENCIES');
+var DOM_HELPER$1 = Symbol('DOM_HELPER');
 
 var Engine = function () {
   function Engine(_ref) {
@@ -715,20 +716,18 @@ var Engine = function () {
 
     this[REGISTRY$1] = new ComponentRegistry();
     this[TOOLKIT] = new Toolkit(this.registry);
+    this[DOM_HELPER$1] = new DomHelper(this.registry);
     this[CAPABILITIES] = capabilities;
     this[SELECTION_PROVIDER] = selectionProvider;
     this[EDIT_POLICIES] = editPolicies;
     this[DEPENDENCIES] = dependencies;
+
     /* eslint-disable no-param-reassign */
     this.editPolicies.forEach(function (policy) {
       policy.dependencies = dependencies;
       policy.toolkit = _this.toolkit;
     });
     this.capabilities.forEach(function (capability) {
-      capability.dependencies = dependencies;
-      capability.toolkit = _this.toolkit;
-      capability.registry = _this.registry;
-      capability.domHelper = new DomHelper(_this.registry);
       capability.engine = _this;
     });
     /* eslint-enable no-param-reassign */
@@ -806,6 +805,11 @@ var Engine = function () {
     get: function get$$1() {
       return this[DEPENDENCIES];
     }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DOM_HELPER$1];
+    }
   }]);
   return Engine;
 }();
@@ -816,10 +820,6 @@ var Capability = function () {
 
     this.progress = false;
     this.engine = null;
-    this.registry = null;
-    this.domHelper = null;
-    this.toolkit = null;
-    this.dependencies = {};
   }
 
   createClass(Capability, [{
@@ -1054,11 +1054,10 @@ var DragCapability = function (_Capability) {
   createClass(DragCapability, [{
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget) {
-      var domHelper = this.domHelper,
-          target = this.target,
+      var target = this.target,
           currentParent = this.currentParent;
 
-      var newTarget = domHelper.findClosest(eventTarget, ACCEPTED_TYPES);
+      var newTarget = this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES);
       if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
@@ -1073,9 +1072,9 @@ var DragCapability = function (_Capability) {
       var clientX = e.clientX,
           clientY = e.clientY;
 
-      var _registry$root$dom$ge = this.registry.root.dom.getBoundingClientRect(),
-          rootX = _registry$root$dom$ge.x,
-          rootY = _registry$root$dom$ge.y;
+      var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
+          rootX = _engine$registry$root.x,
+          rootY = _engine$registry$root.y;
 
       var location = regefGeometry.point(clientX - rootX, clientY - rootY);
       var offset = regefGeometry.point(deltaX, deltaY);
@@ -1185,7 +1184,7 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'buildDragRequest',
     value: function buildDragRequest(e) {
-      if (!this.domHelper.isInsideDiagram(e.target)) {
+      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
         return null;
       }
 
@@ -1218,13 +1217,13 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.domHelper.isInsideDiagram(e.target)) {
+      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      this.target = this.domHelper.findClosest(e.target, NODE_TYPE);
+      this.target = this.engine.domHelper.findClosest(e.target, NODE_TYPE);
       if (this.target !== null) {
-        var parent = this.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
-        this.currentParent = parent || this.registry.root;
+        var parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
+        this.currentParent = parent || this.engine.registry.root;
         this.eventDeltas = buildDeltas(e, this.target.dom);
         this.startLocation = regefGeometry.point(e.clientX, e.clientY);
         this.mouseMoved = false;
@@ -1319,9 +1318,9 @@ var ConnectMouseHandler = function (_Capability) {
       var clientX = _ref.clientX,
           clientY = _ref.clientY;
 
-      var _registry$root$dom$ge = this.registry.root.dom.getBoundingClientRect(),
-          top = _registry$root$dom$ge.top,
-          left = _registry$root$dom$ge.left;
+      var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
+          top = _engine$registry$root.top,
+          left = _engine$registry$root.left;
 
       var x = clientX - left;
       var y = clientY - top;
@@ -1330,21 +1329,21 @@ var ConnectMouseHandler = function (_Capability) {
   }, {
     key: 'buildEndConnectRequest',
     value: function buildEndConnectRequest(e) {
-      if (!this.domHelper.isInsideDiagram(e.target)) {
+      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
         return null;
       }
 
-      this.target = this.domHelper.findClosest(e.target);
+      this.target = this.engine.domHelper.findClosest(e.target);
       this.coordinates = this.buildCoordinates(e);
       return this.getEndConnectionRequest();
     }
   }, {
     key: 'buildStartConnectionRequest',
     value: function buildStartConnectionRequest(e) {
-      if (!this.domHelper.isInsideDiagram(e.target)) {
+      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
         return null;
       }
-      var source = this.domHelper.findClosest(e.target, PORT_TYPE);
+      var source = this.engine.domHelper.findClosest(e.target, PORT_TYPE);
       if (source !== null) {
         this.source = source;
         this.coordinates = this.buildCoordinates(e);
@@ -1458,12 +1457,12 @@ var SingleSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.domHelper.isInsideDiagram(e.target)) {
+      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      var target = this.domHelper.findClosest(e.target, NODE_TYPE);
+      var target = this.engine.domHelper.findClosest(e.target, NODE_TYPE);
       if (target !== null) {
-        this.startLocation = locationOf(e, this.registry.root.dom);
+        this.startLocation = locationOf(e, this.engine.registry.root.dom);
         this.selection = [target.userComponent];
         this.possibleSingleSelection = true;
         this.progress = true;
@@ -1538,9 +1537,9 @@ var MultiSelectionCapability = function (_Capability) {
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
           endLocation = this.endLocation,
-          toolkit = this.toolkit,
           additional = this.additional,
           engine = this.engine;
+      var toolkit = this.engine.toolkit;
 
       var bounds = buildBounds(startLocation, endLocation);
       return {
@@ -1578,12 +1577,12 @@ var MultiSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.domHelper.isInsideDiagram(e.target)) {
+      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      var target = this.domHelper.findClosest(e.target, ROOT_TYPE);
+      var target = this.engine.domHelper.findClosest(e.target, ROOT_TYPE);
       if (target !== null) {
-        this.startLocation = locationOf$1(e, this.registry.root.dom);
+        this.startLocation = locationOf$1(e, this.engine.registry.root.dom);
         this.progress = true;
       }
     }
@@ -1593,7 +1592,7 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.registry.root.dom);
+      this.endLocation = locationOf$1(e, this.engine.registry.root.dom);
       var request = this.createMultiSelectionRequest();
       requestFeedback(this.engine.editPolicies, request);
       this.lastRequest = request;
@@ -1604,7 +1603,7 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.registry.root.dom);
+      this.endLocation = locationOf$1(e, this.engine.registry.root.dom);
       this.additional = e.shiftKey;
       var request = this.createMultiSelectionRequest();
       if (this.lastRequest !== null) {
@@ -1667,7 +1666,7 @@ var DeleteCapability = function (_Capability) {
       var key = _ref.key,
           target = _ref.target;
 
-      if ((key === 'Backspace' || key === 'Delete') && this.domHelper.isInsideDiagram(target)) {
+      if ((key === 'Backspace' || key === 'Delete') && this.engine.domHelper.isInsideDiagram(target)) {
         this.currentSelection = this.engine.selection();
         if (this.currentSelection.length > 0) {
           perform(this.engine.editPolicies, this.getDeleteRequest());
