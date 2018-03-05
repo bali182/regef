@@ -9,8 +9,9 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     if (!this.checkRelevant(container)) {
       return
     }
+    const partToolkit = this.toolkit.forDefaultPart()
     components.forEach((component) => {
-      const { x, y } = this.toolkit.bounds(component).location()
+      const { x, y } = partToolkit.bounds(component).location()
       container.props.setPosition({
         id: component.props.id,
         x: Math.round(x + delta.x),
@@ -21,20 +22,22 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
 
   select({ selection }) {
     const ids = selection.map((component) => component.props.id)
-    this.toolkit.root().props.setSelection({ selection: ids })
+    this.toolkit.forDefaultPart().root().props.setSelection({ selection: ids })
   }
 
   delete({ selection }) {
+    const partToolkit = this.toolkit.forDefaultPart()
     const ids = selection.map((component) => component.props.id)
-    ids.forEach((id) => this.toolkit.root().props.deleteComponent({ id }))
+    ids.forEach((id) => partToolkit.root().props.deleteComponent({ id }))
   }
 
   requestMoveFeedback({ components, delta, container }) {
     if (!this.checkRelevant(container)) {
       return
     }
-    this.toolkit.root().setState({
-      moveFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),
+    const partToolkit = this.toolkit.forDefaultPart()
+    partToolkit.root().setState({
+      moveFeedback: components.map((c) => partToolkit.bounds(c).translate(delta)),
     })
   }
 
@@ -42,17 +45,17 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     if (!this.checkRelevant(container)) {
       return
     }
-    this.toolkit.root().setState({
+    this.toolkit.forDefaultPart().root().setState({
       moveFeedback: null,
     })
   }
 
   requestSelectFeedback({ bounds }) {
-    this.toolkit.root().setState({ selectionFeedback: bounds })
+    this.toolkit.forDefaultPart().root().setState({ selectionFeedback: bounds })
   }
 
   eraseSelectFeedback() {
-    this.toolkit.root().setState({
+    this.toolkit.forDefaultPart().root().setState({
       selectionFeedback: null,
     })
   }
@@ -62,8 +65,9 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
       return
     }
     if (components.some((c) => c.props.step)) {
-      this.toolkit.root().setState({
-        errorFeedback: components.map((c) => this.toolkit.bounds(c).translate(delta)),
+      const partToolkit = this.toolkit.forDefaultPart()
+      partToolkit.root().setState({
+        errorFeedback: components.map((c) => partToolkit.bounds(c).translate(delta)),
       })
     }
   }
@@ -72,6 +76,6 @@ export default class RootEditPolicy extends DispatchingEditPolicy {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
-    this.toolkit.root().setState({ errorFeedback: null })
+    this.toolkit.forDefaultPart().root().setState({ errorFeedback: null })
   }
 }

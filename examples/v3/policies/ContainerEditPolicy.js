@@ -10,7 +10,7 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
       return
     }
     const { toolkit } = this
-    const children = toolkit.children(container)
+    const children = toolkit.forDefaultPart().children(container)
     if (!components.every((moved) => children.indexOf(moved) >= 0)) {
       return
     }
@@ -37,9 +37,10 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
       return
     }
     const { toolkit } = this
-    const root = toolkit.root()
-    const children = toolkit.children(container)
-    const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
+    const partToolkit = toolkit.forDefaultPart()
+    const root = partToolkit.root()
+    const children = partToolkit.children(container)
+    const bounds = components.map((moved) => partToolkit.bounds(moved).translate(delta))
     if (components.every((moved) => children.indexOf(moved) >= 0)) {
       container.setState({ insertionFeedback: this.insertionIndex(children, location) })
       root.setState({ moveFeedback: bounds })
@@ -53,14 +54,15 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
       return
     }
     const { toolkit } = this
-    const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
-    toolkit.root().setState({ errorFeedback: bounds })
+    const partToolkit = toolkit.forDefaultPart()
+    const bounds = components.map((moved) => partToolkit.bounds(moved).translate(delta))
+    partToolkit.root().setState({ errorFeedback: bounds })
   }
   eraseAddFeedback({ targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
-    this.toolkit.root().setState({ errorFeedback: null })
+    this.toolkit.forDefaultPart().root().setState({ errorFeedback: null })
   }
 
   eraseMoveFeedback({ container }) {
@@ -68,17 +70,17 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
       return
     }
     container.setState({ insertionFeedback: null })
-    this.toolkit.root().setState({ moveFeedback: null, errorFeedback: null })
+    this.toolkit.forDefaultPart().root().setState({ moveFeedback: null, errorFeedback: null })
   }
 
   insertionIndex(children, location) {
-    const { toolkit } = this
+    const partToolkit = this.toolkit.forDefaultPart()
     if (children.length === 0) {
       return 0
     }
     for (let i = 0; i < children.length; i += 1) {
       const child = children[i]
-      const bounds = toolkit.bounds(child)
+      const bounds = partToolkit.bounds(child)
       if (bounds.x > location.x) {
         return i
       }
@@ -107,7 +109,8 @@ export default class ContainerEditPolicy extends DispatchingEditPolicy {
   }
 
   mapBounds(children) {
-    return children.reduce((map, child) => map.set(child, this.toolkit.bounds(child)), new Map())
+    const partToolkit = this.toolkit.forDefaultPart()
+    return children.reduce((map, child) => map.set(child, partToolkit.bounds(child)), new Map())
   }
 
   sortedChildren(children, bounds) {

@@ -344,15 +344,15 @@ var END_CONNECTION = 'end-connection';
 var REGISTRY = Symbol('REGISTRY');
 var DOM_HELPER = Symbol('DOM_HELPER');
 
-var Toolkit = function () {
-  function Toolkit(registry) {
-    classCallCheck(this, Toolkit);
+var PartToolkit = function () {
+  function PartToolkit(registry) {
+    classCallCheck(this, PartToolkit);
 
     this[REGISTRY] = registry;
     this[DOM_HELPER] = new DomHelper(registry);
   }
 
-  createClass(Toolkit, [{
+  createClass(PartToolkit, [{
     key: 'root',
     value: function root() {
       var root = this[REGISTRY].root;
@@ -454,7 +454,7 @@ var Toolkit = function () {
       return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
     }
   }]);
-  return Toolkit;
+  return PartToolkit;
 }();
 
 var ID = Symbol('id');
@@ -463,19 +463,19 @@ var REGISTRY$1 = Symbol('REGISTRY');
 var TOOLKIT = Symbol('TOOLKIT');
 var DOM_HELPER$1 = Symbol('DOM_HELPER');
 
-var AttachmentWrapper = function () {
-  function AttachmentWrapper(id, engine) {
-    classCallCheck(this, AttachmentWrapper);
+var DiagramPartWrapper = function () {
+  function DiagramPartWrapper(id, engine) {
+    classCallCheck(this, DiagramPartWrapper);
 
     this[ID] = id;
     this[ENGINE] = engine;
 
     this[REGISTRY$1] = new ComponentRegistry();
-    this[TOOLKIT] = new Toolkit(this.registry);
+    this[TOOLKIT] = new PartToolkit(this.registry);
     this[DOM_HELPER$1] = new DomHelper(this.registry);
   }
 
-  createClass(AttachmentWrapper, [{
+  createClass(DiagramPartWrapper, [{
     key: 'id',
     get: function get$$1() {
       return this[ID];
@@ -501,15 +501,130 @@ var AttachmentWrapper = function () {
       return this[DOM_HELPER$1];
     }
   }]);
-  return AttachmentWrapper;
+  return DiagramPartWrapper;
 }();
 
-var CAPABILITIES = Symbol('CAPABILITIES');
+var EventManager = function () {
+  function EventManager(engine) {
+    classCallCheck(this, EventManager);
+
+    this.engine = engine;
+    this.hooked = false;
+    // binding methods
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+  }
+
+  createClass(EventManager, [{
+    key: 'hookListeners',
+    value: function hookListeners() {
+      document.addEventListener('mousedown', this.onMouseDown);
+      document.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
+      document.addEventListener('keydown', this.onKeyDown);
+      document.addEventListener('keyup', this.onKeyUp);
+
+      this.hooked = true;
+    }
+  }, {
+    key: 'unhookListeners',
+    value: function unhookListeners() {
+      document.removeEventListener('mousedown', this.onMouseDown);
+      document.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseup', this.onMouseUp);
+      document.removeEventListener('keydown', this.onKeyDown);
+      document.removeEventListener('keyup', this.onKeyUp);
+
+      this.hooked = false;
+    }
+  }, {
+    key: 'onKeyUp',
+    value: function onKeyUp(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onKeyUp(e);
+      });
+    }
+  }, {
+    key: 'onKeyDown',
+    value: function onKeyDown(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onKeyDown(e);
+      });
+    }
+  }, {
+    key: 'onMouseDown',
+    value: function onMouseDown(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onMouseDown(e);
+      });
+    }
+  }, {
+    key: 'onMouseMove',
+    value: function onMouseMove(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onMouseMove(e);
+      });
+    }
+  }, {
+    key: 'onMouseUp',
+    value: function onMouseUp(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onMouseUp(e);
+      });
+    }
+  }]);
+  return EventManager;
+}();
+
+var Toolkit = function () {
+  function Toolkit(engine) {
+    classCallCheck(this, Toolkit);
+
+    this.engine = engine;
+  }
+
+  createClass(Toolkit, [{
+    key: 'forDefaultPart',
+    value: function forDefaultPart() {
+      return this.forPart(DEFAULT_PART_ID);
+    }
+  }, {
+    key: 'forPart',
+    value: function forPart(id) {
+      var part = this.engine.part(id);
+      if (part === null) {
+        throw new Error('DiagramPart ' + id + ' hasn\'t been registered.');
+      }
+      return part ? part.toolkit : null;
+    }
+  }, {
+    key: 'forComponent',
+    value: function forComponent(component) {
+      var parts = this.engine.parts();
+      for (var i = 0, length = parts.length; i < length; i += 1) {
+        var part = parts[i];
+        if (part.registry.has(component)) {
+          return part;
+        }
+      }
+      throw new Error('Component ' + component + ' is not registered in any DiagramParts.');
+    }
+  }]);
+  return Toolkit;
+}();
+
 var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
+var CAPABILITIES = Symbol('CAPABILITIES');
+var TOOLKIT$1 = Symbol('TOOLKIT');
+var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var DEPENDENCIES = Symbol('DEPENDENCIES');
-var ATTACHMENTS = Symbol('ATTACHMENTS');
-var DIAGRAM = Symbol('DIAGRAM');
+var PARTS = Symbol('PARTS');
+
+var DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID');
 
 var Engine = function () {
   function Engine(_ref) {
@@ -525,12 +640,14 @@ var Engine = function () {
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
 
-    this[DIAGRAM] = new AttachmentWrapper(DIAGRAM, this);
     this[CAPABILITIES] = capabilities;
     this[SELECTION_PROVIDER] = selectionProvider;
     this[EDIT_POLICIES] = editPolicies;
     this[DEPENDENCIES] = dependencies;
-    this[ATTACHMENTS] = new Map();
+
+    this[TOOLKIT$1] = new Toolkit(this);
+    this[EVENT_MANAGER] = new EventManager(this);
+    this[PARTS] = new Map();
 
     /* eslint-disable no-param-reassign */
     this.editPolicies.forEach(function (policy) {
@@ -546,51 +663,22 @@ var Engine = function () {
   }
 
   createClass(Engine, [{
-    key: 'attachment',
-    value: function attachment(id) {
-      if (id === null || id === undefined) {
-        throw new TypeError('Attachment id cannot be ' + id);
+    key: 'part',
+    value: function part() {
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_PART_ID;
+
+      var parts = this[PARTS];
+      if (!parts.has(id)) {
+        var part = new DiagramPartWrapper(id, this);
+        parts.set(id, part);
       }
-      var attachmentMap = this[ATTACHMENTS];
-      if (!attachmentMap.has(id)) {
-        attachmentMap.set(id, new AttachmentWrapper(id, this));
-      }
-      return attachmentMap.get(id);
+      return parts.get(id);
     }
   }, {
-    key: 'onKeyUp',
-    value: function onKeyUp(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onKeyUp(e);
-      });
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onKeyDown(e);
-      });
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onMouseDown(e);
-      });
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onMouseMove(e);
-      });
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onMouseUp(e);
-      });
+    key: 'removePart',
+    value: function removePart() {
+      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_PART_ID;
+      this[PARTS].delete(id);
     }
   }, {
     key: 'selection',
@@ -598,24 +686,29 @@ var Engine = function () {
       return this.selectionProvider.selection();
     }
   }, {
-    key: 'attachments',
+    key: 'parts',
     get: function get$$1() {
-      return Array.from(this[ATTACHMENTS].values());
+      return Array.from(this[PARTS].values());
     }
   }, {
     key: 'registry',
     get: function get$$1() {
-      return this[DIAGRAM].registry;
-    }
-  }, {
-    key: 'toolkit',
-    get: function get$$1() {
-      return this[DIAGRAM].toolkit;
+      return this[PARTS].get(DEFAULT_PART_ID).registry;
     }
   }, {
     key: 'domHelper',
     get: function get$$1() {
-      return this[DIAGRAM].domHelper;
+      return this[PARTS].get(DEFAULT_PART_ID).domHelper;
+    }
+  }, {
+    key: 'eventManager',
+    get: function get$$1() {
+      return this[EVENT_MANAGER];
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this[TOOLKIT$1];
     }
   }, {
     key: 'capabilities',
@@ -641,101 +734,36 @@ var Engine = function () {
   return Engine;
 }();
 
-var Diagram = function (_PureComponent) {
-  inherits(Diagram, _PureComponent);
+var DiagramPart = function (_PureComponent) {
+  inherits(DiagramPart, _PureComponent);
 
-  function Diagram() {
-    classCallCheck(this, Diagram);
-
-    // binding methods
-    var _this = possibleConstructorReturn(this, (Diagram.__proto__ || Object.getPrototypeOf(Diagram)).call(this));
-
-    _this.onMouseDown = _this.onMouseDown.bind(_this);
-    _this.onMouseMove = _this.onMouseMove.bind(_this);
-    _this.onMouseUp = _this.onMouseUp.bind(_this);
-    _this.onKeyDown = _this.onKeyDown.bind(_this);
-    _this.onKeyUp = _this.onKeyUp.bind(_this);
-    return _this;
+  function DiagramPart() {
+    classCallCheck(this, DiagramPart);
+    return possibleConstructorReturn(this, (DiagramPart.__proto__ || Object.getPrototypeOf(DiagramPart)).apply(this, arguments));
   }
 
-  createClass(Diagram, [{
+  createClass(DiagramPart, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      document.addEventListener('mousedown', this.onMouseDown);
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
-      document.addEventListener('keydown', this.onKeyDown);
-      document.addEventListener('keyup', this.onKeyUp);
+      var engine = this.props.engine;
+
+      if (!engine.eventManager.hooked) {
+        engine.eventManager.hookListeners();
+      }
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      document.removeEventListener('mousedown', this.onMouseDown);
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
-      document.removeEventListener('keydown', this.onKeyDown);
-      document.removeEventListener('keyup', this.onKeyUp);
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(e) {
-      this.props.engine.onKeyDown(e);
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp(e) {
-      this.props.engine.onKeyUp(e);
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.props.engine.onMouseDown(e);
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      this.props.engine.onMouseMove(e);
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      this.props.engine.onMouseUp(e);
-    }
-  }, {
-    key: 'getChildContext',
-    value: function getChildContext() {
-      return { regef: { engine: this.props.engine } };
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      // TODO check if it's node a root node, which is difficult because of other decorators
-      return React.Children.only(this.props.children);
-    }
-  }]);
-  return Diagram;
-}(React.PureComponent);
+      var _props = this.props,
+          id = _props.id,
+          engine = _props.engine;
 
-
-Diagram.propTypes = {
-  engine: propTypes.instanceOf(Engine).isRequired
-};
-
-Diagram.childContextTypes = {
-  regef: propTypes.shape({
-    engine: propTypes.instanceOf(Engine).isRequired
-  })
-};
-
-var Attachment = function (_PureComponent) {
-  inherits(Attachment, _PureComponent);
-
-  function Attachment() {
-    classCallCheck(this, Attachment);
-    return possibleConstructorReturn(this, (Attachment.__proto__ || Object.getPrototypeOf(Attachment)).apply(this, arguments));
-  }
-
-  createClass(Attachment, [{
+      engine.removePart(id);
+      if (engine.parts.length === 0) {
+        engine.eventManager.unhookListeners();
+      }
+    }
+  }, {
     key: 'getChildContext',
     value: function getChildContext() {
       return { regef: { engine: this.props.engine, id: this.props.id } };
@@ -747,20 +775,24 @@ var Attachment = function (_PureComponent) {
       return React.Children.only(this.props.children);
     }
   }]);
-  return Attachment;
+  return DiagramPart;
 }(React.PureComponent);
 
 
-Attachment.childContextTypes = {
+DiagramPart.childContextTypes = {
   regef: propTypes.shape({
     engine: propTypes.instanceOf(Engine).isRequired,
-    id: propTypes.string.isRequired
+    id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
   })
 };
 
-Attachment.propTypes = {
+DiagramPart.propTypes = {
   engine: propTypes.instanceOf(Engine).isRequired,
-  id: propTypes.string.isRequired
+  id: propTypes.oneOfType([propTypes.string, propTypes.symbol])
+};
+
+DiagramPart.defaultProps = {
+  id: DEFAULT_PART_ID
 };
 
 var EditPolicy = function () {
@@ -994,7 +1026,7 @@ function createDecorator(_ref) {
 
           var id = _this.context.regef.id;
 
-          _this.attachmentId = id;
+          _this.partId = id;
           _this.userComponent = null;
           _this.type = type;
           _this.childProps = { toolkit: toolkitResolver(_this, context.regef)
@@ -1036,9 +1068,10 @@ function createDecorator(_ref) {
       }(React.PureComponent);
 
       DecoratedComponent.contextTypes = {
-        regef: function regef() {
-          return null;
-        }
+        regef: propTypes.shape({
+          engine: propTypes.instanceOf(Engine).isRequired,
+          id: propTypes.oneOfType([propTypes.string, propTypes.symbol])
+        })
       };
 
       return DecoratedComponent;
@@ -1082,13 +1115,13 @@ var watchRegister = function watchRegister(registry, target) {
 var registryFrom = function registryFrom(_ref) {
   var engine = _ref.engine,
       id = _ref.id;
-  return id === undefined ? engine.registry : engine.attachment(id).registry;
+  return id === undefined ? engine.registry : engine.part(id).registry;
 };
 
 var toolkitFrom = function toolkitFrom(_ref2) {
   var engine = _ref2.engine,
       id = _ref2.id;
-  return id === undefined ? engine.toolkit : engine.attachment(id).toolkit;
+  return id === undefined ? engine.toolkit : engine.part(id).toolkit;
 };
 
 function defaultToolkitResolver(component, context) {
@@ -1857,10 +1890,10 @@ var CreationCapability = function (_Capability) {
   }, {
     key: 'findTargetedCreator',
     value: function findTargetedCreator(eventTarget) {
-      var attachments = this.engine.attachments;
-      for (var i = 0, len = attachments.length; i < len; i += 1) {
-        var attachment = attachments[i];
-        var creator = attachment.domHelper.findClosest(eventTarget, CREATOR_TYPE);
+      var parts = this.engine.parts;
+      for (var i = 0, len = parts.length; i < len; i += 1) {
+        var part = parts[i];
+        var creator = part.domHelper.findClosest(eventTarget, CREATOR_TYPE);
         if (creator !== null) {
           return creator;
         }
@@ -2004,8 +2037,7 @@ var CreationCapability = function (_Capability) {
   return CreationCapability;
 }(Capability);
 
-exports.Diagram = Diagram;
-exports.Attachment = Attachment;
+exports.DiagramPart = DiagramPart;
 exports.EditPolicy = EditPolicy;
 exports.DispatchingEditPolicy = DispatchingEditPolicy;
 exports.Engine = Engine;

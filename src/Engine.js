@@ -1,12 +1,17 @@
 import SelectionProvider from './SelectionProvider'
-import AttachmentWrapper from './AttachmentWrapper'
+import DiagramPartWrapper from './DiagramPartWrapper'
+import EventManager from './EventManager'
+import Toolkit from './Toolkit'
 
-const CAPABILITIES = Symbol('CAPABILITIES')
 const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
+const CAPABILITIES = Symbol('CAPABILITIES')
+const TOOLKIT = Symbol('TOOLKIT')
+const EVENT_MANAGER = Symbol('EVENT_MANAGER')
 const EDIT_POLICIES = Symbol('EDIT_POLICIES')
 const DEPENDENCIES = Symbol('DEPENDENCIES')
-const ATTACHMENTS = Symbol('ATTACHMENTS')
-const DIAGRAM = Symbol('DIAGRAM')
+const PARTS = Symbol('PARTS')
+
+export const DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID')
 
 export default class Engine {
   constructor({
@@ -15,12 +20,14 @@ export default class Engine {
     editPolicies = [],
     selectionProvider = new SelectionProvider(),
   }) {
-    this[DIAGRAM] = new AttachmentWrapper(DIAGRAM, this)
     this[CAPABILITIES] = capabilities
     this[SELECTION_PROVIDER] = selectionProvider
     this[EDIT_POLICIES] = editPolicies
     this[DEPENDENCIES] = dependencies
-    this[ATTACHMENTS] = new Map()
+
+    this[TOOLKIT] = new Toolkit(this)
+    this[EVENT_MANAGER] = new EventManager(this)
+    this[PARTS] = new Map()
 
     /* eslint-disable no-param-reassign */
     this.editPolicies.forEach((policy) => {
@@ -35,42 +42,29 @@ export default class Engine {
     this.selectionProvider.toolkit = this.toolkit
   }
 
-  attachment(id) {
-    if (id === null || id === undefined) {
-      throw new TypeError(`Attachment id cannot be ${id}`)
+  part(id = DEFAULT_PART_ID) {
+    const parts = this[PARTS]
+    if (!parts.has(id)) {
+      const part = new DiagramPartWrapper(id, this)
+      parts.set(id, part)
     }
-    const attachmentMap = this[ATTACHMENTS]
-    if (!attachmentMap.has(id)) {
-      attachmentMap.set(id, new AttachmentWrapper(id, this))
-    }
-    return attachmentMap.get(id)
+    return parts.get(id)
   }
 
-  get attachments() { return Array.from(this[ATTACHMENTS].values()) }
-  get registry() { return this[DIAGRAM].registry }
-  get toolkit() { return this[DIAGRAM].toolkit }
-  get domHelper() { return this[DIAGRAM].domHelper }
+  removePart(id = DEFAULT_PART_ID) { this[PARTS].delete(id) }
 
+  get parts() { return Array.from(this[PARTS].values()) }
+
+  get registry() { return this[PARTS].get(DEFAULT_PART_ID).registry }
+  get domHelper() { return this[PARTS].get(DEFAULT_PART_ID).domHelper }
+
+  get eventManager() { return this[EVENT_MANAGER] }
+  get toolkit() { return this[TOOLKIT] }
   get capabilities() { return this[CAPABILITIES] }
   get selectionProvider() { return this[SELECTION_PROVIDER] }
   get editPolicies() { return this[EDIT_POLICIES] }
   get dependencies() { return this[DEPENDENCIES] }
 
-  onKeyUp(e) {
-    this.capabilities.forEach((capability) => capability.onKeyUp(e))
-  }
-  onKeyDown(e) {
-    this.capabilities.forEach((capability) => capability.onKeyDown(e))
-  }
-  onMouseDown(e) {
-    this.capabilities.forEach((capability) => capability.onMouseDown(e))
-  }
-  onMouseMove(e) {
-    this.capabilities.forEach((capability) => capability.onMouseMove(e))
-  }
-  onMouseUp(e) {
-    this.capabilities.forEach((capability) => capability.onMouseUp(e))
-  }
   selection() {
     return this.selectionProvider.selection()
   }

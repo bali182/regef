@@ -4,10 +4,10 @@ import { fromComponent } from './ComponentWrapper'
 import { watchRegister } from './watchers'
 
 const registryFrom = ({ engine, id }) =>
-  (id === undefined ? engine.registry : engine.attachment(id).registry)
+  (id === undefined ? engine.registry : engine.part(id).registry)
 
 const toolkitFrom = ({ engine, id }) =>
-  (id === undefined ? engine.toolkit : engine.attachment(id).toolkit)
+  (id === undefined ? engine.toolkit : engine.part(id).toolkit)
 
 function defaultToolkitResolver(component, context) {
   return () => watchRegister(registryFrom(context), component).then(() => toolkitFrom(context))

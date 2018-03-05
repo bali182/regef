@@ -1,5 +1,5 @@
 import ComponentRegistry from './ComponentRegistry'
-import Toolkit from './Toolkit'
+import PartToolkit from './PartToolkit'
 import DomHelper from './DomHelper'
 
 const ID = Symbol('id')
@@ -8,13 +8,13 @@ const REGISTRY = Symbol('REGISTRY')
 const TOOLKIT = Symbol('TOOLKIT')
 const DOM_HELPER = Symbol('DOM_HELPER')
 
-export default class AttachmentWrapper {
+export default class DiagramPartWrapper {
   constructor(id, engine) {
     this[ID] = id
     this[ENGINE] = engine
 
     this[REGISTRY] = new ComponentRegistry()
-    this[TOOLKIT] = new Toolkit(this.registry)
+    this[TOOLKIT] = new PartToolkit(this.registry)
     this[DOM_HELPER] = new DomHelper(this.registry)
   }
   get id() { return this[ID] }

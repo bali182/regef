@@ -3,8 +3,7 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
 import {
-  Diagram,
-  Attachment,
+  DiagramPart,
   Engine,
   ConnectCapability,
   SingleSelectionCapability,
@@ -53,12 +52,12 @@ const engine = new Engine({
 render(
   <Provider store={store}>
     <div>
-      <Diagram engine={engine}>
+      <DiagramPart engine={engine}>
         <Root />
-      </Diagram>
-      <Attachment id="palette" engine={engine}>
+      </DiagramPart>
+      <DiagramPart id="palette" engine={engine}>
         <Palette />
-      </Attachment>
+      </DiagramPart>
     </div>
   </Provider>,
   document.getElementById('app'),

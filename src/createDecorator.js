@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import { oneOfType, string, symbol, shape, instanceOf } from 'prop-types'
+import Engine from './Engine'
 
 function createDecorator({ type, activate, deactivate, toolkitResolver }) {
   return () => (Wrapped) => {
@@ -6,7 +8,7 @@ function createDecorator({ type, activate, deactivate, toolkitResolver }) {
       constructor(props, context) {
         super(props, context)
         const { regef: { id } } = this.context
-        this.attachmentId = id
+        this.partId = id
         this.userComponent = null
         this.type = type
         this.childProps = { toolkit: toolkitResolver(this, context.regef) }
@@ -31,7 +33,10 @@ function createDecorator({ type, activate, deactivate, toolkitResolver }) {
     }
 
     DecoratedComponent.contextTypes = {
-      regef: () => null,
+      regef: shape({
+        engine: instanceOf(Engine).isRequired,
+        id: oneOfType([string, symbol]),
+      }),
     }
 
     return DecoratedComponent

@@ -1,10 +1,7 @@
-import { Children, PureComponent } from 'react'
-import { instanceOf, shape } from 'prop-types'
-import Engine from './Engine'
-
-export default class Diagram extends PureComponent {
-  constructor() {
-    super()
+export default class EventManager {
+  constructor(engine) {
+    this.engine = engine
+    this.hooked = false
     // binding methods
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onMouseMove = this.onMouseMove.bind(this)
@@ -12,50 +9,40 @@ export default class Diagram extends PureComponent {
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
   }
-  componentDidMount() {
+
+  hookListeners() {
     document.addEventListener('mousedown', this.onMouseDown)
     document.addEventListener('mousemove', this.onMouseMove)
     document.addEventListener('mouseup', this.onMouseUp)
     document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('keyup', this.onKeyUp)
+
+    this.hooked = true
   }
-  componentWillUnmount() {
+
+  unhookListeners() {
     document.removeEventListener('mousedown', this.onMouseDown)
     document.removeEventListener('mousemove', this.onMouseMove)
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('keyup', this.onKeyUp)
+
+    this.hooked = false
+  }
+
+  onKeyUp(e) {
+    this.engine.capabilities.forEach((capability) => capability.onKeyUp(e))
   }
   onKeyDown(e) {
-    this.props.engine.onKeyDown(e)
-  }
-  onKeyUp(e) {
-    this.props.engine.onKeyUp(e)
+    this.engine.capabilities.forEach((capability) => capability.onKeyDown(e))
   }
   onMouseDown(e) {
-    this.props.engine.onMouseDown(e)
+    this.engine.capabilities.forEach((capability) => capability.onMouseDown(e))
   }
   onMouseMove(e) {
-    this.props.engine.onMouseMove(e)
+    this.engine.capabilities.forEach((capability) => capability.onMouseMove(e))
   }
   onMouseUp(e) {
-    this.props.engine.onMouseUp(e)
+    this.engine.capabilities.forEach((capability) => capability.onMouseUp(e))
   }
-  getChildContext() {
-    return { regef: { engine: this.props.engine } }
-  }
-  render() {
-    // TODO check if it's node a root node, which is difficult because of other decorators
-    return Children.only(this.props.children)
-  }
-}
-
-Diagram.propTypes = {
-  engine: instanceOf(Engine).isRequired,
-}
-
-Diagram.childContextTypes = {
-  regef: shape({
-    engine: instanceOf(Engine).isRequired,
-  }),
 }

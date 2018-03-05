@@ -64,7 +64,7 @@ export interface EndConnectionIntent extends Intent {
 
 export class EditPolicy {
   constructor()
-  toolkit: Toolkit
+  toolkit: PartToolkit
   dependencies: { [key: string]: any }
 
   perform(intent: Intent): void
@@ -93,7 +93,30 @@ export class DispatchingEditPolicy extends EditPolicy {
   eraseSelectFeedback(intent: SelectionIntent): void
 }
 
-export class Toolkit {
+export default class EventManager {
+  engine: Engine
+  hooked: boolean
+  constructor(engine: Engine)
+
+  hookListeners(): void
+  unhookListeners(): void
+
+  onKeyUp(e: Event): void
+  onKeyDown(e: Event): void
+  onMouseDown(e): void
+  onMouseMove(e): void
+  onMouseUp(e): void
+}
+
+
+class Toolkit {
+  constructor(engine: Engine)
+  forDefaultPart(): PartToolkit
+  forPart(id: string | Symbol): PartToolkit
+  forComponent(component: ReactComponent): PartToolkit
+}
+
+class PartToolkit {
   constructor(registry: ComponentRegistry)
 
   root(): ReactComponent
@@ -108,7 +131,7 @@ export class Toolkit {
 }
 
 export class SelectionProvider {
-  toolkit: Toolkit
+  toolkit: PartToolkit
   dependencies: { [key: string]: any }
 
   constructor()
@@ -124,30 +147,26 @@ export interface EngineParams {
 }
 
 export class Engine {
-  toolkit: Toolkit
+  toolkit: PartToolkit
   selectionProvider: SelectionProvider
   capabilities: Capability[]
   editPolicies: EditPolicy[]
   dependencies: { [key: string]: any }
-  attachments: AttachmentWrapper[]
+  parts: DiagramPartWrapper[]
+  eventManager: EventManager
 
   constructor(params: EngineParams)
 
-  attachment(id: string): AttachmentWrapper
+  part(id: string | Symbol): DiagramPartWrapper
+  removePart(id: string | Symbol): void
 }
 
-interface DiagramProps {
+interface DiagramPartProps {
   engine: Engine
+  id?: string | Symbol
 }
 
-export class Diagram extends ReactComponent<DiagramProps, any> { /* empty */ }
-
-interface AttachmentProps {
-  engine: Engine
-  id: string
-}
-
-export class Attachment extends ReactComponent<AttachmentProps, any> { /* empty */ }
+export class DiagramPart extends ReactComponent<DiagramPartProps, any> { /* empty */ }
 
 export function node(propMapper?: Function): (ReactConstructor: Function) => any
 export function port(propMapper?: Function): (ReactConstructor: Function) => any
@@ -162,10 +181,10 @@ class ComponentWrapper {
   constructor(dom: Node, component: ReactComponent, userComponent: ReactComponent)
 }
 
-class AttachmentWrapper {
+class DiagramPartWrapper {
   id: string
   registry: ComponentRegistry
-  toolkit: Toolkit
+  toolkit: PartToolkit
   engine: Engine
   domHelper: DomHelper
 

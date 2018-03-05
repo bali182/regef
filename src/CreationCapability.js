@@ -30,10 +30,10 @@ export default class CreationCapability extends Capability {
   }
 
   findTargetedCreator(eventTarget) {
-    const attachments = this.engine.attachments
-    for (let i = 0, len = attachments.length; i < len; i += 1) {
-      const attachment = attachments[i]
-      const creator = attachment.domHelper.findClosest(eventTarget, CREATOR_TYPE)
+    const parts = this.engine.parts
+    for (let i = 0, len = parts.length; i < len; i += 1) {
+      const part = parts[i]
+      const creator = part.domHelper.findClosest(eventTarget, CREATOR_TYPE)
       if (creator !== null) {
         return creator
       }

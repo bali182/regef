@@ -10,13 +10,14 @@ export default class NodeEditPolicy extends DispatchingEditPolicy {
       return
     }
     const { toolkit } = this
-    const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
-    toolkit.root().setState({ errorFeedback: bounds })
+    const partToolkit = toolkit.forDefaultPart()
+    const bounds = components.map((moved) => partToolkit.bounds(moved).translate(delta))
+    partToolkit.root().setState({ errorFeedback: bounds })
   }
   eraseAddFeedback({ targetContainer }) {
     if (!this.checkRelevant(targetContainer)) {
       return
     }
-    this.toolkit.root().setState({ errorFeedback: null })
+    this.toolkit.forDefaultPart().root().setState({ errorFeedback: null })
   }
 }
