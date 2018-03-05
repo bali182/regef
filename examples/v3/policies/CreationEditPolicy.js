@@ -10,4 +10,22 @@ export default class CreationEditPolicy extends DispatchingEditPolicy {
   eraseCreateFeedback(intent) {
     console.log('eraseCreateFeedback', intent)
   }
+  add(intent) {
+    console.log('add', intent)
+  }
+  requestAddFeedback(intent) {
+    console.log('requestAddFeedback', intent)
+  }
+  eraseAddFeedback(intent) {
+    console.log('eraseAddFeedback', intent)
+  }
+  move(intent) {
+    console.log('move', intent)
+  }
+  requestMoveFeedback(intent) {
+    console.log('requestMoveFeedback', intent)
+  }
+  eraseMoveFeedback(intent) {
+    console.log('eraseMoveFeedback', intent)
+  }
 }

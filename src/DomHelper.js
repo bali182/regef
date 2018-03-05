@@ -3,12 +3,12 @@ export default class DomHelper {
     this.registry = registry
   }
 
-  findClosest(dom, type = null) {
+  findClosest(dom, matcher = null) {
     const root = this.registry.root.dom
     for (let it = dom; it !== null; it = it.parentNode) {
       const wrapper = this.registry.get(it)
       if (wrapper !== undefined && wrapper !== null) {
-        return this.matchesType(wrapper.component, type) ? wrapper : null
+        return this.matches(wrapper, matcher) ? wrapper : null
       }
       if (it === root) {
         return null
@@ -47,21 +47,23 @@ export default class DomHelper {
     return this.registry.root.dom.contains(element)
   }
 
-  matchesType(component, type) {
-    if (component === null) {
+  matches(wrapper, matcher) {
+    if (wrapper === null) {
       return false
     }
-    if (type === null) {
+    if (matcher === null) {
       return true
     }
-    if (Array.isArray(type)) {
-      for (let i = 0, len = type.length; i < len; i += 1) {
-        const it = type[i]
-        if (it === component.type) {
+    if (matcher instanceof Function) {
+      return matcher(wrapper)
+    } else if (Array.isArray(matcher)) {
+      for (let i = 0, len = matcher.length; i < len; i += 1) {
+        const it = matcher[i]
+        if (it === wrapper.component.type) {
           return true
         }
       }
     }
-    return type === component.type
+    return matcher === wrapper.component.type
   }
 }

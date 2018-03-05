@@ -5,14 +5,9 @@ import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
-const buildDeltas = ({ clientX, clientY }, element) => {
+const buildOffset = ({ clientX, clientY }, element) => {
   const { x, y } = element.getBoundingClientRect()
-  const deltaX = clientX - x
-  const deltaY = clientY - y
-  return {
-    deltaX,
-    deltaY,
-  }
+  return point(clientX - x, clientY - y)
 }
 
 export default class DragCapability extends Capability {
@@ -23,7 +18,7 @@ export default class DragCapability extends Capability {
     this.targetParent = null
     this.currentParent = null
     this.coordinates = null
-    this.eventDeltas = null
+    this.offset = null
     this.lastRequest = null
     this.mouseMoved = false
     this.startLocation = null
@@ -41,16 +36,13 @@ export default class DragCapability extends Capability {
     return newTarget
   }
 
-  updateCoordinates(e) {
-    const { deltaX, deltaY } = this.eventDeltas
-    const { clientX, clientY } = e
+  updateCoordinates({ clientX, clientY }) {
     const { x: rootX, y: rootY } = this.engine.registry.root.dom.getBoundingClientRect()
     const location = point(clientX - rootX, clientY - rootY)
-    const offset = point(deltaX, deltaY)
-    const delta = point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y)
+    const delta = point(clientX - this.startLocation.x, clientY - this.startLocation.y)
     this.coordinates = {
       location,
-      offset,
+      offset: this.offset,
       delta,
     }
   }
@@ -157,7 +149,7 @@ export default class DragCapability extends Capability {
       }
       this.progress = false
       this.lastRequest = null
-      this.eventDeltas = null
+      this.offset = null
       this.coordinates = null
       this.targetParent = null
       this.target = null
@@ -173,7 +165,7 @@ export default class DragCapability extends Capability {
     if (this.target !== null) {
       const parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
       this.currentParent = parent || this.engine.registry.root
-      this.eventDeltas = buildDeltas(e, this.target.dom)
+      this.offset = buildOffset(e, this.target.dom)
       this.startLocation = point(e.clientX, e.clientY)
       this.mouseMoved = false
       this.progress = true

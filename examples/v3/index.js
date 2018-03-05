@@ -2,7 +2,18 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
-import { Diagram, Attachment, Engine, DragCapability, ConnectCapability, SingleSelectionCapability, MultiSelectionCapability, CancelCapability, DeleteCapability, CreationCapability } from '../../src/index'
+import {
+  Diagram,
+  Attachment,
+  Engine,
+  ConnectCapability,
+  SingleSelectionCapability,
+  MultiSelectionCapability,
+  CancelCapability,
+  DeleteCapability,
+  CreationCapability,
+  DragCapability,
+} from '../../src/index'
 
 import store from './redux/store'
 import Root from './Root'

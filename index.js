@@ -167,6 +167,7 @@ var ComponentRegistry = function () {
       if (!(wrapper instanceof ComponentWrapper)) {
         throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
       }
+      this.mapping.set(wrapper, wrapper);
       this.mapping.set(wrapper.dom, wrapper);
       this.mapping.set(wrapper.component, wrapper);
       this.mapping.set(wrapper.userComponent, wrapper);
@@ -180,6 +181,7 @@ var ComponentRegistry = function () {
     value: function unregister(input) {
       var wrapper = this.get(input);
       if (wrapper !== undefined) {
+        this.mapping.delete(wrapper);
         this.mapping.delete(wrapper.dom);
         this.mapping.delete(wrapper.component);
         this.mapping.delete(wrapper.userComponent);
@@ -242,13 +244,13 @@ var DomHelper = function () {
   createClass(DomHelper, [{
     key: "findClosest",
     value: function findClosest(dom) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
       var root = this.registry.root.dom;
       for (var it = dom; it !== null; it = it.parentNode) {
         var wrapper = this.registry.get(it);
         if (wrapper !== undefined && wrapper !== null) {
-          return this.matchesType(wrapper.component, type) ? wrapper : null;
+          return this.matches(wrapper, matcher) ? wrapper : null;
         }
         if (it === root) {
           return null;
@@ -295,23 +297,25 @@ var DomHelper = function () {
       return this.registry.root.dom.contains(element);
     }
   }, {
-    key: "matchesType",
-    value: function matchesType(component, type) {
-      if (component === null) {
+    key: "matches",
+    value: function matches(wrapper, matcher) {
+      if (wrapper === null) {
         return false;
       }
-      if (type === null) {
+      if (matcher === null) {
         return true;
       }
-      if (Array.isArray(type)) {
-        for (var i = 0, len = type.length; i < len; i += 1) {
-          var it = type[i];
-          if (it === component.type) {
+      if (matcher instanceof Function) {
+        return matcher(wrapper);
+      } else if (Array.isArray(matcher)) {
+        for (var i = 0, len = matcher.length; i < len; i += 1) {
+          var it = matcher[i];
+          if (it === wrapper.component.type) {
             return true;
           }
         }
       }
-      return type === component.type;
+      return matcher === wrapper.component.type;
     }
   }]);
   return DomHelper;
@@ -1158,7 +1162,7 @@ var creator = createDecorator({
 
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
-var buildDeltas = function buildDeltas(_ref, element) {
+var buildOffset = function buildOffset(_ref, element) {
   var clientX = _ref.clientX,
       clientY = _ref.clientY;
 
@@ -1166,12 +1170,7 @@ var buildDeltas = function buildDeltas(_ref, element) {
       x = _element$getBoundingC.x,
       y = _element$getBoundingC.y;
 
-  var deltaX = clientX - x;
-  var deltaY = clientY - y;
-  return {
-    deltaX: deltaX,
-    deltaY: deltaY
-  };
+  return regefGeometry.point(clientX - x, clientY - y);
 };
 
 var DragCapability = function (_Capability) {
@@ -1187,7 +1186,7 @@ var DragCapability = function (_Capability) {
     _this.targetParent = null;
     _this.currentParent = null;
     _this.coordinates = null;
-    _this.eventDeltas = null;
+    _this.offset = null;
     _this.lastRequest = null;
     _this.mouseMoved = false;
     _this.startLocation = null;
@@ -1208,23 +1207,19 @@ var DragCapability = function (_Capability) {
     }
   }, {
     key: 'updateCoordinates',
-    value: function updateCoordinates(e) {
-      var _eventDeltas = this.eventDeltas,
-          deltaX = _eventDeltas.deltaX,
-          deltaY = _eventDeltas.deltaY;
-      var clientX = e.clientX,
-          clientY = e.clientY;
+    value: function updateCoordinates(_ref2) {
+      var clientX = _ref2.clientX,
+          clientY = _ref2.clientY;
 
       var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
           rootX = _engine$registry$root.x,
           rootY = _engine$registry$root.y;
 
       var location = regefGeometry.point(clientX - rootX, clientY - rootY);
-      var offset = regefGeometry.point(deltaX, deltaY);
-      var delta = regefGeometry.point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y);
+      var delta = regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
       this.coordinates = {
         location: location,
-        offset: offset,
+        offset: this.offset,
         delta: delta
       };
     }
@@ -1350,7 +1345,7 @@ var DragCapability = function (_Capability) {
         }
         this.progress = false;
         this.lastRequest = null;
-        this.eventDeltas = null;
+        this.offset = null;
         this.coordinates = null;
         this.targetParent = null;
         this.target = null;
@@ -1367,7 +1362,7 @@ var DragCapability = function (_Capability) {
       if (this.target !== null) {
         var parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
         this.currentParent = parent || this.engine.registry.root;
-        this.eventDeltas = buildDeltas(e, this.target.dom);
+        this.offset = buildOffset(e, this.target.dom);
         this.startLocation = regefGeometry.point(e.clientX, e.clientY);
         this.mouseMoved = false;
         this.progress = true;
@@ -1822,7 +1817,7 @@ var DeleteCapability = function (_Capability) {
 
 var ACCEPTED_TYPES$1 = [NODE_TYPE, ROOT_TYPE];
 
-var buildOffset = function buildOffset(_ref, element) {
+var buildOffset$1 = function buildOffset(_ref, element) {
   var clientX = _ref.clientX,
       clientY = _ref.clientY;
 
@@ -1977,7 +1972,7 @@ var CreationCapability = function (_Capability) {
         return;
       }
       this.startLocation = regefGeometry.point(e.clientX, e.clientY);
-      this.offset = buildOffset(e, this.target.dom);
+      this.offset = buildOffset$1(e, this.target.dom);
       this.progress = true;
     }
   }, {

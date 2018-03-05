@@ -22,6 +22,7 @@ export default class ComponentRegistry {
     if (!(wrapper instanceof ComponentWrapper)) {
       throw new TypeError(`ComponentWrapper instance expected, got ${wrapper}`)
     }
+    this.mapping.set(wrapper, wrapper)
     this.mapping.set(wrapper.dom, wrapper)
     this.mapping.set(wrapper.component, wrapper)
     this.mapping.set(wrapper.userComponent, wrapper)
@@ -31,6 +32,7 @@ export default class ComponentRegistry {
   unregister(input) {
     const wrapper = this.get(input)
     if (wrapper !== undefined) {
+      this.mapping.delete(wrapper)
       this.mapping.delete(wrapper.dom)
       this.mapping.delete(wrapper.component)
       this.mapping.delete(wrapper.userComponent)
