@@ -1,6 +1,7 @@
 import { Children, PureComponent } from 'react'
 import { instanceOf, string, shape, symbol, oneOfType } from 'prop-types'
-import Engine, { DEFAULT_PART_ID } from './Engine'
+import Engine from './Engine'
+import { DEFAULT_PART_ID } from './constants'
 
 export default class DiagramPart extends PureComponent {
   componentDidMount() {

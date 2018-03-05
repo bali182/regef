@@ -1,6 +1,3 @@
-// Data attribute keys
-export const DATA_ID = 'data-regef-id'
-
 // Diagram participant types
 export const ROOT_TYPE = 'root'
 export const NODE_TYPE = 'node'
@@ -17,3 +14,6 @@ export const SELECT = 'select'
 export const DELETE = 'delete'
 export const START_CONNECTION = 'start-connection'
 export const END_CONNECTION = 'end-connection'
+
+// Internal constants
+export const DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID')

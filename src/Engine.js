@@ -2,6 +2,7 @@ import SelectionProvider from './SelectionProvider'
 import DiagramPartWrapper from './DiagramPartWrapper'
 import EventManager from './EventManager'
 import Toolkit from './Toolkit'
+import { DEFAULT_PART_ID } from './constants'
 
 const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
 const CAPABILITIES = Symbol('CAPABILITIES')
@@ -10,8 +11,6 @@ const EVENT_MANAGER = Symbol('EVENT_MANAGER')
 const EDIT_POLICIES = Symbol('EDIT_POLICIES')
 const DEPENDENCIES = Symbol('DEPENDENCIES')
 const PARTS = Symbol('PARTS')
-
-export const DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID')
 
 export default class Engine {
   constructor({

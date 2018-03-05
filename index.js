@@ -321,9 +321,6 @@ var DomHelper = function () {
   return DomHelper;
 }();
 
-// Data attribute keys
-var DATA_ID = 'data-regef-id';
-
 // Diagram participant types
 var ROOT_TYPE = 'root';
 var NODE_TYPE = 'node';
@@ -340,6 +337,9 @@ var SELECT = 'select';
 var DELETE = 'delete';
 var START_CONNECTION = 'start-connection';
 var END_CONNECTION = 'end-connection';
+
+// Internal constants
+var DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID');
 
 var REGISTRY = Symbol('REGISTRY');
 var DOM_HELPER = Symbol('DOM_HELPER');
@@ -623,8 +623,6 @@ var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var DEPENDENCIES = Symbol('DEPENDENCIES');
 var PARTS = Symbol('PARTS');
-
-var DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID');
 
 var Engine = function () {
   function Engine(_ref) {
@@ -1725,8 +1723,10 @@ var MultiSelectionCapability = function (_Capability) {
           } : function () {
             return true;
           };
-          var newSelection = toolkit.nodes().filter(additionalFilter).filter(function (node) {
-            return bounds.containsRectangle(toolkit.bounds(node));
+          // TODO this is not OK
+          var partToolkit = toolkit.forDefaultPart();
+          var newSelection = partToolkit.nodes().filter(additionalFilter).filter(function (node) {
+            return bounds.containsRectangle(partToolkit.bounds(node));
           });
           return additional ? selection.concat(newSelection) : newSelection;
         }
@@ -2056,7 +2056,6 @@ exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
 exports.CreationCapability = CreationCapability;
-exports.DATA_ID = DATA_ID;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
@@ -2070,3 +2069,4 @@ exports.SELECT = SELECT;
 exports.DELETE = DELETE;
 exports.START_CONNECTION = START_CONNECTION;
 exports.END_CONNECTION = END_CONNECTION;
+exports.DEFAULT_PART_ID = DEFAULT_PART_ID;

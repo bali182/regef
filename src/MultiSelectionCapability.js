@@ -39,9 +39,11 @@ export default class MultiSelectionCapability extends Capability {
         const additionalFilter = additional
           ? ((node) => selection.indexOf(node) < 0)
           : (() => true)
-        const newSelection = toolkit.nodes()
+        // TODO this is not OK
+        const partToolkit = toolkit.forDefaultPart()
+        const newSelection = partToolkit.nodes()
           .filter(additionalFilter)
-          .filter((node) => bounds.containsRectangle(toolkit.bounds(node)))
+          .filter((node) => bounds.containsRectangle(partToolkit.bounds(node)))
         return additional ? selection.concat(newSelection) : newSelection
       },
     }

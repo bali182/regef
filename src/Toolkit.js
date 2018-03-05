@@ -1,4 +1,4 @@
-import { DEFAULT_PART_ID } from './Engine'
+import { DEFAULT_PART_ID } from './constants'
 
 export default class Toolkit {
   constructor(engine) {
