@@ -1802,8 +1802,8 @@ var CancelCapability = function (_Capability) {
       var key = _ref.key;
 
       if (key === 'Escape') {
-        this.engine.capabilities.forEach(function (tracker) {
-          return tracker.cancel();
+        this.engine.capabilities.forEach(function (capability) {
+          return capability.cancel();
         });
       }
     }

@@ -147,7 +147,7 @@ export interface EngineParams {
 }
 
 export class Engine {
-  toolkit: PartToolkit
+  toolkit: Toolkit
   selectionProvider: SelectionProvider
   capabilities: Capability[]
   editPolicies: EditPolicy[]
@@ -168,10 +168,10 @@ interface DiagramPartProps {
 
 export class DiagramPart extends ReactComponent<DiagramPartProps, any> { /* empty */ }
 
-export function node(propMapper?: Function): (ReactConstructor: Function) => any
-export function port(propMapper?: Function): (ReactConstructor: Function) => any
-export function root(propMapper?: Function): (ReactConstructor: Function) => any
-export function connection(propMapper?: Function): (ReactConstructor: Function) => any
+export function node(): (ReactConstructor: Function) => any
+export function port(): (ReactConstructor: Function) => any
+export function root(): (ReactConstructor: Function) => any
+export function connection(): (ReactConstructor: Function) => any
 
 class ComponentWrapper {
   dom: Node
