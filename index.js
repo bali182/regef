@@ -689,16 +689,6 @@ var Engine = function () {
       return Array.from(this[PARTS].values());
     }
   }, {
-    key: 'registry',
-    get: function get$$1() {
-      return this[PARTS].get(DEFAULT_PART_ID).registry;
-    }
-  }, {
-    key: 'domHelper',
-    get: function get$$1() {
-      return this[PARTS].get(DEFAULT_PART_ID).domHelper;
-    }
-  }, {
     key: 'eventManager',
     get: function get$$1() {
       return this[EVENT_MANAGER];
@@ -1208,6 +1198,10 @@ var DragCapability = function (_Capability) {
   inherits(DragCapability, _Capability);
 
   function DragCapability() {
+    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref2$part = _ref2.part,
+        part = _ref2$part === undefined ? DEFAULT_PART_ID : _ref2$part;
+
     classCallCheck(this, DragCapability);
 
     var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this));
@@ -1221,16 +1215,22 @@ var DragCapability = function (_Capability) {
     _this.lastRequest = null;
     _this.mouseMoved = false;
     _this.startLocation = null;
+    _this.partId = part;
     return _this;
   }
 
   createClass(DragCapability, [{
+    key: 'part',
+    value: function part() {
+      return this.engine.part(this.partId);
+    }
+  }, {
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget) {
       var target = this.target,
           currentParent = this.currentParent;
 
-      var newTarget = this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES);
+      var newTarget = this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES);
       if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
@@ -1238,13 +1238,13 @@ var DragCapability = function (_Capability) {
     }
   }, {
     key: 'updateCoordinates',
-    value: function updateCoordinates(_ref2) {
-      var clientX = _ref2.clientX,
-          clientY = _ref2.clientY;
+    value: function updateCoordinates(_ref3) {
+      var clientX = _ref3.clientX,
+          clientY = _ref3.clientY;
 
-      var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
-          rootX = _engine$registry$root.x,
-          rootY = _engine$registry$root.y;
+      var _part$registry$root$d = this.part().registry.root.dom.getBoundingClientRect(),
+          rootX = _part$registry$root$d.x,
+          rootY = _part$registry$root$d.y;
 
       var location = regefGeometry.point(clientX - rootX, clientY - rootY);
       var delta = regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
@@ -1353,7 +1353,7 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'buildDragRequest',
     value: function buildDragRequest(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return null;
       }
 
@@ -1386,13 +1386,13 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      this.target = this.engine.domHelper.findClosest(e.target, NODE_TYPE);
+      this.target = this.part().domHelper.findClosest(e.target, NODE_TYPE);
       if (this.target !== null) {
-        var parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
-        this.currentParent = parent || this.engine.registry.root;
+        var parent = this.part().domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
+        this.currentParent = parent || this.part().registry.root;
         this.offset = buildOffset(e, this.target.dom);
         this.startLocation = regefGeometry.point(e.clientX, e.clientY);
         this.mouseMoved = false;
@@ -1439,6 +1439,10 @@ var ConnectMouseHandler = function (_Capability) {
   inherits(ConnectMouseHandler, _Capability);
 
   function ConnectMouseHandler() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$part = _ref.part,
+        part = _ref$part === undefined ? DEFAULT_PART_ID : _ref$part;
+
     classCallCheck(this, ConnectMouseHandler);
 
     var _this = possibleConstructorReturn(this, (ConnectMouseHandler.__proto__ || Object.getPrototypeOf(ConnectMouseHandler)).call(this));
@@ -1447,10 +1451,16 @@ var ConnectMouseHandler = function (_Capability) {
     _this.target = null;
     _this.coordinates = null;
     _this.lastRequest = null;
+    _this.partId = part;
     return _this;
   }
 
   createClass(ConnectMouseHandler, [{
+    key: 'part',
+    value: function part() {
+      return this.engine.part(this.partId);
+    }
+  }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
@@ -1483,13 +1493,13 @@ var ConnectMouseHandler = function (_Capability) {
     }
   }, {
     key: 'buildCoordinates',
-    value: function buildCoordinates(_ref) {
-      var clientX = _ref.clientX,
-          clientY = _ref.clientY;
+    value: function buildCoordinates(_ref2) {
+      var clientX = _ref2.clientX,
+          clientY = _ref2.clientY;
 
-      var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
-          top = _engine$registry$root.top,
-          left = _engine$registry$root.left;
+      var _part$registry$root$d = this.part().registry.root.dom.getBoundingClientRect(),
+          top = _part$registry$root$d.top,
+          left = _part$registry$root$d.left;
 
       var x = clientX - left;
       var y = clientY - top;
@@ -1498,21 +1508,21 @@ var ConnectMouseHandler = function (_Capability) {
   }, {
     key: 'buildEndConnectRequest',
     value: function buildEndConnectRequest(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return null;
       }
 
-      this.target = this.engine.domHelper.findClosest(e.target);
+      this.target = this.part().domHelper.findClosest(e.target);
       this.coordinates = this.buildCoordinates(e);
       return this.getEndConnectionRequest();
     }
   }, {
     key: 'buildStartConnectionRequest',
     value: function buildStartConnectionRequest(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return null;
       }
-      var source = this.engine.domHelper.findClosest(e.target, PORT_TYPE);
+      var source = this.part().domHelper.findClosest(e.target, PORT_TYPE);
       if (source !== null) {
         this.source = source;
         this.coordinates = this.buildCoordinates(e);
@@ -1584,6 +1594,10 @@ var SingleSelectionCapability = function (_Capability) {
   inherits(SingleSelectionCapability, _Capability);
 
   function SingleSelectionCapability() {
+    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref2$part = _ref2.part,
+        part = _ref2$part === undefined ? DEFAULT_PART_ID : _ref2$part;
+
     classCallCheck(this, SingleSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this));
@@ -1593,10 +1607,16 @@ var SingleSelectionCapability = function (_Capability) {
     _this.possibleSingleSelection = false;
     _this.additional = false;
     _this.selection = [];
+    _this.partId = part;
     return _this;
   }
 
   createClass(SingleSelectionCapability, [{
+    key: 'part',
+    value: function part() {
+      return this.engine.part(this.partId);
+    }
+  }, {
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1626,12 +1646,12 @@ var SingleSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      var target = this.engine.domHelper.findClosest(e.target, NODE_TYPE);
+      var target = this.part().domHelper.findClosest(e.target, NODE_TYPE);
       if (target !== null) {
-        this.startLocation = locationOf(e, this.engine.registry.root.dom);
+        this.startLocation = locationOf(e, this.part().registry.root.dom);
         this.selection = [target.userComponent];
         this.possibleSingleSelection = true;
         this.progress = true;
@@ -1644,9 +1664,9 @@ var SingleSelectionCapability = function (_Capability) {
     }
   }, {
     key: 'onMouseUp',
-    value: function onMouseUp(_ref2) {
-      var ctrlKey = _ref2.ctrlKey,
-          metaKey = _ref2.metaKey;
+    value: function onMouseUp(_ref3) {
+      var ctrlKey = _ref3.ctrlKey,
+          metaKey = _ref3.metaKey;
 
       if (!this.progress) {
         return;
@@ -1690,6 +1710,10 @@ var MultiSelectionCapability = function (_Capability) {
   inherits(MultiSelectionCapability, _Capability);
 
   function MultiSelectionCapability() {
+    var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref4$part = _ref4.part,
+        part = _ref4$part === undefined ? DEFAULT_PART_ID : _ref4$part;
+
     classCallCheck(this, MultiSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this));
@@ -1698,19 +1722,25 @@ var MultiSelectionCapability = function (_Capability) {
     _this.endLocation = null;
     _this.lastRequest = null;
     _this.additional = false;
+    _this.partId = part;
     return _this;
   }
 
   createClass(MultiSelectionCapability, [{
+    key: 'part',
+    value: function part() {
+      return this.engine.part(this.partId);
+    }
+  }, {
     key: 'createMultiSelectionRequest',
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
           endLocation = this.endLocation,
           additional = this.additional,
           engine = this.engine;
-      var toolkit = this.engine.toolkit;
 
       var bounds = buildBounds(startLocation, endLocation);
+      var part = this.part();
       return {
         type: SELECT,
         bounds: bounds,
@@ -1723,8 +1753,7 @@ var MultiSelectionCapability = function (_Capability) {
           } : function () {
             return true;
           };
-          // TODO this is not OK
-          var partToolkit = toolkit.forDefaultPart();
+          var partToolkit = part.toolkit;
           var newSelection = partToolkit.nodes().filter(additionalFilter).filter(function (node) {
             return bounds.containsRectangle(partToolkit.bounds(node));
           });
@@ -1748,12 +1777,12 @@ var MultiSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      var target = this.engine.domHelper.findClosest(e.target, ROOT_TYPE);
+      var target = this.part().domHelper.findClosest(e.target, ROOT_TYPE);
       if (target !== null) {
-        this.startLocation = locationOf$1(e, this.engine.registry.root.dom);
+        this.startLocation = locationOf$1(e, this.part().registry.root.dom);
         this.progress = true;
       }
     }
@@ -1763,7 +1792,7 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.engine.registry.root.dom);
+      this.endLocation = locationOf$1(e, this.part().registry.root.dom);
       var request = this.createMultiSelectionRequest();
       requestFeedback(this.engine.editPolicies, request);
       this.lastRequest = request;
@@ -1774,7 +1803,7 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.engine.registry.root.dom);
+      this.endLocation = locationOf$1(e, this.part().registry.root.dom);
       this.additional = e.shiftKey;
       var request = this.createMultiSelectionRequest();
       if (this.lastRequest !== null) {
@@ -1815,15 +1844,28 @@ var DeleteCapability = function (_Capability) {
   inherits(DeleteCapability, _Capability);
 
   function DeleteCapability() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$part = _ref.part,
+        part = _ref$part === undefined ? DEFAULT_PART_ID : _ref$part,
+        _ref$keys = _ref.keys,
+        keys = _ref$keys === undefined ? ['Backspace', 'Delete'] : _ref$keys;
+
     classCallCheck(this, DeleteCapability);
 
     var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this));
 
     _this.currentSelection = [];
+    _this.partId = part;
+    _this.keys = keys;
     return _this;
   }
 
   createClass(DeleteCapability, [{
+    key: 'part',
+    value: function part() {
+      return this.engine.part(this.partId);
+    }
+  }, {
     key: 'getDeleteRequest',
     value: function getDeleteRequest() {
       return {
@@ -1833,11 +1875,11 @@ var DeleteCapability = function (_Capability) {
     }
   }, {
     key: 'onKeyDown',
-    value: function onKeyDown(_ref) {
-      var key = _ref.key,
-          target = _ref.target;
+    value: function onKeyDown(_ref2) {
+      var key = _ref2.key,
+          target = _ref2.target;
 
-      if ((key === 'Backspace' || key === 'Delete') && this.engine.domHelper.isInsideDiagram(target)) {
+      if (this.keys.indexOf(key) >= 0 && this.part().domHelper.isInsideDiagram(target)) {
         this.currentSelection = this.engine.selection();
         if (this.currentSelection.length > 0) {
           perform(this.engine.editPolicies, this.getDeleteRequest());
@@ -1868,6 +1910,10 @@ var CreationCapability = function (_Capability) {
   inherits(CreationCapability, _Capability);
 
   function CreationCapability() {
+    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref2$part = _ref2.part,
+        part = _ref2$part === undefined ? DEFAULT_PART_ID : _ref2$part;
+
     classCallCheck(this, CreationCapability);
 
     var _this = possibleConstructorReturn(this, (CreationCapability.__proto__ || Object.getPrototypeOf(CreationCapability)).call(this));
@@ -1879,13 +1925,19 @@ var CreationCapability = function (_Capability) {
     _this.offset = null;
     _this.lastRequest = null;
     _this.startLocation = null;
+    _this.partId = part;
     return _this;
   }
 
   createClass(CreationCapability, [{
+    key: 'part',
+    value: function part() {
+      return this.engine.part(this.partId);
+    }
+  }, {
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget) {
-      return this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES$1);
+      return this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES$1);
     }
   }, {
     key: 'findTargetedCreator',
@@ -1921,9 +1973,9 @@ var CreationCapability = function (_Capability) {
       var screenLocation = regefGeometry.point(clientX, clientY);
       var offset = regefGeometry.point(this.offset);
       if (this.targetParent !== null) {
-        var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
-            rootX = _engine$registry$root.x,
-            rootY = _engine$registry$root.y;
+        var _part$registry$root$d = this.part().registry.root.dom.getBoundingClientRect(),
+            rootX = _part$registry$root$d.x,
+            rootY = _part$registry$root$d.y;
 
         this.coordinates = {
           offset: offset,

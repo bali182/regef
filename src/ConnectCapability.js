@@ -1,15 +1,20 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
-import { PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
+import { PORT_TYPE, START_CONNECTION, END_CONNECTION, DEFAULT_PART_ID } from './constants'
 import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
 export default class ConnectMouseHandler extends Capability {
-  constructor() {
+  constructor({ part = DEFAULT_PART_ID } = {}) {
     super()
     this.source = null
     this.target = null
     this.coordinates = null
     this.lastRequest = null
+    this.partId = part
+  }
+
+  part() {
+    return this.engine.part(this.partId)
   }
 
   cancel() {
@@ -41,27 +46,27 @@ export default class ConnectMouseHandler extends Capability {
   }
 
   buildCoordinates({ clientX, clientY }) {
-    const { top, left } = this.engine.registry.root.dom.getBoundingClientRect()
+    const { top, left } = this.part().registry.root.dom.getBoundingClientRect()
     const x = clientX - left
     const y = clientY - top
     return { x, y }
   }
 
   buildEndConnectRequest(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return null
     }
 
-    this.target = this.engine.domHelper.findClosest(e.target)
+    this.target = this.part().domHelper.findClosest(e.target)
     this.coordinates = this.buildCoordinates(e)
     return this.getEndConnectionRequest()
   }
 
   buildStartConnectionRequest(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return null
     }
-    const source = this.engine.domHelper.findClosest(e.target, PORT_TYPE)
+    const source = this.part().domHelper.findClosest(e.target, PORT_TYPE)
     if (source !== null) {
       this.source = source
       this.coordinates = this.buildCoordinates(e)

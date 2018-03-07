@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
+import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT, DEFAULT_PART_ID } from './constants'
 import Capability from './Capability'
 import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
@@ -11,7 +11,7 @@ const buildOffset = ({ clientX, clientY }, element) => {
 }
 
 export default class DragCapability extends Capability {
-  constructor() {
+  constructor({ part = DEFAULT_PART_ID } = {}) {
     super()
     this.target = null
     this.lastTargetParent = null
@@ -22,11 +22,16 @@ export default class DragCapability extends Capability {
     this.lastRequest = null
     this.mouseMoved = false
     this.startLocation = null
+    this.partId = part
+  }
+
+  part() {
+    return this.engine.part(this.partId)
   }
 
   findTargetedParent(eventTarget) {
     const { target, currentParent } = this
-    const newTarget = this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    const newTarget = this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
     if (newTarget === null
       || newTarget === target
       || target.dom.contains(newTarget.dom)
@@ -37,7 +42,7 @@ export default class DragCapability extends Capability {
   }
 
   updateCoordinates({ clientX, clientY }) {
-    const { x: rootX, y: rootY } = this.engine.registry.root.dom.getBoundingClientRect()
+    const { x: rootX, y: rootY } = this.part().registry.root.dom.getBoundingClientRect()
     const location = point(clientX - rootX, clientY - rootY)
     const delta = point(clientX - this.startLocation.x, clientY - this.startLocation.y)
     this.coordinates = {
@@ -127,7 +132,7 @@ export default class DragCapability extends Capability {
   }
 
   buildDragRequest(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return null
     }
 
@@ -158,13 +163,13 @@ export default class DragCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return
     }
-    this.target = this.engine.domHelper.findClosest(e.target, NODE_TYPE)
+    this.target = this.part().domHelper.findClosest(e.target, NODE_TYPE)
     if (this.target !== null) {
-      const parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
-      this.currentParent = parent || this.engine.registry.root
+      const parent = this.part().domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
+      this.currentParent = parent || this.part().registry.root
       this.offset = buildOffset(e, this.target.dom)
       this.startLocation = point(e.clientX, e.clientY)
       this.mouseMoved = false

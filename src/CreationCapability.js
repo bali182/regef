@@ -1,5 +1,5 @@
 import { point } from 'regef-geometry'
-import { CREATE, NODE_TYPE, ROOT_TYPE, CREATOR_TYPE } from './constants'
+import { CREATE, NODE_TYPE, ROOT_TYPE, CREATOR_TYPE, DEFAULT_PART_ID } from './constants'
 import Capability from './Capability'
 import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
@@ -14,7 +14,7 @@ const buildOffset = ({ clientX, clientY }, element) => {
 }
 
 export default class CreationCapability extends Capability {
-  constructor() {
+  constructor({ part = DEFAULT_PART_ID } = {}) {
     super()
     this.target = null
     this.targetParent = null
@@ -23,10 +23,15 @@ export default class CreationCapability extends Capability {
     this.offset = null
     this.lastRequest = null
     this.startLocation = null
+    this.partId = part
+  }
+
+  part() {
+    return this.engine.part(this.partId)
   }
 
   findTargetedParent(eventTarget) {
-    return this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    return this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
   }
 
   findTargetedCreator(eventTarget) {
@@ -57,7 +62,7 @@ export default class CreationCapability extends Capability {
     const screenLocation = point(clientX, clientY)
     const offset = point(this.offset)
     if (this.targetParent !== null) {
-      const { x: rootX, y: rootY } = this.engine.registry.root.dom.getBoundingClientRect()
+      const { x: rootX, y: rootY } = this.part().registry.root.dom.getBoundingClientRect()
       this.coordinates = {
         offset,
         location: point(clientX - rootX, clientY - rootY),

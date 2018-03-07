@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { NODE_TYPE, SELECT } from './constants'
+import { NODE_TYPE, SELECT, DEFAULT_PART_ID } from './constants'
 import Capability from './Capability'
 import { perform } from './EditPolicy'
 
@@ -9,13 +9,18 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
 }
 
 export default class SingleSelectionCapability extends Capability {
-  constructor() {
+  constructor({ part = DEFAULT_PART_ID } = {}) {
     super()
     this.startLocation = null
     this.endLocation = null
     this.possibleSingleSelection = false
     this.additional = false
     this.selection = []
+    this.partId = part
+  }
+
+  part() {
+    return this.engine.part(this.partId)
   }
 
   createSingleSelectionRequest() {
@@ -42,12 +47,12 @@ export default class SingleSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.engine.domHelper.findClosest(e.target, NODE_TYPE)
+    const target = this.part().domHelper.findClosest(e.target, NODE_TYPE)
     if (target !== null) {
-      this.startLocation = locationOf(e, this.engine.registry.root.dom)
+      this.startLocation = locationOf(e, this.part().registry.root.dom)
       this.selection = [target.userComponent]
       this.possibleSingleSelection = true
       this.progress = true

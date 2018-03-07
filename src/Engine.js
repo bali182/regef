@@ -53,10 +53,6 @@ export default class Engine {
   removePart(id = DEFAULT_PART_ID) { this[PARTS].delete(id) }
 
   get parts() { return Array.from(this[PARTS].values()) }
-
-  get registry() { return this[PARTS].get(DEFAULT_PART_ID).registry }
-  get domHelper() { return this[PARTS].get(DEFAULT_PART_ID).domHelper }
-
   get eventManager() { return this[EVENT_MANAGER] }
   get toolkit() { return this[TOOLKIT] }
   get capabilities() { return this[CAPABILITIES] }

@@ -1,11 +1,17 @@
 import Capability from './Capability'
-import { DELETE } from './constants'
+import { DELETE, DEFAULT_PART_ID } from './constants'
 import { perform } from './EditPolicy'
 
 export default class DeleteCapability extends Capability {
-  constructor() {
+  constructor({ part = DEFAULT_PART_ID, keys = ['Backspace', 'Delete'] } = {}) {
     super()
     this.currentSelection = []
+    this.partId = part
+    this.keys = keys
+  }
+
+  part() {
+    return this.engine.part(this.partId)
   }
 
   getDeleteRequest() {
@@ -16,7 +22,7 @@ export default class DeleteCapability extends Capability {
   }
 
   onKeyDown({ key, target }) {
-    if ((key === 'Backspace' || key === 'Delete') && this.engine.domHelper.isInsideDiagram(target)) {
+    if (this.keys.indexOf(key) >= 0 && this.part().domHelper.isInsideDiagram(target)) {
       this.currentSelection = this.engine.selection()
       if (this.currentSelection.length > 0) {
         perform(this.engine.editPolicies, this.getDeleteRequest())

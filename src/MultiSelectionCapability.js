@@ -1,5 +1,5 @@
 import { point, rectangle } from 'regef-geometry'
-import { ROOT_TYPE, SELECT } from './constants'
+import { ROOT_TYPE, SELECT, DEFAULT_PART_ID } from './constants'
 import Capability from './Capability'
 import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
 
@@ -17,18 +17,23 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
 }
 
 export default class MultiSelectionCapability extends Capability {
-  constructor() {
+  constructor({ part = DEFAULT_PART_ID } = {}) {
     super()
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null
     this.additional = false
+    this.partId = part
+  }
+
+  part() {
+    return this.engine.part(this.partId)
   }
 
   createMultiSelectionRequest() {
     const { startLocation, endLocation, additional, engine } = this
-    const { toolkit } = this.engine
     const bounds = buildBounds(startLocation, endLocation)
+    const part = this.part()
     return {
       type: SELECT,
       bounds,
@@ -39,8 +44,7 @@ export default class MultiSelectionCapability extends Capability {
         const additionalFilter = additional
           ? ((node) => selection.indexOf(node) < 0)
           : (() => true)
-        // TODO this is not OK
-        const partToolkit = toolkit.forDefaultPart()
+        const partToolkit = part.toolkit
         const newSelection = partToolkit.nodes()
           .filter(additionalFilter)
           .filter((node) => bounds.containsRectangle(partToolkit.bounds(node)))
@@ -62,12 +66,12 @@ export default class MultiSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.engine.domHelper.findClosest(e.target, ROOT_TYPE)
+    const target = this.part().domHelper.findClosest(e.target, ROOT_TYPE)
     if (target !== null) {
-      this.startLocation = locationOf(e, this.engine.registry.root.dom)
+      this.startLocation = locationOf(e, this.part().registry.root.dom)
       this.progress = true
     }
   }
@@ -76,7 +80,7 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = locationOf(e, this.engine.registry.root.dom)
+    this.endLocation = locationOf(e, this.part().registry.root.dom)
     const request = this.createMultiSelectionRequest()
     requestFeedback(this.engine.editPolicies, request)
     this.lastRequest = request
@@ -86,7 +90,7 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = locationOf(e, this.engine.registry.root.dom)
+    this.endLocation = locationOf(e, this.part().registry.root.dom)
     this.additional = e.shiftKey
     const request = this.createMultiSelectionRequest()
     if (this.lastRequest !== null) {
