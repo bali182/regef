@@ -23,10 +23,6 @@ export default class Diagram extends React.Component {
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('keyup', this.onKeyUp)
-
-    if (this.registry.root !== null) {
-      this.registry.setRoot(null)
-    }
   }
   onKeyDown(e) {
     this.props.engine.onKeyDown(e)

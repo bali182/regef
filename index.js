@@ -117,10 +117,6 @@ var Diagram = function (_React$Component) {
       document.removeEventListener('mouseup', this.onMouseUp);
       document.removeEventListener('keydown', this.onKeyDown);
       document.removeEventListener('keyup', this.onKeyUp);
-
-      if (this.registry.root !== null) {
-        this.registry.setRoot(null);
-      }
     }
   }, {
     key: 'onKeyDown',
