@@ -31,7 +31,8 @@ export default class DragCapability extends Capability {
 
   findTargetedParent(eventTarget) {
     const { target, currentParent } = this
-    const newTarget = this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    const newTarget = this.part().domHelper
+      .findClosest(eventTarget, (wrapper) => ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0)
     if (newTarget === null
       || newTarget === target
       || target.dom.contains(newTarget.dom)
@@ -166,9 +167,13 @@ export default class DragCapability extends Capability {
     if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return
     }
-    this.target = this.part().domHelper.findClosest(e.target, NODE_TYPE)
+    this.target = this.part().domHelper
+      .findClosest(e.target, (wrapper) => wrapper.component.type === NODE_TYPE)
     if (this.target !== null) {
-      const parent = this.part().domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
+      const parent = this.part().domHelper.findClosest(
+        this.target.dom.parentNode,
+        (wrapper) => ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0,
+      )
       this.currentParent = parent || this.part().registry.root
       this.offset = buildOffset(e, this.target.dom)
       this.startLocation = point(e.clientX, e.clientY)

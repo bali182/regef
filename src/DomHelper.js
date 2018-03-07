@@ -3,12 +3,12 @@ export default class DomHelper {
     this.registry = registry
   }
 
-  findClosest(dom, matcher = null) {
+  findClosest(dom, matcher = () => true) {
     const root = this.registry.root.dom
     for (let it = dom; it !== null; it = it.parentNode) {
       const wrapper = this.registry.get(it)
       if (wrapper !== undefined && wrapper !== null) {
-        return this.matches(wrapper, matcher) ? wrapper : null
+        return matcher(wrapper) ? wrapper : null
       }
       if (it === root) {
         return null
@@ -45,25 +45,5 @@ export default class DomHelper {
 
   isInsideDiagram(element) {
     return this.registry.root.dom.contains(element)
-  }
-
-  matches(wrapper, matcher) {
-    if (wrapper === null) {
-      return false
-    }
-    if (matcher === null) {
-      return true
-    }
-    if (matcher instanceof Function) {
-      return matcher(wrapper)
-    } else if (Array.isArray(matcher)) {
-      for (let i = 0, len = matcher.length; i < len; i += 1) {
-        const it = matcher[i]
-        if (it === wrapper.component.type) {
-          return true
-        }
-      }
-    }
-    return matcher === wrapper.component.type
   }
 }

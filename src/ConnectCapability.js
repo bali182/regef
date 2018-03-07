@@ -66,7 +66,8 @@ export default class ConnectMouseHandler extends Capability {
     if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return null
     }
-    const source = this.part().domHelper.findClosest(e.target, PORT_TYPE)
+    const source = this.part().domHelper
+      .findClosest(e.target, (wrapper) => wrapper.component.type === PORT_TYPE)
     if (source !== null) {
       this.source = source
       this.coordinates = this.buildCoordinates(e)

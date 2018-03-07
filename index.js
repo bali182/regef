@@ -244,13 +244,15 @@ var DomHelper = function () {
   createClass(DomHelper, [{
     key: "findClosest",
     value: function findClosest(dom) {
-      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        return true;
+      };
 
       var root = this.registry.root.dom;
       for (var it = dom; it !== null; it = it.parentNode) {
         var wrapper = this.registry.get(it);
         if (wrapper !== undefined && wrapper !== null) {
-          return this.matches(wrapper, matcher) ? wrapper : null;
+          return matcher(wrapper) ? wrapper : null;
         }
         if (it === root) {
           return null;
@@ -295,27 +297,6 @@ var DomHelper = function () {
     key: "isInsideDiagram",
     value: function isInsideDiagram(element) {
       return this.registry.root.dom.contains(element);
-    }
-  }, {
-    key: "matches",
-    value: function matches(wrapper, matcher) {
-      if (wrapper === null) {
-        return false;
-      }
-      if (matcher === null) {
-        return true;
-      }
-      if (matcher instanceof Function) {
-        return matcher(wrapper);
-      } else if (Array.isArray(matcher)) {
-        for (var i = 0, len = matcher.length; i < len; i += 1) {
-          var it = matcher[i];
-          if (it === wrapper.component.type) {
-            return true;
-          }
-        }
-      }
-      return matcher === wrapper.component.type;
     }
   }]);
   return DomHelper;
@@ -372,7 +353,7 @@ var PartToolkit = function () {
       } else if (wrapper === registry.root) {
         return null;
       }
-      var parent = domHelper.findClosest(wrapper.dom.parentNode, null);
+      var parent = domHelper.findClosest(wrapper.dom.parentNode);
       return parent === null ? null : parent.userComponent;
     }
   }, {
@@ -1230,7 +1211,9 @@ var DragCapability = function (_Capability) {
       var target = this.target,
           currentParent = this.currentParent;
 
-      var newTarget = this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES);
+      var newTarget = this.part().domHelper.findClosest(eventTarget, function (wrapper) {
+        return ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0;
+      });
       if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
@@ -1389,9 +1372,13 @@ var DragCapability = function (_Capability) {
       if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      this.target = this.part().domHelper.findClosest(e.target, NODE_TYPE);
+      this.target = this.part().domHelper.findClosest(e.target, function (wrapper) {
+        return wrapper.component.type === NODE_TYPE;
+      });
       if (this.target !== null) {
-        var parent = this.part().domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
+        var parent = this.part().domHelper.findClosest(this.target.dom.parentNode, function (wrapper) {
+          return ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0;
+        });
         this.currentParent = parent || this.part().registry.root;
         this.offset = buildOffset(e, this.target.dom);
         this.startLocation = regefGeometry.point(e.clientX, e.clientY);
@@ -1522,7 +1509,9 @@ var ConnectMouseHandler = function (_Capability) {
       if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return null;
       }
-      var source = this.part().domHelper.findClosest(e.target, PORT_TYPE);
+      var source = this.part().domHelper.findClosest(e.target, function (wrapper) {
+        return wrapper.component.type === PORT_TYPE;
+      });
       if (source !== null) {
         this.source = source;
         this.coordinates = this.buildCoordinates(e);
@@ -1649,7 +1638,9 @@ var SingleSelectionCapability = function (_Capability) {
       if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      var target = this.part().domHelper.findClosest(e.target, NODE_TYPE);
+      var target = this.part().domHelper.findClosest(e.target, function (wrapper) {
+        return wrapper.component.type === NODE_TYPE;
+      });
       if (target !== null) {
         this.startLocation = locationOf(e, this.part().registry.root.dom);
         this.selection = [target.userComponent];
@@ -1780,7 +1771,9 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.part().domHelper.isInsideDiagram(e.target)) {
         return;
       }
-      var target = this.part().domHelper.findClosest(e.target, ROOT_TYPE);
+      var target = this.part().domHelper.findClosest(e.target, function (wrapper) {
+        return wrapper.component.type === ROOT_TYPE;
+      });
       if (target !== null) {
         this.startLocation = locationOf$1(e, this.part().registry.root.dom);
         this.progress = true;
@@ -1937,7 +1930,9 @@ var CreationCapability = function (_Capability) {
   }, {
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget) {
-      return this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES$1);
+      return this.part().domHelper.findClosest(eventTarget, function (wrapper) {
+        return ACCEPTED_TYPES$1.indexOf(wrapper.component.type) >= 0;
+      });
     }
   }, {
     key: 'findTargetedCreator',
@@ -1945,7 +1940,9 @@ var CreationCapability = function (_Capability) {
       var parts = this.engine.parts;
       for (var i = 0, len = parts.length; i < len; i += 1) {
         var part = parts[i];
-        var creator = part.domHelper.findClosest(eventTarget, CREATOR_TYPE);
+        var creator = part.domHelper.findClosest(eventTarget, function (wrapper) {
+          return wrapper.component.type === CREATOR_TYPE;
+        });
         if (creator !== null) {
           return creator;
         }

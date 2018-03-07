@@ -69,7 +69,8 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.part().domHelper.isInsideDiagram(e.target)) {
       return
     }
-    const target = this.part().domHelper.findClosest(e.target, ROOT_TYPE)
+    const target = this.part().domHelper
+      .findClosest(e.target, (wrapper) => wrapper.component.type === ROOT_TYPE)
     if (target !== null) {
       this.startLocation = locationOf(e, this.part().registry.root.dom)
       this.progress = true

@@ -28,7 +28,7 @@ export default class PartToolkit {
     } else if (wrapper === registry.root) {
       return null
     }
-    const parent = domHelper.findClosest(wrapper.dom.parentNode, null)
+    const parent = domHelper.findClosest(wrapper.dom.parentNode)
     return parent === null ? null : parent.userComponent
   }
 

@@ -31,14 +31,16 @@ export default class CreationCapability extends Capability {
   }
 
   findTargetedParent(eventTarget) {
-    return this.part().domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    return this.part().domHelper
+      .findClosest(eventTarget, (wrapper) => ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0)
   }
 
   findTargetedCreator(eventTarget) {
     const parts = this.engine.parts
     for (let i = 0, len = parts.length; i < len; i += 1) {
       const part = parts[i]
-      const creator = part.domHelper.findClosest(eventTarget, CREATOR_TYPE)
+      const creator = part.domHelper
+        .findClosest(eventTarget, (wrapper) => wrapper.component.type === CREATOR_TYPE)
       if (creator !== null) {
         return creator
       }
