@@ -47,7 +47,7 @@ export default class SingleSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.part().domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.partContains(e.target)) {
       return
     }
     const target = this.part().domHelper

@@ -1,6 +1,6 @@
 import ComponentRegistry from './ComponentRegistry'
 import PartToolkit from './PartToolkit'
-import DomHelper from './DomHelper'
+import PartDomHelper from './PartDomHelper'
 
 const ID = Symbol('id')
 const ENGINE = Symbol('ENGINE')
@@ -14,8 +14,8 @@ export default class DiagramPartWrapper {
     this[ENGINE] = engine
 
     this[REGISTRY] = new ComponentRegistry()
-    this[TOOLKIT] = new PartToolkit(this.registry)
-    this[DOM_HELPER] = new DomHelper(this.registry)
+    this[DOM_HELPER] = new PartDomHelper(this.registry)
+    this[TOOLKIT] = new PartToolkit(this.registry, this[DOM_HELPER])
   }
   get id() { return this[ID] }
   get registry() { return this[REGISTRY] }

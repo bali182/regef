@@ -2,10 +2,12 @@ import SelectionProvider from './SelectionProvider'
 import DiagramPartWrapper from './DiagramPartWrapper'
 import EventManager from './EventManager'
 import Toolkit from './Toolkit'
+import DomHelper from './DomHelper'
 import { DEFAULT_PART_ID } from './constants'
 
 const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
 const CAPABILITIES = Symbol('CAPABILITIES')
+const DOM_HELPER = Symbol('DOM_HELPER')
 const TOOLKIT = Symbol('TOOLKIT')
 const EVENT_MANAGER = Symbol('EVENT_MANAGER')
 const EDIT_POLICIES = Symbol('EDIT_POLICIES')
@@ -25,6 +27,7 @@ export default class Engine {
   }) {
     this[TOOLKIT] = new Toolkit(this)
     this[EVENT_MANAGER] = new EventManager(this)
+    this[DOM_HELPER] = new DomHelper(this)
     this[PARTS] = new Map()
 
     this[CAPABILITIES] = arrayFrom(capabilities, this)

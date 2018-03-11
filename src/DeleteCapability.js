@@ -22,7 +22,7 @@ export default class DeleteCapability extends Capability {
   }
 
   onKeyDown({ key, target }) {
-    if (this.keys.indexOf(key) >= 0 && this.part().domHelper.isInsideDiagram(target)) {
+    if (this.keys.indexOf(key) >= 0 && this.part().domHelper.partContains(target)) {
       this.currentSelection = this.engine.selection()
       if (this.currentSelection.length > 0) {
         perform(this.engine.editPolicies, this.getDeleteRequest())

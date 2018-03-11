@@ -231,74 +231,6 @@ var ComponentRegistry = function () {
   return ComponentRegistry;
 }();
 
-var DomHelper = function () {
-  function DomHelper(registry) {
-    classCallCheck(this, DomHelper);
-
-    this.registry = registry;
-  }
-
-  createClass(DomHelper, [{
-    key: "findClosest",
-    value: function findClosest(dom) {
-      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
-        return true;
-      };
-
-      var root = this.registry.root.dom;
-      for (var it = dom; it !== null; it = it.parentNode) {
-        var wrapper = this.registry.get(it);
-        if (wrapper !== undefined && wrapper !== null) {
-          return matcher(wrapper) ? wrapper : null;
-        }
-        if (it === root) {
-          return null;
-        }
-      }
-      return null;
-    }
-  }, {
-    key: "findRelevantChildrenIntenal",
-    value: function findRelevantChildrenIntenal(node) {
-      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      if (node !== null && node.hasChildNodes()) {
-        var childNodes = node.childNodes;
-        for (var i = 0, len = childNodes.length; i < len; i += 1) {
-          var childNode = childNodes[i];
-          if (this.registry.has(childNode)) {
-            children.push(childNode);
-          } else {
-            this.findRelevantChildrenIntenal(childNode, children);
-          }
-        }
-      }
-      return children;
-    }
-  }, {
-    key: "findRelevantChildren",
-    value: function findRelevantChildren(element) {
-      return this.findRelevantChildrenIntenal(element, []);
-    }
-  }, {
-    key: "findClosestParent",
-    value: function findClosestParent(element) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (element === this.registry.root.dom) {
-        return element;
-      }
-      return this.findClosestElement(element.parentNode, type);
-    }
-  }, {
-    key: "isInsideDiagram",
-    value: function isInsideDiagram(element) {
-      return this.registry.root.dom.contains(element);
-    }
-  }]);
-  return DomHelper;
-}();
-
 // Diagram participant types
 var ROOT_TYPE = 'root';
 var NODE_TYPE = 'node';
@@ -323,11 +255,11 @@ var REGISTRY = Symbol('REGISTRY');
 var DOM_HELPER = Symbol('DOM_HELPER');
 
 var PartToolkit = function () {
-  function PartToolkit(registry) {
+  function PartToolkit(registry, domHelper) {
     classCallCheck(this, PartToolkit);
 
     this[REGISTRY] = registry;
-    this[DOM_HELPER] = new DomHelper(registry);
+    this[DOM_HELPER] = domHelper;
   }
 
   createClass(PartToolkit, [{
@@ -435,6 +367,74 @@ var PartToolkit = function () {
   return PartToolkit;
 }();
 
+var PartDomHelper = function () {
+  function PartDomHelper(registry) {
+    classCallCheck(this, PartDomHelper);
+
+    this.registry = registry;
+  }
+
+  createClass(PartDomHelper, [{
+    key: "findClosest",
+    value: function findClosest(dom) {
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        return true;
+      };
+
+      var root = this.registry.root.dom;
+      for (var it = dom; it !== null; it = it.parentNode) {
+        var wrapper = this.registry.get(it);
+        if (wrapper !== undefined && wrapper !== null) {
+          return matcher(wrapper) ? wrapper : null;
+        }
+        if (it === root) {
+          return null;
+        }
+      }
+      return null;
+    }
+  }, {
+    key: "findRelevantChildrenIntenal",
+    value: function findRelevantChildrenIntenal(node) {
+      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      if (node !== null && node.hasChildNodes()) {
+        var childNodes = node.childNodes;
+        for (var i = 0, len = childNodes.length; i < len; i += 1) {
+          var childNode = childNodes[i];
+          if (this.registry.has(childNode)) {
+            children.push(childNode);
+          } else {
+            this.findRelevantChildrenIntenal(childNode, children);
+          }
+        }
+      }
+      return children;
+    }
+  }, {
+    key: "findRelevantChildren",
+    value: function findRelevantChildren(element) {
+      return this.findRelevantChildrenIntenal(element, []);
+    }
+  }, {
+    key: "findClosestParent",
+    value: function findClosestParent(element) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (element === this.registry.root.dom) {
+        return element;
+      }
+      return this.findClosestElement(element.parentNode, type);
+    }
+  }, {
+    key: "partContains",
+    value: function partContains(element) {
+      return this.registry.root.dom.contains(element);
+    }
+  }]);
+  return PartDomHelper;
+}();
+
 var ID = Symbol('id');
 var ENGINE = Symbol('ENGINE');
 var REGISTRY$1 = Symbol('REGISTRY');
@@ -449,8 +449,8 @@ var DiagramPartWrapper = function () {
     this[ENGINE] = engine;
 
     this[REGISTRY$1] = new ComponentRegistry();
-    this[TOOLKIT] = new PartToolkit(this.registry);
-    this[DOM_HELPER$1] = new DomHelper(this.registry);
+    this[DOM_HELPER$1] = new PartDomHelper(this.registry);
+    this[TOOLKIT] = new PartToolkit(this.registry, this[DOM_HELPER$1]);
   }
 
   createClass(DiagramPartWrapper, [{
@@ -594,8 +594,32 @@ var Toolkit = function () {
   return Toolkit;
 }();
 
+var DomHelper = function () {
+  function DomHelper(engine) {
+    classCallCheck(this, DomHelper);
+
+    this.engine = engine;
+  }
+
+  createClass(DomHelper, [{
+    key: "findPartFor",
+    value: function findPartFor(dom) {
+      var parts = this.engine.parts;
+      for (var i = 0; i < parts.length; i += 1) {
+        var part = parts[i];
+        if (part.domHelper.partContains(dom)) {
+          return part;
+        }
+      }
+      return null;
+    }
+  }]);
+  return DomHelper;
+}();
+
 var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
 var CAPABILITIES = Symbol('CAPABILITIES');
+var DOM_HELPER$2 = Symbol('DOM_HELPER');
 var TOOLKIT$1 = Symbol('TOOLKIT');
 var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
@@ -631,6 +655,7 @@ var Engine = function () {
 
     this[TOOLKIT$1] = new Toolkit(this);
     this[EVENT_MANAGER] = new EventManager(this);
+    this[DOM_HELPER$2] = new DomHelper(this);
     this[PARTS] = new Map();
 
     this[CAPABILITIES] = arrayFrom(capabilities, this);
@@ -1330,7 +1355,7 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'buildDragRequest',
     value: function buildDragRequest(e) {
-      if (!this.part().domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.partContains(e.target)) {
         return null;
       }
 
@@ -1363,7 +1388,7 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.part().domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.partContains(e.target)) {
         return;
       }
       this.target = this.part().domHelper.findClosest(e.target, function (wrapper) {
@@ -1489,7 +1514,7 @@ var ConnectMouseHandler = function (_Capability) {
   }, {
     key: 'buildEndConnectRequest',
     value: function buildEndConnectRequest(e) {
-      if (!this.part().domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.partContains(e.target)) {
         return null;
       }
 
@@ -1500,7 +1525,7 @@ var ConnectMouseHandler = function (_Capability) {
   }, {
     key: 'buildStartConnectionRequest',
     value: function buildStartConnectionRequest(e) {
-      if (!this.part().domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.partContains(e.target)) {
         return null;
       }
       var source = this.part().domHelper.findClosest(e.target, function (wrapper) {
@@ -1629,7 +1654,7 @@ var SingleSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.part().domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.partContains(e.target)) {
         return;
       }
       var target = this.part().domHelper.findClosest(e.target, function (wrapper) {
@@ -1762,7 +1787,7 @@ var MultiSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.part().domHelper.isInsideDiagram(e.target)) {
+      if (!this.part().domHelper.partContains(e.target)) {
         return;
       }
       var target = this.part().domHelper.findClosest(e.target, function (wrapper) {
@@ -1866,7 +1891,7 @@ var DeleteCapability = function (_Capability) {
       var key = _ref2.key,
           target = _ref2.target;
 
-      if (this.keys.indexOf(key) >= 0 && this.part().domHelper.isInsideDiagram(target)) {
+      if (this.keys.indexOf(key) >= 0 && this.part().domHelper.partContains(target)) {
         this.currentSelection = this.engine.selection();
         if (this.currentSelection.length > 0) {
           perform(this.engine.editPolicies, this.getDeleteRequest());

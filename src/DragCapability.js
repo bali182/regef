@@ -133,7 +133,7 @@ export default class DragCapability extends Capability {
   }
 
   buildDragRequest(e) {
-    if (!this.part().domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.partContains(e.target)) {
       return null
     }
 
@@ -164,7 +164,7 @@ export default class DragCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.part().domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.partContains(e.target)) {
       return
     }
     this.target = this.part().domHelper

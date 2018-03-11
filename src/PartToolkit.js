@@ -1,14 +1,13 @@
 import { rectangle } from 'regef-geometry'
-import DomHelper from './DomHelper'
 import { NODE_TYPE, PORT_TYPE, CONNECTION_TYPE } from './constants'
 
 const REGISTRY = Symbol('REGISTRY')
 const DOM_HELPER = Symbol('DOM_HELPER')
 
 export default class PartToolkit {
-  constructor(registry) {
+  constructor(registry, domHelper) {
     this[REGISTRY] = registry
-    this[DOM_HELPER] = new DomHelper(registry)
+    this[DOM_HELPER] = domHelper
   }
 
   root() {

@@ -53,7 +53,7 @@ export default class ConnectMouseHandler extends Capability {
   }
 
   buildEndConnectRequest(e) {
-    if (!this.part().domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.partContains(e.target)) {
       return null
     }
 
@@ -63,7 +63,7 @@ export default class ConnectMouseHandler extends Capability {
   }
 
   buildStartConnectionRequest(e) {
-    if (!this.part().domHelper.isInsideDiagram(e.target)) {
+    if (!this.part().domHelper.partContains(e.target)) {
       return null
     }
     const source = this.part().domHelper
