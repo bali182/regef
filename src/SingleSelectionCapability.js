@@ -1,7 +1,8 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { NODE_TYPE, SELECT, DEFAULT_PART_ID } from './constants'
+import { NODE_TYPE, SELECT } from './constants'
 import Capability from './Capability'
 import { perform } from './EditPolicy'
+import { typeMatches, partMatches } from './utils'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
@@ -9,18 +10,14 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
 }
 
 export default class SingleSelectionCapability extends Capability {
-  constructor({ part = DEFAULT_PART_ID } = {}) {
+  constructor(config = { parts: null, types: [NODE_TYPE] }) {
     super()
     this.startLocation = null
     this.endLocation = null
     this.possibleSingleSelection = false
     this.additional = false
     this.selection = []
-    this.partId = part
-  }
-
-  part() {
-    return this.engine.part(this.partId)
+    this.config = config
   }
 
   createSingleSelectionRequest() {
@@ -47,17 +44,18 @@ export default class SingleSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.part().domHelper.partContains(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return
     }
-    const target = this.part().domHelper
-      .findClosest(e.target, (wrapper) => wrapper.component.type === NODE_TYPE)
-    if (target !== null) {
-      this.startLocation = locationOf(e, this.part().registry.root.dom)
-      this.selection = [target.userComponent]
-      this.possibleSingleSelection = true
-      this.progress = true
+    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.types))
+    if (!target) {
+      return
     }
+    this.startLocation = locationOf(e, part.registry.root.dom)
+    this.selection = [target.userComponent]
+    this.possibleSingleSelection = true
+    this.progress = true
   }
 
   onMouseMove() {

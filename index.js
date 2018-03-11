@@ -602,13 +602,17 @@ var DomHelper = function () {
   }
 
   createClass(DomHelper, [{
-    key: "findPartFor",
-    value: function findPartFor(dom) {
+    key: "findPart",
+    value: function findPart(dom) {
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        return true;
+      };
+
       var parts = this.engine.parts;
       for (var i = 0; i < parts.length; i += 1) {
         var part = parts[i];
         if (part.domHelper.partContains(dom)) {
-          return part;
+          return matcher(part) ? part : null;
         }
       }
       return null;
@@ -690,6 +694,11 @@ var Engine = function () {
     key: 'selection',
     value: function selection() {
       return this.selectionProvider.selection();
+    }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DOM_HELPER$2];
     }
   }, {
     key: 'parts',
@@ -1587,6 +1596,54 @@ var ConnectMouseHandler = function (_Capability) {
   return ConnectMouseHandler;
 }(Capability);
 
+var matchesSingleType = function matchesSingleType(type) {
+  return function (_ref) {
+    var component = _ref.component;
+    return component.type === type;
+  };
+};
+
+var matchesMultiTypes = function matchesMultiTypes(types) {
+  return function (_ref2) {
+    var component = _ref2.component;
+    return types.indexOf(component.type) >= 0;
+  };
+};
+
+var matchesSinglePart = function matchesSinglePart(partId) {
+  return function (part) {
+    return part.id === partId;
+  };
+};
+
+var matchesMultiParts = function matchesMultiParts(partIds) {
+  return function (part) {
+    return partIds.indexOf(part.id) >= 0;
+  };
+};
+
+var alwaysTrue = function alwaysTrue() {
+  return true;
+};
+
+var typeMatches = function typeMatches(types) {
+  if (types === null || types === undefined) {
+    return alwaysTrue;
+  } else if (Array.isArray(types)) {
+    return matchesMultiTypes(types);
+  }
+  return matchesSingleType(types);
+};
+
+var partMatches = function partMatches(ids) {
+  if (ids === null || ids === undefined) {
+    return alwaysTrue;
+  } else if (Array.isArray(ids)) {
+    return matchesMultiParts(ids);
+  }
+  return matchesSinglePart(ids);
+};
+
 var locationOf = function locationOf(_ref, rootDom) {
   var clientX = _ref.clientX,
       clientY = _ref.clientY;
@@ -1602,10 +1659,7 @@ var SingleSelectionCapability = function (_Capability) {
   inherits(SingleSelectionCapability, _Capability);
 
   function SingleSelectionCapability() {
-    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref2$part = _ref2.part,
-        part = _ref2$part === undefined ? DEFAULT_PART_ID : _ref2$part;
-
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, SingleSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this));
@@ -1615,16 +1669,11 @@ var SingleSelectionCapability = function (_Capability) {
     _this.possibleSingleSelection = false;
     _this.additional = false;
     _this.selection = [];
-    _this.partId = part;
+    _this.config = config;
     return _this;
   }
 
   createClass(SingleSelectionCapability, [{
-    key: 'part',
-    value: function part() {
-      return this.engine.part(this.partId);
-    }
-  }, {
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1654,18 +1703,18 @@ var SingleSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.part().domHelper.partContains(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return;
       }
-      var target = this.part().domHelper.findClosest(e.target, function (wrapper) {
-        return wrapper.component.type === NODE_TYPE;
-      });
-      if (target !== null) {
-        this.startLocation = locationOf(e, this.part().registry.root.dom);
-        this.selection = [target.userComponent];
-        this.possibleSingleSelection = true;
-        this.progress = true;
+      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.types));
+      if (!target) {
+        return;
       }
+      this.startLocation = locationOf(e, part.registry.root.dom);
+      this.selection = [target.userComponent];
+      this.possibleSingleSelection = true;
+      this.progress = true;
     }
   }, {
     key: 'onMouseMove',
@@ -1674,9 +1723,9 @@ var SingleSelectionCapability = function (_Capability) {
     }
   }, {
     key: 'onMouseUp',
-    value: function onMouseUp(_ref3) {
-      var ctrlKey = _ref3.ctrlKey,
-          metaKey = _ref3.metaKey;
+    value: function onMouseUp(_ref2) {
+      var ctrlKey = _ref2.ctrlKey,
+          metaKey = _ref2.metaKey;
 
       if (!this.progress) {
         return;
