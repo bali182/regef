@@ -87,9 +87,6 @@ var possibleConstructorReturn = function (self, call) {
 var SelectionProvider = function () {
   function SelectionProvider() {
     classCallCheck(this, SelectionProvider);
-
-    this.toolkit = null;
-    this.dependencies = {};
   }
 
   createClass(SelectionProvider, [{
@@ -602,16 +599,29 @@ var CAPABILITIES = Symbol('CAPABILITIES');
 var TOOLKIT$1 = Symbol('TOOLKIT');
 var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
-var DEPENDENCIES = Symbol('DEPENDENCIES');
 var PARTS = Symbol('PARTS');
+
+var valueFrom = function valueFrom(input) {
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  return input instanceof Function ? input.apply(undefined, args) : input;
+};
+var arrayFrom = function arrayFrom(input) {
+  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    args[_key2 - 1] = arguments[_key2];
+  }
+
+  var value = input instanceof Function ? input.apply(undefined, args) : input;
+  return Array.isArray(value) ? value : [value];
+};
 
 var Engine = function () {
   function Engine(_ref) {
     var _this = this;
 
-    var _ref$dependencies = _ref.dependencies,
-        dependencies = _ref$dependencies === undefined ? {} : _ref$dependencies,
-        _ref$capabilities = _ref.capabilities,
+    var _ref$capabilities = _ref.capabilities,
         capabilities = _ref$capabilities === undefined ? [] : _ref$capabilities,
         _ref$editPolicies = _ref.editPolicies,
         editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
@@ -619,26 +629,18 @@ var Engine = function () {
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
 
-    this[CAPABILITIES] = capabilities;
-    this[SELECTION_PROVIDER] = selectionProvider;
-    this[EDIT_POLICIES] = editPolicies;
-    this[DEPENDENCIES] = dependencies;
-
     this[TOOLKIT$1] = new Toolkit(this);
     this[EVENT_MANAGER] = new EventManager(this);
     this[PARTS] = new Map();
 
-    /* eslint-disable no-param-reassign */
-    this.editPolicies.forEach(function (policy) {
-      policy.dependencies = dependencies;
-      policy.toolkit = _this.toolkit;
-    });
+    this[CAPABILITIES] = arrayFrom(capabilities, this);
+    this[EDIT_POLICIES] = arrayFrom(editPolicies, this);
+    this[SELECTION_PROVIDER] = valueFrom(selectionProvider, this);
+
     this.capabilities.forEach(function (capability) {
+      // eslint-disable-next-line no-param-reassign
       capability.engine = _this;
     });
-    /* eslint-enable no-param-reassign */
-    this.selectionProvider.dependencies = dependencies;
-    this.selectionProvider.toolkit = this.toolkit;
   }
 
   createClass(Engine, [{
@@ -693,11 +695,6 @@ var Engine = function () {
     key: 'editPolicies',
     get: function get$$1() {
       return this[EDIT_POLICIES];
-    }
-  }, {
-    key: 'dependencies',
-    get: function get$$1() {
-      return this[DEPENDENCIES];
     }
   }]);
   return Engine;
@@ -767,9 +764,6 @@ DiagramPart.defaultProps = {
 var EditPolicy = function () {
   function EditPolicy() {
     classCallCheck(this, EditPolicy);
-
-    this.toolkit = null;
-    this.dependencies = {};
   }
 
   createClass(EditPolicy, [{

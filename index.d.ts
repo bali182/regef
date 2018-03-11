@@ -63,10 +63,6 @@ export interface EndConnectionIntent extends Intent {
 }
 
 export class EditPolicy {
-  constructor()
-  toolkit: PartToolkit
-  dependencies: { [key: string]: any }
-
   perform(intent: Intent): void
   requestFeedback(intent: Intent): void
   eraseFeedback(intent): void
@@ -131,9 +127,6 @@ class PartToolkit {
 }
 
 export class SelectionProvider {
-  toolkit: PartToolkit
-  dependencies: { [key: string]: any }
-
   constructor()
 
   selection(): ReactComponent[]

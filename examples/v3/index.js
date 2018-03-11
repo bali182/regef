@@ -27,7 +27,7 @@ import ContainerEditPolicy from './policies/ContainerEditPolicy'
 import CreationEditPolicy from './policies/CreationEditPolicy'
 
 const engine = new Engine({
-  selectionProvider: new DiagramSelectionProvider(),
+  selectionProvider: ({ toolkit }) => new DiagramSelectionProvider(toolkit),
   capabilities: [
     new DragCapability(),
     new ConnectCapability(),
@@ -37,16 +37,13 @@ const engine = new Engine({
     new DeleteCapability(),
     new CreationCapability(),
   ],
-  editPolicies: [
-    new RootEditPolicy(),
-    new NodeEditPolicy(),
-    new StepEditPolicy(),
-    new ContainerEditPolicy(),
-    new CreationEditPolicy(),
+  editPolicies: ({ toolkit }) => [
+    new RootEditPolicy(toolkit),
+    new NodeEditPolicy(toolkit),
+    new StepEditPolicy(toolkit),
+    new ContainerEditPolicy(toolkit),
+    new CreationEditPolicy(toolkit),
   ],
-  dependencies: {
-    hello: 'world',
-  },
 })
 
 render(

@@ -1,6 +1,11 @@
 import { DispatchingEditPolicy } from '../../../src/index'
 
 export default class ContainerEditPolicy extends DispatchingEditPolicy {
+  constructor(toolkit) {
+    super()
+    this.toolkit = toolkit
+  }
+
   checkRelevant(component) {
     return Boolean(component) && Boolean(component.props.container)
   }

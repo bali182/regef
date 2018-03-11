@@ -1,8 +1,4 @@
 export default class EditPolicy {
-  constructor() {
-    this.toolkit = null
-    this.dependencies = {}
-  }
   perform(/* intent */) { }
   requestFeedback(/* intent */) { }
   eraseFeedback(/* intent */) { }
