@@ -1190,6 +1190,54 @@ var creator = createDecorator({
   toolkitResolver: defaultToolkitResolver
 });
 
+var matchesSingleType = function matchesSingleType(type) {
+  return function (_ref) {
+    var component = _ref.component;
+    return component.type === type;
+  };
+};
+
+var matchesMultiTypes = function matchesMultiTypes(types) {
+  return function (_ref2) {
+    var component = _ref2.component;
+    return types.indexOf(component.type) >= 0;
+  };
+};
+
+var matchesSinglePart = function matchesSinglePart(partId) {
+  return function (part) {
+    return part.id === partId;
+  };
+};
+
+var matchesMultiParts = function matchesMultiParts(partIds) {
+  return function (part) {
+    return partIds.indexOf(part.id) >= 0;
+  };
+};
+
+var alwaysTrue = function alwaysTrue() {
+  return true;
+};
+
+var typeMatches = function typeMatches(types) {
+  if (types === null || types === undefined) {
+    return alwaysTrue;
+  } else if (Array.isArray(types)) {
+    return matchesMultiTypes(types);
+  }
+  return matchesSingleType(types);
+};
+
+var partMatches = function partMatches(ids) {
+  if (ids === null || ids === undefined) {
+    return alwaysTrue;
+  } else if (Array.isArray(ids)) {
+    return matchesMultiParts(ids);
+  }
+  return matchesSinglePart(ids);
+};
+
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
 var buildOffset = function buildOffset(_ref, element) {
@@ -1207,10 +1255,7 @@ var DragCapability = function (_Capability) {
   inherits(DragCapability, _Capability);
 
   function DragCapability() {
-    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref2$part = _ref2.part,
-        part = _ref2$part === undefined ? DEFAULT_PART_ID : _ref2$part;
-
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, DragCapability);
 
     var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this));
@@ -1224,24 +1269,20 @@ var DragCapability = function (_Capability) {
     _this.lastRequest = null;
     _this.mouseMoved = false;
     _this.startLocation = null;
-    _this.partId = part;
+    _this.config = config;
     return _this;
   }
 
   createClass(DragCapability, [{
-    key: 'part',
-    value: function part() {
-      return this.engine.part(this.partId);
-    }
-  }, {
     key: 'findTargetedParent',
-    value: function findTargetedParent(eventTarget) {
+    value: function findTargetedParent(eventTarget, part) {
       var target = this.target,
           currentParent = this.currentParent;
 
-      var newTarget = this.part().domHelper.findClosest(eventTarget, function (wrapper) {
-        return ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0;
-      });
+      if (!part) {
+        return currentParent;
+      }
+      var newTarget = part.domHelper.findClosest(eventTarget, partMatches(ACCEPTED_TYPES)); // TODO
       if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
@@ -1249,11 +1290,11 @@ var DragCapability = function (_Capability) {
     }
   }, {
     key: 'updateCoordinates',
-    value: function updateCoordinates(_ref3) {
-      var clientX = _ref3.clientX,
-          clientY = _ref3.clientY;
+    value: function updateCoordinates(_ref2, part) {
+      var clientX = _ref2.clientX,
+          clientY = _ref2.clientY;
 
-      var _part$registry$root$d = this.part().registry.root.dom.getBoundingClientRect(),
+      var _part$registry$root$d = part.registry.root.dom.getBoundingClientRect(),
           rootX = _part$registry$root$d.x,
           rootY = _part$registry$root$d.y;
 
@@ -1267,8 +1308,8 @@ var DragCapability = function (_Capability) {
     }
   }, {
     key: 'updateParents',
-    value: function updateParents(e) {
-      var newTargetParent = this.findTargetedParent(e.target);
+    value: function updateParents(e, part) {
+      var newTargetParent = this.findTargetedParent(e.target, part);
       var targetParent = this.targetParent;
       if (targetParent !== newTargetParent) {
         this.lastTargetParent = targetParent;
@@ -1352,28 +1393,19 @@ var DragCapability = function (_Capability) {
       }
     }
   }, {
-    key: 'isMoveChild',
-    value: function isMoveChild() {
-      return this.currentParent === this.targetParent;
-    }
-  }, {
-    key: 'isAddChild',
-    value: function isAddChild() {
-      return this.currentParent !== this.targetParent;
-    }
-  }, {
     key: 'buildDragRequest',
     value: function buildDragRequest(e) {
-      if (!this.part().domHelper.partContains(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return null;
       }
 
-      this.updateParents(e);
-      this.updateCoordinates(e);
+      this.updateParents(e, part);
+      this.updateCoordinates(e, part);
 
-      if (this.isMoveChild(e)) {
+      if (this.currentParent === this.targetParent) {
         return this.getMoveChildRequest();
-      } else if (this.isAddChild(e)) {
+      } else if (this.currentParent !== this.targetParent) {
         return this.getAddChildRequest();
       }
       return null;
@@ -1397,17 +1429,16 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.part().domHelper.partContains(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return;
       }
-      this.target = this.part().domHelper.findClosest(e.target, function (wrapper) {
-        return wrapper.component.type === NODE_TYPE;
-      });
+      this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.types));
       if (this.target !== null) {
-        var parent = this.part().domHelper.findClosest(this.target.dom.parentNode, function (wrapper) {
+        var parent = part.domHelper.findClosest(this.target.dom.parentNode, function (wrapper) {
           return ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0;
         });
-        this.currentParent = parent || this.part().registry.root;
+        this.currentParent = parent || part.registry.root;
         this.offset = buildOffset(e, this.target.dom);
         this.startLocation = regefGeometry.point(e.clientX, e.clientY);
         this.mouseMoved = false;
@@ -1595,54 +1626,6 @@ var ConnectMouseHandler = function (_Capability) {
   }]);
   return ConnectMouseHandler;
 }(Capability);
-
-var matchesSingleType = function matchesSingleType(type) {
-  return function (_ref) {
-    var component = _ref.component;
-    return component.type === type;
-  };
-};
-
-var matchesMultiTypes = function matchesMultiTypes(types) {
-  return function (_ref2) {
-    var component = _ref2.component;
-    return types.indexOf(component.type) >= 0;
-  };
-};
-
-var matchesSinglePart = function matchesSinglePart(partId) {
-  return function (part) {
-    return part.id === partId;
-  };
-};
-
-var matchesMultiParts = function matchesMultiParts(partIds) {
-  return function (part) {
-    return partIds.indexOf(part.id) >= 0;
-  };
-};
-
-var alwaysTrue = function alwaysTrue() {
-  return true;
-};
-
-var typeMatches = function typeMatches(types) {
-  if (types === null || types === undefined) {
-    return alwaysTrue;
-  } else if (Array.isArray(types)) {
-    return matchesMultiTypes(types);
-  }
-  return matchesSingleType(types);
-};
-
-var partMatches = function partMatches(ids) {
-  if (ids === null || ids === undefined) {
-    return alwaysTrue;
-  } else if (Array.isArray(ids)) {
-    return matchesMultiParts(ids);
-  }
-  return matchesSinglePart(ids);
-};
 
 var locationOf = function locationOf(_ref, rootDom) {
   var clientX = _ref.clientX,
