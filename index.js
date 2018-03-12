@@ -236,7 +236,6 @@ var ROOT_TYPE = 'root';
 var NODE_TYPE = 'node';
 var PORT_TYPE = 'port';
 var CONNECTION_TYPE = 'connection';
-var ATTACHMENT_TYPE = 'attachment';
 var CREATOR_TYPE = 'palette-entry';
 
 // Request types
@@ -1173,13 +1172,6 @@ var connection = createDecorator({
   type: CONNECTION_TYPE,
   activate: defaultActivate,
   deactivate: defaultDecativate,
-  toolkitResolver: defaultToolkitResolver
-});
-
-var attachment = createDecorator({
-  type: ATTACHMENT_TYPE,
-  activate: rootActivate,
-  deactivate: rootDeactivate,
   toolkitResolver: defaultToolkitResolver
 });
 
@@ -2147,7 +2139,6 @@ exports.root = root;
 exports.connection = connection;
 exports.node = node;
 exports.port = port;
-exports.attachment = attachment;
 exports.creator = creator;
 exports.DragCapability = DragCapability;
 exports.ConnectCapability = ConnectMouseHandler;
@@ -2160,7 +2151,6 @@ exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
-exports.ATTACHMENT_TYPE = ATTACHMENT_TYPE;
 exports.CREATOR_TYPE = CREATOR_TYPE;
 exports.ADD = ADD;
 exports.CREATE = CREATE;

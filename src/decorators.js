@@ -1,4 +1,4 @@
-import { NODE_TYPE, PORT_TYPE, ROOT_TYPE, CONNECTION_TYPE, CREATOR_TYPE, ATTACHMENT_TYPE } from './constants'
+import { NODE_TYPE, PORT_TYPE, ROOT_TYPE, CONNECTION_TYPE, CREATOR_TYPE } from './constants'
 import createDecorator from './createDecorator'
 import { fromComponent } from './ComponentWrapper'
 import { watchRegister } from './watchers'
@@ -57,13 +57,6 @@ export const connection = createDecorator({
   type: CONNECTION_TYPE,
   activate: defaultActivate,
   deactivate: defaultDecativate,
-  toolkitResolver: defaultToolkitResolver,
-})
-
-export const attachment = createDecorator({
-  type: ATTACHMENT_TYPE,
-  activate: rootActivate,
-  deactivate: rootDeactivate,
   toolkitResolver: defaultToolkitResolver,
 })
 

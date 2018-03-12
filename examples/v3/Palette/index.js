@@ -1,5 +1,5 @@
 import React from 'react'
-import { attachment } from '../../../src/index'
+import { root } from '../../../src/index'
 import PaletteEntry from '../PaletteEntry'
 
 const style = {
@@ -20,7 +20,7 @@ const style = {
   backgroundColor: '#fff',
 }
 
-@attachment()
+@root()
 export default class Palette extends React.Component {
   render() {
     return (<div style={style}>
