@@ -1,6 +1,6 @@
 import Capability from './Capability'
 import { DELETE, DEFAULT_PART_ID } from './constants'
-import { perform } from './EditPolicy'
+import { perform } from './utils'
 
 export default class DeleteCapability extends Capability {
   constructor({ part = DEFAULT_PART_ID, keys = ['Backspace', 'Delete'] } = {}) {

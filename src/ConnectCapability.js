@@ -1,7 +1,7 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
 import { PORT_TYPE, START_CONNECTION, END_CONNECTION, DEFAULT_PART_ID } from './constants'
-import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
+import { eraseFeedback, requestFeedback, perform } from './utils'
 
 export default class ConnectMouseHandler extends Capability {
   constructor({ part = DEFAULT_PART_ID } = {}) {

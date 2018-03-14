@@ -1,8 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { NODE_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { perform } from './EditPolicy'
-import { typeMatches, partMatches } from './utils'
+import { typeMatches, partMatches, perform } from './utils'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()

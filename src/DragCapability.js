@@ -1,8 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
-import { typeMatches, partMatches } from './utils'
+import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform } from './utils'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -29,26 +28,44 @@ export default class DragCapability extends Capability {
   findTargetedParent(eventTarget, part) {
     const { target, currentParent } = this
     if (!part) {
-      return currentParent
+      return null
     }
-    const newTarget = part.domHelper.findClosest(eventTarget, partMatches(ACCEPTED_TYPES)) // TODO
+    const newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)) // TODO
     if (newTarget === null
       || newTarget === target
-      || target.dom.contains(newTarget.dom)
+      || (target !== null && target.dom.contains(newTarget.dom))
       || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
       return currentParent
     }
     return newTarget
   }
 
-  updateCoordinates({ clientX, clientY }, part) {
+  deltaCoordinates({ clientX, clientY }) {
+    return point(clientX - this.startLocation.x, clientY - this.startLocation.y)
+  }
+
+  screenCoordinates({ clientX, clientY }) {
+    return point(clientX, clientY)
+  }
+
+  offsetCoordinates() {
+    return point(this.offset)
+  }
+
+  locationCoordinates({ clientX, clientY }, part) {
+    if (part === null || part === undefined) {
+      return null
+    }
     const { x: rootX, y: rootY } = part.registry.root.dom.getBoundingClientRect()
-    const location = point(clientX - rootX, clientY - rootY)
-    const delta = point(clientX - this.startLocation.x, clientY - this.startLocation.y)
+    return point(clientX - rootX, clientY - rootY)
+  }
+
+  updateCoordinates(e, part) {
     this.coordinates = {
-      location,
-      offset: this.offset,
-      delta,
+      offset: this.offsetCoordinates(),
+      delta: this.deltaCoordinates(e),
+      location: this.locationCoordinates(e, part),
+      screen: this.screenCoordinates(e),
     }
   }
 
@@ -72,29 +89,22 @@ export default class DragCapability extends Capability {
   }
 
   getMoveChildRequest() {
-    const { currentParent, coordinates } = this
-    const { location, offset, delta } = coordinates
     return {
       type: MOVE,
       components: this.getMovedComponents(),
-      container: currentParent.component.userComponent,
-      location,
-      offset,
-      delta,
+      container: this.currentParent.component.userComponent,
+      ...this.coordinates,
     }
   }
 
   getAddChildRequest() {
-    const { targetParent, currentParent, coordinates } = this
-    const { location, offset, delta } = coordinates
+    const { targetParent, currentParent } = this
     return {
       type: ADD,
       components: this.getMovedComponents(),
-      targetContainer: targetParent.component.userComponent,
+      targetContainer: targetParent === null ? null : targetParent.component.userComponent,
       container: currentParent.component.userComponent,
-      location,
-      offset,
-      delta,
+      ...this.coordinates,
     }
   }
 
@@ -113,8 +123,7 @@ export default class DragCapability extends Capability {
     const { lastTargetParent, targetParent } = this
     if (
       lastRequest !== null &&
-      lastTargetParent.dom !== targetParent.dom &&
-      lastTargetParent.component !== null
+      lastTargetParent !== targetParent
     ) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
@@ -125,16 +134,15 @@ export default class DragCapability extends Capability {
 
   buildDragRequest(e) {
     const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
-    if (!part) {
-      return null
-    }
 
     this.updateParents(e, part)
     this.updateCoordinates(e, part)
 
-    if (this.currentParent === this.targetParent) {
+    const { currentParent, targetParent } = this
+
+    if (currentParent === targetParent) {
       return this.getMoveChildRequest()
-    } else if (this.currentParent !== this.targetParent) {
+    } else if (currentParent !== targetParent) {
       return this.getAddChildRequest()
     }
     return null

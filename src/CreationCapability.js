@@ -1,7 +1,7 @@
 import { point } from 'regef-geometry'
 import { CREATE, NODE_TYPE, ROOT_TYPE, CREATOR_TYPE, DEFAULT_PART_ID } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
+import { eraseFeedback, requestFeedback, perform } from './utils'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 

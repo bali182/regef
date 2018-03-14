@@ -812,25 +812,6 @@ var EditPolicy = function () {
   return EditPolicy;
 }();
 
-
-var perform = function perform(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.perform(intent);
-  });
-};
-
-var requestFeedback = function requestFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.requestFeedback(intent);
-  });
-};
-
-var eraseFeedback = function eraseFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.eraseFeedback(intent);
-  });
-};
-
 var DispatchingEditPolicy = function (_EditPolicy) {
   inherits(DispatchingEditPolicy, _EditPolicy);
 
@@ -841,7 +822,7 @@ var DispatchingEditPolicy = function (_EditPolicy) {
 
   createClass(DispatchingEditPolicy, [{
     key: 'perform',
-    value: function perform$$1(request) {
+    value: function perform(request) {
       switch (request.type) {
         case ADD:
           return this.add(request);
@@ -863,7 +844,7 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     }
   }, {
     key: 'requestFeedback',
-    value: function requestFeedback$$1(request) {
+    value: function requestFeedback(request) {
       switch (request.type) {
         case ADD:
           return this.requestAddFeedback(request);
@@ -883,7 +864,7 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     }
   }, {
     key: 'eraseFeedback',
-    value: function eraseFeedback$$1(request) {
+    value: function eraseFeedback(request) {
       switch (request.type) {
         case ADD:
           return this.eraseAddFeedback(request);
@@ -1230,6 +1211,24 @@ var partMatches = function partMatches(ids) {
   return matchesSinglePart(ids);
 };
 
+var perform = function perform(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.perform(intent);
+  });
+};
+
+var requestFeedback = function requestFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.requestFeedback(intent);
+  });
+};
+
+var eraseFeedback = function eraseFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.eraseFeedback(intent);
+  });
+};
+
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
 var buildOffset = function buildOffset(_ref, element) {
@@ -1272,30 +1271,59 @@ var DragCapability = function (_Capability) {
           currentParent = this.currentParent;
 
       if (!part) {
-        return currentParent;
+        return null;
       }
-      var newTarget = part.domHelper.findClosest(eventTarget, partMatches(ACCEPTED_TYPES)); // TODO
-      if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
+      var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)); // TODO
+      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
       return newTarget;
     }
   }, {
-    key: 'updateCoordinates',
-    value: function updateCoordinates(_ref2, part) {
+    key: 'deltaCoordinates',
+    value: function deltaCoordinates(_ref2) {
       var clientX = _ref2.clientX,
           clientY = _ref2.clientY;
+
+      return regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
+    }
+  }, {
+    key: 'screenCoordinates',
+    value: function screenCoordinates(_ref3) {
+      var clientX = _ref3.clientX,
+          clientY = _ref3.clientY;
+
+      return regefGeometry.point(clientX, clientY);
+    }
+  }, {
+    key: 'offsetCoordinates',
+    value: function offsetCoordinates() {
+      return regefGeometry.point(this.offset);
+    }
+  }, {
+    key: 'locationCoordinates',
+    value: function locationCoordinates(_ref4, part) {
+      var clientX = _ref4.clientX,
+          clientY = _ref4.clientY;
+
+      if (part === null || part === undefined) {
+        return null;
+      }
 
       var _part$registry$root$d = part.registry.root.dom.getBoundingClientRect(),
           rootX = _part$registry$root$d.x,
           rootY = _part$registry$root$d.y;
 
-      var location = regefGeometry.point(clientX - rootX, clientY - rootY);
-      var delta = regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
+      return regefGeometry.point(clientX - rootX, clientY - rootY);
+    }
+  }, {
+    key: 'updateCoordinates',
+    value: function updateCoordinates(e, part) {
       this.coordinates = {
-        location: location,
-        offset: this.offset,
-        delta: delta
+        offset: this.offsetCoordinates(),
+        delta: this.deltaCoordinates(e),
+        location: this.locationCoordinates(e, part),
+        screen: this.screenCoordinates(e)
       };
     }
   }, {
@@ -1322,40 +1350,24 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'getMoveChildRequest',
     value: function getMoveChildRequest() {
-      var currentParent = this.currentParent,
-          coordinates = this.coordinates;
-      var location = coordinates.location,
-          offset = coordinates.offset,
-          delta = coordinates.delta;
-
-      return {
+      return _extends({
         type: MOVE,
         components: this.getMovedComponents(),
-        container: currentParent.component.userComponent,
-        location: location,
-        offset: offset,
-        delta: delta
-      };
+        container: this.currentParent.component.userComponent
+      }, this.coordinates);
     }
   }, {
     key: 'getAddChildRequest',
     value: function getAddChildRequest() {
       var targetParent = this.targetParent,
-          currentParent = this.currentParent,
-          coordinates = this.coordinates;
-      var location = coordinates.location,
-          offset = coordinates.offset,
-          delta = coordinates.delta;
+          currentParent = this.currentParent;
 
-      return {
+      return _extends({
         type: ADD,
         components: this.getMovedComponents(),
-        targetContainer: targetParent.component.userComponent,
-        container: currentParent.component.userComponent,
-        location: location,
-        offset: offset,
-        delta: delta
-      };
+        targetContainer: targetParent === null ? null : targetParent.component.userComponent,
+        container: currentParent.component.userComponent
+      }, this.coordinates);
     }
   }, {
     key: 'getSelectionRequest',
@@ -1377,7 +1389,7 @@ var DragCapability = function (_Capability) {
       var lastTargetParent = this.lastTargetParent,
           targetParent = this.targetParent;
 
-      if (lastRequest !== null && lastTargetParent.dom !== targetParent.dom && lastTargetParent.component !== null) {
+      if (lastRequest !== null && lastTargetParent !== targetParent) {
         eraseFeedback(this.engine.editPolicies, lastRequest);
       }
       if (request !== null) {
@@ -1388,16 +1400,17 @@ var DragCapability = function (_Capability) {
     key: 'buildDragRequest',
     value: function buildDragRequest(e) {
       var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      if (!part) {
-        return null;
-      }
 
       this.updateParents(e, part);
       this.updateCoordinates(e, part);
 
-      if (this.currentParent === this.targetParent) {
+      var currentParent = this.currentParent,
+          targetParent = this.targetParent;
+
+
+      if (currentParent === targetParent) {
         return this.getMoveChildRequest();
-      } else if (this.currentParent !== this.targetParent) {
+      } else if (currentParent !== targetParent) {
         return this.getAddChildRequest();
       }
       return null;

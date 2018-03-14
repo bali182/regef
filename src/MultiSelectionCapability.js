@@ -1,7 +1,7 @@
 import { point, rectangle } from 'regef-geometry'
 import { ROOT_TYPE, SELECT, DEFAULT_PART_ID } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
+import { eraseFeedback, requestFeedback, perform } from './utils'
 
 const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   const x = Math.min(x1, x2)

@@ -25,3 +25,12 @@ export const partMatches = (ids) => {
   }
   return matchesSinglePart(ids)
 }
+
+export const perform = (policies, intent) => policies
+  .forEach((policy) => policy.perform(intent))
+
+export const requestFeedback = (policies, intent) => policies
+  .forEach((policy) => policy.requestFeedback(intent))
+
+export const eraseFeedback = (policies, intent) => policies
+  .forEach((policy) => policy.eraseFeedback(intent))
