@@ -1463,14 +1463,18 @@ var DragCapability = function (_Capability) {
   return DragCapability;
 }(Capability);
 
-var ConnectMouseHandler = function (_Capability) {
-  inherits(ConnectMouseHandler, _Capability);
+var ConnectCapability = function (_Capability) {
+  inherits(ConnectCapability, _Capability);
 
-  function ConnectMouseHandler() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, sourceTypes: [PORT_TYPE], targetTypes: [NODE_TYPE] };
-    classCallCheck(this, ConnectMouseHandler);
+  function ConnectCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      parts: null,
+      sourceTypes: [PORT_TYPE],
+      targetTypes: [ROOT_TYPE, NODE_TYPE]
+    };
+    classCallCheck(this, ConnectCapability);
 
-    var _this = possibleConstructorReturn(this, (ConnectMouseHandler.__proto__ || Object.getPrototypeOf(ConnectMouseHandler)).call(this));
+    var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this));
 
     _this.source = null;
     _this.target = null;
@@ -1480,7 +1484,7 @@ var ConnectMouseHandler = function (_Capability) {
     return _this;
   }
 
-  createClass(ConnectMouseHandler, [{
+  createClass(ConnectCapability, [{
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
@@ -1598,7 +1602,7 @@ var ConnectMouseHandler = function (_Capability) {
       this.progress = false;
     }
   }]);
-  return ConnectMouseHandler;
+  return ConnectCapability;
 }(Capability);
 
 var locationOf = function locationOf(_ref, rootDom) {
@@ -1919,7 +1923,7 @@ exports.connection = connection;
 exports.node = node;
 exports.port = port;
 exports.DragCapability = DragCapability;
-exports.ConnectCapability = ConnectMouseHandler;
+exports.ConnectCapability = ConnectCapability;
 exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;

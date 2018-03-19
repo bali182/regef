@@ -1,10 +1,14 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
-import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE } from './constants'
+import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE, ROOT_TYPE } from './constants'
 import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches } from './utils'
 
-export default class ConnectMouseHandler extends Capability {
-  constructor(config = { parts: null, sourceTypes: [PORT_TYPE], targetTypes: [NODE_TYPE] }) {
+export default class ConnectCapability extends Capability {
+  constructor(config = {
+    parts: null,
+    sourceTypes: [PORT_TYPE],
+    targetTypes: [ROOT_TYPE, NODE_TYPE],
+  }) {
     super()
     this.source = null
     this.target = null
