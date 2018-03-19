@@ -5,7 +5,7 @@ export { default as Engine } from './Engine'
 export { default as Capability } from './Capability'
 export { default as SelectionProvider } from './SelectionProvider'
 
-export { root, connection, node, port, creator } from './decorators'
+export { root, connection, node, port } from './decorators'
 
 export { default as DragCapability } from './DragCapability'
 export { default as ConnectCapability } from './ConnectCapability'
@@ -13,6 +13,5 @@ export { default as SingleSelectionCapability } from './SingleSelectionCapabilit
 export { default as MultiSelectionCapability } from './MultiSelectionCapability'
 export { default as CancelCapability } from './CancelCapability'
 export { default as DeleteCapability } from './DeleteCapability'
-export { default as CreationCapability } from './CreationCapability'
 
 export * from './constants'

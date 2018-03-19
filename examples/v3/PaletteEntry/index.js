@@ -1,8 +1,8 @@
 import React from 'react'
-import { creator } from '../../../src/index'
+import { node } from '../../../src/index'
 import { paletteEntryStyle } from './styles'
 
-@creator()
+@node()
 export default class PaletteEntry extends React.Component {
   render() {
     const { type, regef, ...rest } = this.props

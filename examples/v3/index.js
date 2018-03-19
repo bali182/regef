@@ -10,7 +10,6 @@ import {
   MultiSelectionCapability,
   CancelCapability,
   DeleteCapability,
-  CreationCapability,
   DragCapability,
 } from '../../src/index'
 
@@ -35,7 +34,6 @@ const engine = new Engine({
     new MultiSelectionCapability(),
     new CancelCapability(),
     new DeleteCapability(),
-    new CreationCapability(),
   ],
   editPolicies: ({ toolkit }) => [
     new RootEditPolicy(toolkit),

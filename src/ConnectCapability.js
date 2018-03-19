@@ -1,20 +1,16 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
-import { PORT_TYPE, START_CONNECTION, END_CONNECTION, DEFAULT_PART_ID } from './constants'
-import { eraseFeedback, requestFeedback, perform } from './utils'
+import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE } from './constants'
+import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches } from './utils'
 
 export default class ConnectMouseHandler extends Capability {
-  constructor({ part = DEFAULT_PART_ID } = {}) {
+  constructor(config = { parts: null, sourceTypes: [PORT_TYPE], targetTypes: [NODE_TYPE] }) {
     super()
     this.source = null
     this.target = null
     this.coordinates = null
     this.lastRequest = null
-    this.partId = part
-  }
-
-  part() {
-    return this.engine.part(this.partId)
+    this.config = config
   }
 
   cancel() {
@@ -45,35 +41,39 @@ export default class ConnectMouseHandler extends Capability {
     }
   }
 
-  buildCoordinates({ clientX, clientY }) {
-    const { top, left } = this.part().registry.root.dom.getBoundingClientRect()
-    const x = clientX - left
-    const y = clientY - top
+  buildCoordinates(e, part) {
+    const { top, left } = part.registry.root.dom.getBoundingClientRect()
+    const x = e.clientX - left
+    const y = e.clientY - top
     return { x, y }
   }
 
   buildEndConnectRequest(e) {
-    if (!this.part().domHelper.partContains(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return null
     }
-
-    this.target = this.part().domHelper.findClosest(e.target)
-    this.coordinates = this.buildCoordinates(e)
+    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes))
+    if (!target) {
+      return null
+    }
+    this.target = target
+    this.coordinates = this.buildCoordinates(e, part)
     return this.getEndConnectionRequest()
   }
 
   buildStartConnectionRequest(e) {
-    if (!this.part().domHelper.partContains(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return null
     }
-    const source = this.part().domHelper
-      .findClosest(e.target, (wrapper) => wrapper.component.type === PORT_TYPE)
-    if (source !== null) {
-      this.source = source
-      this.coordinates = this.buildCoordinates(e)
-      return this.getStartConnectionRequest()
+    const source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes))
+    if (!source) {
+      return null
     }
-    return null
+    this.source = source
+    this.coordinates = this.buildCoordinates(e, part)
+    return this.getStartConnectionRequest()
   }
 
   handleFeedback(lastRequest, request) {

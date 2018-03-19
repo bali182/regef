@@ -236,7 +236,6 @@ var ROOT_TYPE = 'root';
 var NODE_TYPE = 'node';
 var PORT_TYPE = 'port';
 var CONNECTION_TYPE = 'connection';
-var CREATOR_TYPE = 'palette-entry';
 
 // Request types
 var ADD = 'add';
@@ -836,8 +835,6 @@ var DispatchingEditPolicy = function (_EditPolicy) {
           return this.select(request);
         case DELETE:
           return this.delete(request);
-        case CREATE:
-          return this.create(request);
         default:
           throw new Error('Unknown request type ' + request.type);
       }
@@ -856,8 +853,6 @@ var DispatchingEditPolicy = function (_EditPolicy) {
           return this.requestEndConnectionFeedback(request);
         case SELECT:
           return this.requestSelectFeedback(request);
-        case CREATE:
-          return this.requestCreateFeedback(request);
         default:
           throw new Error('Unknown request type ' + request.type);
       }
@@ -876,8 +871,6 @@ var DispatchingEditPolicy = function (_EditPolicy) {
           return this.eraseEndConnectionFeedback(request);
         case SELECT:
           return this.eraseSelectFeedback(request);
-        case CREATE:
-          return this.eraseCreateFeedback(request);
         default:
           throw new Error('Unknown request type ' + request.type);
       }
@@ -901,9 +894,6 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'delete',
     value: function _delete() /* request */{}
   }, {
-    key: 'create',
-    value: function create() /* request */{}
-  }, {
     key: 'requestAddFeedback',
     value: function requestAddFeedback() /* request */{}
   }, {
@@ -919,9 +909,6 @@ var DispatchingEditPolicy = function (_EditPolicy) {
     key: 'requestSelectFeedback',
     value: function requestSelectFeedback() /* request */{}
   }, {
-    key: 'requestCreateFeedback',
-    value: function requestCreateFeedback() /* request */{}
-  }, {
     key: 'eraseAddFeedback',
     value: function eraseAddFeedback() /* request */{}
   }, {
@@ -936,9 +923,6 @@ var DispatchingEditPolicy = function (_EditPolicy) {
   }, {
     key: 'eraseSelectFeedback',
     value: function eraseSelectFeedback() /* request */{}
-  }, {
-    key: 'eraseCreateFeedback',
-    value: function eraseCreateFeedback() /* request */{}
   }]);
   return DispatchingEditPolicy;
 }(EditPolicy);
@@ -1151,13 +1135,6 @@ var root = createDecorator({
 
 var connection = createDecorator({
   type: CONNECTION_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate,
-  toolkitResolver: defaultToolkitResolver
-});
-
-var creator = createDecorator({
-  type: CREATOR_TYPE,
   activate: defaultActivate,
   deactivate: defaultDecativate,
   toolkitResolver: defaultToolkitResolver
@@ -1490,10 +1467,7 @@ var ConnectMouseHandler = function (_Capability) {
   inherits(ConnectMouseHandler, _Capability);
 
   function ConnectMouseHandler() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref$part = _ref.part,
-        part = _ref$part === undefined ? DEFAULT_PART_ID : _ref$part;
-
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, sourceTypes: [PORT_TYPE], targetTypes: [NODE_TYPE] };
     classCallCheck(this, ConnectMouseHandler);
 
     var _this = possibleConstructorReturn(this, (ConnectMouseHandler.__proto__ || Object.getPrototypeOf(ConnectMouseHandler)).call(this));
@@ -1502,16 +1476,11 @@ var ConnectMouseHandler = function (_Capability) {
     _this.target = null;
     _this.coordinates = null;
     _this.lastRequest = null;
-    _this.partId = part;
+    _this.config = config;
     return _this;
   }
 
   createClass(ConnectMouseHandler, [{
-    key: 'part',
-    value: function part() {
-      return this.engine.part(this.partId);
-    }
-  }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
@@ -1544,44 +1513,44 @@ var ConnectMouseHandler = function (_Capability) {
     }
   }, {
     key: 'buildCoordinates',
-    value: function buildCoordinates(_ref2) {
-      var clientX = _ref2.clientX,
-          clientY = _ref2.clientY;
-
-      var _part$registry$root$d = this.part().registry.root.dom.getBoundingClientRect(),
+    value: function buildCoordinates(e, part) {
+      var _part$registry$root$d = part.registry.root.dom.getBoundingClientRect(),
           top = _part$registry$root$d.top,
           left = _part$registry$root$d.left;
 
-      var x = clientX - left;
-      var y = clientY - top;
+      var x = e.clientX - left;
+      var y = e.clientY - top;
       return { x: x, y: y };
     }
   }, {
     key: 'buildEndConnectRequest',
     value: function buildEndConnectRequest(e) {
-      if (!this.part().domHelper.partContains(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return null;
       }
-
-      this.target = this.part().domHelper.findClosest(e.target);
-      this.coordinates = this.buildCoordinates(e);
+      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes));
+      if (!target) {
+        return null;
+      }
+      this.target = target;
+      this.coordinates = this.buildCoordinates(e, part);
       return this.getEndConnectionRequest();
     }
   }, {
     key: 'buildStartConnectionRequest',
     value: function buildStartConnectionRequest(e) {
-      if (!this.part().domHelper.partContains(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return null;
       }
-      var source = this.part().domHelper.findClosest(e.target, function (wrapper) {
-        return wrapper.component.type === PORT_TYPE;
-      });
-      if (source !== null) {
-        this.source = source;
-        this.coordinates = this.buildCoordinates(e);
-        return this.getStartConnectionRequest();
+      var source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes));
+      if (!source) {
+        return null;
       }
-      return null;
+      this.source = source;
+      this.coordinates = this.buildCoordinates(e, part);
+      return this.getStartConnectionRequest();
     }
   }, {
     key: 'handleFeedback',
@@ -1939,209 +1908,6 @@ var DeleteCapability = function (_Capability) {
   return DeleteCapability;
 }(Capability);
 
-var ACCEPTED_TYPES$1 = [NODE_TYPE, ROOT_TYPE];
-
-var buildOffset$1 = function buildOffset(_ref, element) {
-  var clientX = _ref.clientX,
-      clientY = _ref.clientY;
-
-  var _element$getBoundingC = element.getBoundingClientRect(),
-      x = _element$getBoundingC.x,
-      y = _element$getBoundingC.y;
-
-  return {
-    x: clientX - x,
-    y: clientY - y
-  };
-};
-
-var CreationCapability = function (_Capability) {
-  inherits(CreationCapability, _Capability);
-
-  function CreationCapability() {
-    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref2$part = _ref2.part,
-        part = _ref2$part === undefined ? DEFAULT_PART_ID : _ref2$part;
-
-    classCallCheck(this, CreationCapability);
-
-    var _this = possibleConstructorReturn(this, (CreationCapability.__proto__ || Object.getPrototypeOf(CreationCapability)).call(this));
-
-    _this.target = null;
-    _this.targetParent = null;
-    _this.lastTargetParent = null;
-    _this.coordinates = null;
-    _this.offset = null;
-    _this.lastRequest = null;
-    _this.startLocation = null;
-    _this.partId = part;
-    return _this;
-  }
-
-  createClass(CreationCapability, [{
-    key: 'part',
-    value: function part() {
-      return this.engine.part(this.partId);
-    }
-  }, {
-    key: 'findTargetedParent',
-    value: function findTargetedParent(eventTarget) {
-      return this.part().domHelper.findClosest(eventTarget, function (wrapper) {
-        return ACCEPTED_TYPES$1.indexOf(wrapper.component.type) >= 0;
-      });
-    }
-  }, {
-    key: 'findTargetedCreator',
-    value: function findTargetedCreator(eventTarget) {
-      var parts = this.engine.parts;
-      for (var i = 0, len = parts.length; i < len; i += 1) {
-        var part = parts[i];
-        var creator = part.domHelper.findClosest(eventTarget, function (wrapper) {
-          return wrapper.component.type === CREATOR_TYPE;
-        });
-        if (creator !== null) {
-          return creator;
-        }
-      }
-      return null;
-    }
-  }, {
-    key: 'updateTargetParent',
-    value: function updateTargetParent(e) {
-      var newTargetParent = this.findTargetedParent(e.target);
-      var targetParent = this.targetParent;
-      if (targetParent !== newTargetParent) {
-        this.lastTargetParent = targetParent;
-        this.targetParent = newTargetParent;
-      } else {
-        this.lastTargetParent = targetParent;
-      }
-    }
-  }, {
-    key: 'updateCoordinates',
-    value: function updateCoordinates(e) {
-      var clientX = e.clientX,
-          clientY = e.clientY;
-
-      var screenLocation = regefGeometry.point(clientX, clientY);
-      var offset = regefGeometry.point(this.offset);
-      if (this.targetParent !== null) {
-        var _part$registry$root$d = this.part().registry.root.dom.getBoundingClientRect(),
-            rootX = _part$registry$root$d.x,
-            rootY = _part$registry$root$d.y;
-
-        this.coordinates = {
-          offset: offset,
-          location: regefGeometry.point(clientX - rootX, clientY - rootY),
-          screenLocation: screenLocation
-        };
-      } else {
-        this.coordinates = {
-          offset: offset,
-          location: null,
-          screenLocation: screenLocation
-        };
-      }
-    }
-  }, {
-    key: 'getCreateChildRequest',
-    value: function getCreateChildRequest() {
-      var targetParent = this.targetParent,
-          coordinates = this.coordinates,
-          target = this.target;
-      var location = coordinates.location,
-          offset = coordinates.offset,
-          screenLocation = coordinates.screenLocation;
-
-      return {
-        type: CREATE,
-        component: target.userComponent,
-        targetContainer: targetParent === null ? null : targetParent.userComponent,
-        screenLocation: screenLocation,
-        location: location,
-        offset: offset
-      };
-    }
-  }, {
-    key: 'handleFeedback',
-    value: function handleFeedback(lastRequest, request) {
-      var lastTargetParent = this.lastTargetParent,
-          targetParent = this.targetParent;
-
-      if (lastRequest !== null && lastTargetParent !== targetParent) {
-        eraseFeedback(this.engine.editPolicies, lastRequest);
-      }
-      if (request !== null) {
-        requestFeedback(this.engine.editPolicies, request);
-      }
-    }
-  }, {
-    key: 'cleanupFeedback',
-    value: function cleanupFeedback() {
-      if (this.lastRequest !== null) {
-        eraseFeedback(this.engine.editPolicies, this.lastRequest);
-      }
-    }
-  }, {
-    key: 'buildDragRequest',
-    value: function buildDragRequest(e) {
-      this.updateTargetParent(e);
-      this.updateCoordinates(e);
-      return this.getCreateChildRequest();
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      if (this.progress) {
-        this.cleanupFeedback();
-        this.progress = false;
-        this.lastRequest = null;
-        this.eventDeltas = null;
-        this.coordinates = null;
-        this.targetParent = null;
-        this.target = null;
-      }
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.target = this.findTargetedCreator(e.target);
-      if (this.target === null || this.target === undefined) {
-        return;
-      }
-      this.startLocation = regefGeometry.point(e.clientX, e.clientY);
-      this.offset = buildOffset$1(e, this.target.dom);
-      this.progress = true;
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      if (!this.progress) {
-        return;
-      }
-      var request = this.buildDragRequest(e);
-      this.handleFeedback(this.lastRequest, request);
-      if (request !== null) {
-        this.lastRequest = request;
-      }
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      if (!this.progress) {
-        return;
-      }
-      var request = this.buildDragRequest(e);
-      this.cleanupFeedback();
-      if (request !== null) {
-        perform(this.engine.editPolicies, request);
-      }
-      this.progress = false;
-    }
-  }]);
-  return CreationCapability;
-}(Capability);
-
 exports.DiagramPart = DiagramPart;
 exports.EditPolicy = EditPolicy;
 exports.DispatchingEditPolicy = DispatchingEditPolicy;
@@ -2152,19 +1918,16 @@ exports.root = root;
 exports.connection = connection;
 exports.node = node;
 exports.port = port;
-exports.creator = creator;
 exports.DragCapability = DragCapability;
 exports.ConnectCapability = ConnectMouseHandler;
 exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
-exports.CreationCapability = CreationCapability;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
-exports.CREATOR_TYPE = CREATOR_TYPE;
 exports.ADD = ADD;
 exports.CREATE = CREATE;
 exports.MOVE = MOVE;
