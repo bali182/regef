@@ -246,9 +246,6 @@ var DELETE = 'delete';
 var START_CONNECTION = 'start-connection';
 var END_CONNECTION = 'end-connection';
 
-// Internal constants
-var DEFAULT_PART_ID = Symbol('DEFAULT_PART_ID');
-
 var REGISTRY = Symbol('REGISTRY');
 var DOM_HELPER = Symbol('DOM_HELPER');
 
@@ -360,6 +357,23 @@ var PartToolkit = function () {
           height = _wrapper$dom$getBound.height;
 
       return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
+    }
+  }, {
+    key: 'boundsOnScreen',
+    value: function boundsOnScreen(component) {
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+
+      var _wrapper$dom$getBound2 = wrapper.dom.getBoundingClientRect(),
+          left = _wrapper$dom$getBound2.left,
+          top = _wrapper$dom$getBound2.top,
+          width = _wrapper$dom$getBound2.width,
+          height = _wrapper$dom$getBound2.height;
+
+      return regefGeometry.rectangle(left, top, width, height);
     }
   }]);
   return PartToolkit;
@@ -563,21 +577,16 @@ var Toolkit = function () {
   }
 
   createClass(Toolkit, [{
-    key: 'forDefaultPart',
-    value: function forDefaultPart() {
-      return this.forPart(DEFAULT_PART_ID);
-    }
-  }, {
-    key: 'forPart',
+    key: "forPart",
     value: function forPart(id) {
       var part = this.engine.part(id);
       if (part === null) {
-        throw new Error('DiagramPart ' + id + ' hasn\'t been registered.');
+        throw new Error("DiagramPart " + id + " hasn't been registered.");
       }
       return part ? part.toolkit : null;
     }
   }, {
-    key: 'forComponent',
+    key: "forComponent",
     value: function forComponent(component) {
       var parts = this.engine.parts();
       for (var i = 0, length = parts.length; i < length; i += 1) {
@@ -586,7 +595,7 @@ var Toolkit = function () {
           return part;
         }
       }
-      throw new Error('Component ' + component + ' is not registered in any DiagramParts.');
+      throw new Error("Component " + component + " is not registered in any DiagramParts.");
     }
   }]);
   return Toolkit;
@@ -672,9 +681,7 @@ var Engine = function () {
 
   createClass(Engine, [{
     key: 'part',
-    value: function part() {
-      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_PART_ID;
-
+    value: function part(id) {
       var parts = this[PARTS];
       if (!parts.has(id)) {
         var part = new DiagramPartWrapper(id, this);
@@ -684,14 +691,8 @@ var Engine = function () {
     }
   }, {
     key: 'removePart',
-    value: function removePart() {
-      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_PART_ID;
+    value: function removePart(id) {
       this[PARTS].delete(id);
-    }
-  }, {
-    key: 'selection',
-    value: function selection() {
-      return this.selectionProvider.selection();
     }
   }, {
     key: 'domHelper',
@@ -786,11 +787,7 @@ DiagramPart.childContextTypes = {
 
 DiagramPart.propTypes = {
   engine: propTypes.instanceOf(Engine).isRequired,
-  id: propTypes.oneOfType([propTypes.string, propTypes.symbol])
-};
-
-DiagramPart.defaultProps = {
-  id: DEFAULT_PART_ID
+  id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
 };
 
 var EditPolicy = function () {
@@ -1170,6 +1167,13 @@ var alwaysTrue = function alwaysTrue() {
   return true;
 };
 
+var getSelection = function getSelection(engine) {
+  if (engine && engine.selectionProvider instanceof SelectionProvider) {
+    return engine.selectionProvider.selection();
+  }
+  return [];
+};
+
 var typeMatches = function typeMatches(types) {
   if (types === null || types === undefined) {
     return alwaysTrue;
@@ -1251,7 +1255,7 @@ var DragCapability = function (_Capability) {
         return null;
       }
       var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)); // TODO
-      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
+      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom) || getSelection(this.engine).indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
       return newTarget;
@@ -1319,8 +1323,9 @@ var DragCapability = function (_Capability) {
     key: 'getMovedComponents',
     value: function getMovedComponents() {
       var target = this.target.userComponent;
-      if (this.engine.selection().indexOf(target) >= 0) {
-        return this.engine.selection();
+      var selection = getSelection(this.engine);
+      if (selection.indexOf(target) >= 0) {
+        return selection;
       }
       return [target];
     }
@@ -1435,8 +1440,7 @@ var DragCapability = function (_Capability) {
       }
       this.mouseMoved = true;
       var request = this.buildDragRequest(e);
-      var selection = this.engine.selection();
-      if (selection.indexOf(this.target.userComponent) < 0) {
+      if (getSelection(this.engine).indexOf(this.target.userComponent) < 0) {
         perform(this.engine.editPolicies, this.getSelectionRequest());
       }
       this.handleFeedback(this.lastRequest, request);
@@ -1625,8 +1629,7 @@ var SingleSelectionCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this));
 
-    _this.startLocation = null;
-    _this.endLocation = null;
+    _this.location = null;
     _this.possibleSingleSelection = false;
     _this.additional = false;
     _this.selection = [];
@@ -1637,25 +1640,21 @@ var SingleSelectionCapability = function (_Capability) {
   createClass(SingleSelectionCapability, [{
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
-      var startLocation = this.startLocation,
-          endLocation = this.endLocation,
+      var location = this.location,
           selection = this.selection,
           additional = this.additional;
 
       return {
         type: SELECT,
-        bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
-        startLocation: startLocation,
-        endLocation: endLocation,
-        selection: additional ? this.engine.selection().concat(selection) : selection
+        bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
+        selection: additional ? getSelection(this.engine).concat(selection) : selection
       };
     }
   }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
-        this.startLocation = null;
-        this.endLocation = null;
+        this.location = null;
         this.possibleSingleSelection = false;
         this.selection = [];
         this.progress = false;
@@ -1672,7 +1671,7 @@ var SingleSelectionCapability = function (_Capability) {
       if (!target) {
         return;
       }
-      this.startLocation = locationOf(e, part.registry.root.dom);
+      this.location = locationOf(e, part.registry.root.dom);
       this.selection = [target.userComponent];
       this.possibleSingleSelection = true;
       this.progress = true;
@@ -1691,7 +1690,6 @@ var SingleSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = this.startLocation;
       if (this.possibleSingleSelection) {
         this.additional = metaKey || ctrlKey;
         perform(this.engine.editPolicies, this.createSingleSelectionRequest());
@@ -1715,25 +1713,17 @@ var buildBounds = function buildBounds(_ref, _ref2) {
   return regefGeometry.rectangle(x, y, width, height);
 };
 
-var locationOf$1 = function locationOf(_ref3, rootDom) {
+var locationOf$1 = function locationOf(_ref3) {
   var clientX = _ref3.clientX,
       clientY = _ref3.clientY;
-
-  var _rootDom$getBoundingC = rootDom.getBoundingClientRect(),
-      x = _rootDom$getBoundingC.x,
-      y = _rootDom$getBoundingC.y;
-
-  return regefGeometry.point(clientX - x, clientY - y);
+  return regefGeometry.point(clientX, clientY);
 };
 
 var MultiSelectionCapability = function (_Capability) {
   inherits(MultiSelectionCapability, _Capability);
 
   function MultiSelectionCapability() {
-    var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref4$part = _ref4.part,
-        part = _ref4$part === undefined ? DEFAULT_PART_ID : _ref4$part;
-
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, MultiSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this));
@@ -1741,17 +1731,14 @@ var MultiSelectionCapability = function (_Capability) {
     _this.startLocation = null;
     _this.endLocation = null;
     _this.lastRequest = null;
+    _this.startPart = null;
+    _this.endPart = null;
     _this.additional = false;
-    _this.partId = part;
+    _this.config = config;
     return _this;
   }
 
   createClass(MultiSelectionCapability, [{
-    key: 'part',
-    value: function part() {
-      return this.engine.part(this.partId);
-    }
-  }, {
     key: 'createMultiSelectionRequest',
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1767,7 +1754,7 @@ var MultiSelectionCapability = function (_Capability) {
         startLocation: startLocation,
         endLocation: endLocation,
         get selection() {
-          var selection = engine.selection();
+          var selection = getSelection(engine);
           var additionalFilter = additional ? function (node) {
             return selection.indexOf(node) < 0;
           } : function () {
@@ -1797,15 +1784,15 @@ var MultiSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.part().domHelper.partContains(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return;
       }
-      var target = this.part().domHelper.findClosest(e.target, function (wrapper) {
-        return wrapper.component.type === ROOT_TYPE;
-      });
+      var target = part.domHelper.findClosest(e.target, typeMatches(ROOT_TYPE));
       if (target !== null) {
-        this.startLocation = locationOf$1(e, this.part().registry.root.dom);
+        this.startLocation = locationOf$1(e);
         this.progress = true;
+        this.startPart = part;
       }
     }
   }, {
@@ -1814,7 +1801,10 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.part().registry.root.dom);
+      this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      this.endLocation = locationOf$1(e);
+      this.additional = Boolean(e.shiftKey);
+
       var request = this.createMultiSelectionRequest();
       requestFeedback(this.engine.editPolicies, request);
       this.lastRequest = request;
@@ -1825,8 +1815,10 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.part().registry.root.dom);
-      this.additional = e.shiftKey;
+      this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      this.endLocation = locationOf$1(e);
+      this.additional = Boolean(e.shiftKey);
+
       var request = this.createMultiSelectionRequest();
       if (this.lastRequest !== null) {
         eraseFeedback(this.engine.editPolicies, this.lastRequest);
@@ -1843,16 +1835,32 @@ var CancelCapability = function (_Capability) {
   inherits(CancelCapability, _Capability);
 
   function CancelCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, keys: ['Escape'] };
     classCallCheck(this, CancelCapability);
-    return possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).apply(this, arguments));
+
+    var _this = possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).call(this));
+
+    _this.config = config;
+    return _this;
   }
 
   createClass(CancelCapability, [{
+    key: 'focusOnTargetedParts',
+    value: function focusOnTargetedParts(target) {
+      return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+    }
+  }, {
+    key: 'keyMatches',
+    value: function keyMatches(key) {
+      return this.config.keys.indexOf(key) >= 0;
+    }
+  }, {
     key: 'onKeyDown',
     value: function onKeyDown(_ref) {
-      var key = _ref.key;
+      var key = _ref.key,
+          target = _ref.target;
 
-      if (key === 'Escape') {
+      if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
         this.engine.capabilities.forEach(function (capability) {
           return capability.cancel();
         });
@@ -1866,28 +1874,17 @@ var DeleteCapability = function (_Capability) {
   inherits(DeleteCapability, _Capability);
 
   function DeleteCapability() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref$part = _ref.part,
-        part = _ref$part === undefined ? DEFAULT_PART_ID : _ref$part,
-        _ref$keys = _ref.keys,
-        keys = _ref$keys === undefined ? ['Backspace', 'Delete'] : _ref$keys;
-
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, keys: ['Backspace', 'Delete'] };
     classCallCheck(this, DeleteCapability);
 
     var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this));
 
     _this.currentSelection = [];
-    _this.partId = part;
-    _this.keys = keys;
+    _this.config = config;
     return _this;
   }
 
   createClass(DeleteCapability, [{
-    key: 'part',
-    value: function part() {
-      return this.engine.part(this.partId);
-    }
-  }, {
     key: 'getDeleteRequest',
     value: function getDeleteRequest() {
       return {
@@ -1896,13 +1893,23 @@ var DeleteCapability = function (_Capability) {
       };
     }
   }, {
+    key: 'focusOnTargetedParts',
+    value: function focusOnTargetedParts(target) {
+      return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+    }
+  }, {
+    key: 'keyMatches',
+    value: function keyMatches(key) {
+      return this.config.keys.indexOf(key) >= 0;
+    }
+  }, {
     key: 'onKeyDown',
-    value: function onKeyDown(_ref2) {
-      var key = _ref2.key,
-          target = _ref2.target;
+    value: function onKeyDown(_ref) {
+      var key = _ref.key,
+          target = _ref.target;
 
-      if (this.keys.indexOf(key) >= 0 && this.part().domHelper.partContains(target)) {
-        this.currentSelection = this.engine.selection();
+      if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+        this.currentSelection = getSelection(this.engine);
         if (this.currentSelection.length > 0) {
           perform(this.engine.editPolicies, this.getDeleteRequest());
         }
@@ -1939,4 +1946,3 @@ exports.SELECT = SELECT;
 exports.DELETE = DELETE;
 exports.START_CONNECTION = START_CONNECTION;
 exports.END_CONNECTION = END_CONNECTION;
-exports.DEFAULT_PART_ID = DEFAULT_PART_ID;

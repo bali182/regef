@@ -1,17 +1,12 @@
 import Capability from './Capability'
-import { DELETE, DEFAULT_PART_ID } from './constants'
-import { perform } from './utils'
+import { DELETE } from './constants'
+import { perform, partMatches, getSelection } from './utils'
 
 export default class DeleteCapability extends Capability {
-  constructor({ part = DEFAULT_PART_ID, keys = ['Backspace', 'Delete'] } = {}) {
+  constructor(config = { parts: null, keys: ['Backspace', 'Delete'] }) {
     super()
     this.currentSelection = []
-    this.partId = part
-    this.keys = keys
-  }
-
-  part() {
-    return this.engine.part(this.partId)
+    this.config = config
   }
 
   getDeleteRequest() {
@@ -21,9 +16,17 @@ export default class DeleteCapability extends Capability {
     }
   }
 
+  focusOnTargetedParts(target) {
+    return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)))
+  }
+
+  keyMatches(key) {
+    return this.config.keys.indexOf(key) >= 0
+  }
+
   onKeyDown({ key, target }) {
-    if (this.keys.indexOf(key) >= 0 && this.part().domHelper.partContains(target)) {
-      this.currentSelection = this.engine.selection()
+    if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+      this.currentSelection = getSelection(this.engine)
       if (this.currentSelection.length > 0) {
         perform(this.engine.editPolicies, this.getDeleteRequest())
       }

@@ -1,7 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform } from './utils'
+import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform, getSelection } from './utils'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -34,7 +34,7 @@ export default class DragCapability extends Capability {
     if (newTarget === null
       || newTarget === target
       || (target !== null && target.dom.contains(newTarget.dom))
-      || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
+      || getSelection(this.engine).indexOf(newTarget.userComponent) >= 0) {
       return currentParent
     }
     return newTarget
@@ -82,8 +82,9 @@ export default class DragCapability extends Capability {
 
   getMovedComponents() {
     const target = this.target.userComponent
-    if (this.engine.selection().indexOf(target) >= 0) {
-      return this.engine.selection()
+    const selection = getSelection(this.engine)
+    if (selection.indexOf(target) >= 0) {
+      return selection
     }
     return [target]
   }
@@ -188,8 +189,7 @@ export default class DragCapability extends Capability {
     }
     this.mouseMoved = true
     const request = this.buildDragRequest(e)
-    const selection = this.engine.selection()
-    if (selection.indexOf(this.target.userComponent) < 0) {
+    if (getSelection(this.engine).indexOf(this.target.userComponent) < 0) {
       perform(this.engine.editPolicies, this.getSelectionRequest())
     }
     this.handleFeedback(this.lastRequest, request)

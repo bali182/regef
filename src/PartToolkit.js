@@ -97,4 +97,19 @@ export default class PartToolkit {
       height,
     )
   }
+
+  boundsOnScreen(component) {
+    const registry = this[REGISTRY]
+    const wrapper = registry.get(component)
+    if (wrapper === undefined || wrapper === null) {
+      throw new Error('Given component is not part of the diagram!')
+    }
+    const { left, top, width, height } = wrapper.dom.getBoundingClientRect()
+    return rectangle(
+      left,
+      top,
+      width,
+      height,
+    )
+  }
 }

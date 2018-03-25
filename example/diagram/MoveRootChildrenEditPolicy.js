@@ -1,5 +1,6 @@
 import { DispatchingEditPolicy } from '../../src/index'
 import { isRoot } from './typeUtils'
+import { DIAGRAM } from './constants'
 
 export default class MoveRootChildrenEditPolicy extends DispatchingEditPolicy {
   constructor(engine, dependencies) {
@@ -12,7 +13,7 @@ export default class MoveRootChildrenEditPolicy extends DispatchingEditPolicy {
     if (!isRoot(container)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     components.forEach((component) => {
       const { x, y } = toolkit.bounds(component).location().translate(delta)
       this.dependencies.setPosition({
@@ -27,7 +28,7 @@ export default class MoveRootChildrenEditPolicy extends DispatchingEditPolicy {
     if (!isRoot(container)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     container.setState({
       moveFeedback: components.map((c) => toolkit.bounds(c).translate(delta)),
     })

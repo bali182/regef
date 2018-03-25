@@ -1,5 +1,6 @@
 import { DispatchingEditPolicy } from '../../src/index'
 import { isContainer } from './typeUtils'
+import { DIAGRAM } from './constants'
 
 export default class MoveContainerChildrenEditPolicy extends DispatchingEditPolicy {
   constructor(engine, dependencies) {
@@ -12,7 +13,7 @@ export default class MoveContainerChildrenEditPolicy extends DispatchingEditPoli
     if (!isContainer(container)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     const children = toolkit.children(container).filter((comp) => comp.props.step)
     if (!components.every((moved) => children.indexOf(moved) >= 0)) {
       return
@@ -39,7 +40,7 @@ export default class MoveContainerChildrenEditPolicy extends DispatchingEditPoli
     if (!isContainer(container)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     const root = toolkit.root()
     const children = toolkit.children(container)
     const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
@@ -56,7 +57,7 @@ export default class MoveContainerChildrenEditPolicy extends DispatchingEditPoli
       return
     }
     container.setState({ insertionFeedback: null })
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     toolkit.root().setState({ moveFeedback: null, errorFeedback: null })
   }
 
@@ -81,7 +82,7 @@ export default class MoveContainerChildrenEditPolicy extends DispatchingEditPoli
   }
 
   mapBounds(children) {
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     return children.reduce((map, child) => map.set(child, toolkit.bounds(child)), new Map())
   }
 
@@ -115,7 +116,7 @@ export default class MoveContainerChildrenEditPolicy extends DispatchingEditPoli
     if (children.length === 0) {
       return 0
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     for (let i = 0; i < children.length; i += 1) {
       const child = children[i]
       const bounds = toolkit.bounds(child)

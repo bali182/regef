@@ -3,7 +3,6 @@ import DiagramPartWrapper from './DiagramPartWrapper'
 import EventManager from './EventManager'
 import Toolkit from './Toolkit'
 import DomHelper from './DomHelper'
-import { DEFAULT_PART_ID } from './constants'
 
 const SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER')
 const CAPABILITIES = Symbol('CAPABILITIES')
@@ -40,7 +39,7 @@ export default class Engine {
     })
   }
 
-  part(id = DEFAULT_PART_ID) {
+  part(id) {
     const parts = this[PARTS]
     if (!parts.has(id)) {
       const part = new DiagramPartWrapper(id, this)
@@ -49,7 +48,7 @@ export default class Engine {
     return parts.get(id)
   }
 
-  removePart(id = DEFAULT_PART_ID) { this[PARTS].delete(id) }
+  removePart(id) { this[PARTS].delete(id) }
 
   get domHelper() { return this[DOM_HELPER] }
   get parts() { return Array.from(this[PARTS].values()) }
@@ -58,8 +57,4 @@ export default class Engine {
   get capabilities() { return this[CAPABILITIES] }
   get selectionProvider() { return this[SELECTION_PROVIDER] }
   get editPolicies() { return this[EDIT_POLICIES] }
-
-  selection() {
-    return this.selectionProvider.selection()
-  }
 }

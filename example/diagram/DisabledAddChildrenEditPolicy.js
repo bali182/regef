@@ -1,5 +1,6 @@
 import { DispatchingEditPolicy } from '../../src/index'
 import { isRoot, isStep, isNode } from './typeUtils'
+import { DIAGRAM } from './constants'
 
 export default class DisabledAddChildrenEditPolicy extends DispatchingEditPolicy {
   constructor(engine, dependencies) {
@@ -12,7 +13,7 @@ export default class DisabledAddChildrenEditPolicy extends DispatchingEditPolicy
     if (!isRoot(targetContainer) && !isStep(targetContainer) && !isNode(targetContainer)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     toolkit.root().setState({
       errorFeedback: components.map((c) => toolkit.bounds(c).translate(delta)),
     })
@@ -22,7 +23,7 @@ export default class DisabledAddChildrenEditPolicy extends DispatchingEditPolicy
     if (!isRoot(targetContainer) && !isStep(targetContainer) && !isNode(targetContainer)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     toolkit.root().setState({ errorFeedback: null })
   }
 }

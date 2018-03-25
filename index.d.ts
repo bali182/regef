@@ -107,7 +107,6 @@ export default class EventManager {
 
 class Toolkit {
   constructor(engine: Engine)
-  forDefaultPart(): PartToolkit
   forPart(id: string | Symbol): PartToolkit
   forComponent(component: ReactComponent): PartToolkit
 }

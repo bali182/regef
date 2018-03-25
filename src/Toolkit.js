@@ -1,11 +1,6 @@
-import { DEFAULT_PART_ID } from './constants'
-
 export default class Toolkit {
   constructor(engine) {
     this.engine = engine
-  }
-  forDefaultPart() {
-    return this.forPart(DEFAULT_PART_ID)
   }
   forPart(id) {
     const part = this.engine.part(id)

@@ -1,7 +1,6 @@
 import { Children, PureComponent } from 'react'
 import { instanceOf, string, shape, symbol, oneOfType } from 'prop-types'
 import Engine from './Engine'
-import { DEFAULT_PART_ID } from './constants'
 
 export default class DiagramPart extends PureComponent {
   componentDidMount() {
@@ -35,9 +34,5 @@ DiagramPart.childContextTypes = {
 
 DiagramPart.propTypes = {
   engine: instanceOf(Engine).isRequired,
-  id: oneOfType([string, symbol]),
-}
-
-DiagramPart.defaultProps = {
-  id: DEFAULT_PART_ID,
+  id: oneOfType([string, symbol]).isRequired,
 }

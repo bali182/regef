@@ -6,6 +6,7 @@ import { DiagramPart } from '../src/index'
 import createStore from './state'
 import createEngine from './diagram'
 import Root from './components/Root'
+import { DIAGRAM } from './diagram/constants'
 
 const rootContainerStyle = {
   margin: '10vh',
@@ -17,7 +18,7 @@ const engine = createEngine(store)
 render(
   <Provider store={store}>
     <div style={rootContainerStyle}>
-      <DiagramPart engine={engine}>
+      <DiagramPart engine={engine} id={DIAGRAM}>
         <Root />
       </DiagramPart>
     </div>

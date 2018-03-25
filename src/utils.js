@@ -1,3 +1,5 @@
+import SelectionProvider from './SelectionProvider'
+
 const matchesSingleType = (type) => ({ component }) => component.type === type
 
 const matchesMultiTypes = (types) => ({ component }) => types.indexOf(component.type) >= 0
@@ -7,6 +9,13 @@ const matchesSinglePart = (partId) => (part) => part.id === partId
 const matchesMultiParts = (partIds) => (part) => partIds.indexOf(part.id) >= 0
 
 const alwaysTrue = () => true
+
+export const getSelection = (engine) => {
+  if (engine && engine.selectionProvider instanceof SelectionProvider) {
+    return engine.selectionProvider.selection()
+  }
+  return []
+}
 
 export const typeMatches = (types) => {
   if (types === null || types === undefined) {

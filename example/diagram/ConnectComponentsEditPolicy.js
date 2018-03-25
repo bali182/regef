@@ -1,5 +1,6 @@
 import { DispatchingEditPolicy } from '../../src/index'
 import { isContainer, isNode, isRoot, isPort, isStep } from './typeUtils'
+import { DIAGRAM } from './constants'
 
 export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
   constructor(engine, dependencies) {
@@ -12,7 +13,7 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
     if (!isContainer(rawTarget) && !isNode(rawTarget) && !isPort(rawTarget) && !isStep(rawTarget)) {
       return
     }
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     const target = isNode(rawTarget) || isContainer(rawTarget)
       ? rawTarget
       : toolkit.parent(rawTarget)
@@ -25,7 +26,7 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
 
   requestEndConnectionFeedback(intent) {
     const { source, target, location } = intent
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     if (isRoot(target)) {
       toolkit.root().setState({
         connectionFeedback: this.connectionWithLocation(source, location),
@@ -43,12 +44,12 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
   }
 
   eraseEndConnectionFeedback() {
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     toolkit.root().setState({ connectionFeedback: null })
   }
 
   connectionWithTarget(source, target) {
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     const srcBounds = toolkit.bounds(toolkit.parent(source))
     const tgtBounds = toolkit.bounds(target)
 
@@ -71,7 +72,7 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
   }
 
   connectionWithLocation(source, location) {
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     const parent = toolkit.parent(source)
     const bounds = toolkit.bounds(parent)
 

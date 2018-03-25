@@ -1,7 +1,7 @@
 import { point, rectangle } from 'regef-geometry'
-import { ROOT_TYPE, SELECT, DEFAULT_PART_ID } from './constants'
+import { ROOT_TYPE, SELECT, NODE_TYPE } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform } from './utils'
+import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typeMatches } from './utils'
 
 const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   const x = Math.min(x1, x2)
@@ -11,23 +11,18 @@ const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
   return rectangle(x, y, width, height)
 }
 
-const locationOf = ({ clientX, clientY }, rootDom) => {
-  const { x, y } = rootDom.getBoundingClientRect()
-  return point(clientX - x, clientY - y)
-}
+const locationOf = ({ clientX, clientY }) => point(clientX, clientY)
 
 export default class MultiSelectionCapability extends Capability {
-  constructor({ part = DEFAULT_PART_ID } = {}) {
+  constructor(config = { parts: null, types: [NODE_TYPE] }) {
     super()
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null
+    this.startPart = null
+    this.endPart = null
     this.additional = false
-    this.partId = part
-  }
-
-  part() {
-    return this.engine.part(this.partId)
+    this.config = config
   }
 
   createMultiSelectionRequest() {
@@ -40,7 +35,7 @@ export default class MultiSelectionCapability extends Capability {
       startLocation,
       endLocation,
       get selection() {
-        const selection = engine.selection()
+        const selection = getSelection(engine)
         const additionalFilter = additional
           ? ((node) => selection.indexOf(node) < 0)
           : (() => true)
@@ -66,14 +61,15 @@ export default class MultiSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.part().domHelper.partContains(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return
     }
-    const target = this.part().domHelper
-      .findClosest(e.target, (wrapper) => wrapper.component.type === ROOT_TYPE)
+    const target = part.domHelper.findClosest(e.target, typeMatches(ROOT_TYPE))
     if (target !== null) {
-      this.startLocation = locationOf(e, this.part().registry.root.dom)
+      this.startLocation = locationOf(e)
       this.progress = true
+      this.startPart = part
     }
   }
 
@@ -81,7 +77,10 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = locationOf(e, this.part().registry.root.dom)
+    this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    this.endLocation = locationOf(e)
+    this.additional = Boolean(e.shiftKey)
+
     const request = this.createMultiSelectionRequest()
     requestFeedback(this.engine.editPolicies, request)
     this.lastRequest = request
@@ -91,8 +90,10 @@ export default class MultiSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = locationOf(e, this.part().registry.root.dom)
-    this.additional = e.shiftKey
+    this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    this.endLocation = locationOf(e)
+    this.additional = Boolean(e.shiftKey)
+
     const request = this.createMultiSelectionRequest()
     if (this.lastRequest !== null) {
       eraseFeedback(this.engine.editPolicies, this.lastRequest)

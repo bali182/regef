@@ -1,4 +1,5 @@
 import { DispatchingEditPolicy } from '../../src/index'
+import { DIAGRAM } from './constants'
 
 export default class SelectComponentsEditPolicy extends DispatchingEditPolicy {
   constructor(engine, dependencies) {
@@ -13,12 +14,12 @@ export default class SelectComponentsEditPolicy extends DispatchingEditPolicy {
   }
 
   requestSelectFeedback({ bounds }) {
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     toolkit.root().setState({ selectionFeedback: bounds })
   }
 
   eraseSelectFeedback() {
-    const toolkit = this.engine.toolkit.forDefaultPart()
+    const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     toolkit.root().setState({ selectionFeedback: null })
   }
 }
