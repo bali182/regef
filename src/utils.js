@@ -8,7 +8,7 @@ const matchesSinglePart = (partId) => (part) => part.id === partId
 
 const matchesMultiParts = (partIds) => (part) => partIds.indexOf(part.id) >= 0
 
-const alwaysTrue = () => true
+export const alwaysTrue = () => true
 
 export const getSelection = (engine) => {
   if (engine && engine.selectionProvider instanceof SelectionProvider) {
@@ -43,3 +43,10 @@ export const requestFeedback = (policies, intent) => policies
 
 export const eraseFeedback = (policies, intent) => policies
   .forEach((policy) => policy.eraseFeedback(intent))
+
+export const getParts = (engine, ids = null) => {
+  if (ids === null || ids === undefined) {
+    return engine.parts
+  }
+  return ids.map((id) => engine.part(id))
+}

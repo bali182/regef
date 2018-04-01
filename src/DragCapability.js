@@ -49,7 +49,7 @@ export default class DragCapability extends Capability {
   }
 
   offsetCoordinates() {
-    return point(this.offset)
+    return this.offset
   }
 
   locationCoordinates({ clientX, clientY }, part) {

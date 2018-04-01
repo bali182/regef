@@ -1210,6 +1210,17 @@ var eraseFeedback = function eraseFeedback(policies, intent) {
   });
 };
 
+var getParts = function getParts(engine) {
+  var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (ids === null || ids === undefined) {
+    return engine.parts;
+  }
+  return ids.map(function (id) {
+    return engine.part(id);
+  });
+};
+
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
 var buildOffset = function buildOffset(_ref, element) {
@@ -1279,7 +1290,7 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'offsetCoordinates',
     value: function offsetCoordinates() {
-      return regefGeometry.point(this.offset);
+      return this.offset;
     }
   }, {
     key: 'locationCoordinates',
@@ -1700,22 +1711,9 @@ var SingleSelectionCapability = function (_Capability) {
   return SingleSelectionCapability;
 }(Capability);
 
-var buildBounds = function buildBounds(_ref, _ref2) {
-  var x1 = _ref.x,
-      y1 = _ref.y;
-  var x2 = _ref2.x,
-      y2 = _ref2.y;
-
-  var x = Math.min(x1, x2);
-  var y = Math.min(y1, y2);
-  var width = Math.max(x1, x2) - x;
-  var height = Math.max(y1, y2) - y;
-  return regefGeometry.rectangle(x, y, width, height);
-};
-
-var locationOf$1 = function locationOf(_ref3) {
-  var clientX = _ref3.clientX,
-      clientY = _ref3.clientY;
+var locationOf$1 = function locationOf(_ref) {
+  var clientX = _ref.clientX,
+      clientY = _ref.clientY;
   return regefGeometry.point(clientX, clientY);
 };
 
@@ -1723,7 +1721,12 @@ var MultiSelectionCapability = function (_Capability) {
   inherits(MultiSelectionCapability, _Capability);
 
   function MultiSelectionCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      parts: null,
+      types: [NODE_TYPE],
+      intersection: false,
+      containment: true
+    };
     classCallCheck(this, MultiSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this));
@@ -1733,6 +1736,8 @@ var MultiSelectionCapability = function (_Capability) {
     _this.lastRequest = null;
     _this.startPart = null;
     _this.endPart = null;
+    _this.selectionBounds = null;
+    _this.selection = null;
     _this.additional = false;
     _this.config = config;
     return _this;
@@ -1743,30 +1748,76 @@ var MultiSelectionCapability = function (_Capability) {
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
           endLocation = this.endLocation,
-          additional = this.additional,
-          engine = this.engine;
+          selectionBounds = this.selectionBounds,
+          selection = this.selection;
 
-      var bounds = buildBounds(startLocation, endLocation);
-      var part = this.part();
       return {
         type: SELECT,
-        bounds: bounds,
+        bounds: selectionBounds,
         startLocation: startLocation,
         endLocation: endLocation,
-        get selection() {
-          var selection = getSelection(engine);
-          var additionalFilter = additional ? function (node) {
-            return selection.indexOf(node) < 0;
-          } : function () {
-            return true;
-          };
-          var partToolkit = part.toolkit;
-          var newSelection = partToolkit.nodes().filter(additionalFilter).filter(function (node) {
-            return bounds.containsRectangle(partToolkit.bounds(node));
-          });
-          return additional ? selection.concat(newSelection) : newSelection;
-        }
+        selection: selection
       };
+    }
+  }, {
+    key: 'buildSelectionBounds',
+    value: function buildSelectionBounds() {
+      var startLocation = this.startLocation,
+          endLocation = this.endLocation;
+
+      if (!startLocation || !endLocation) {
+        return;
+      }
+      var x1 = startLocation.x,
+          y1 = startLocation.y;
+      var x2 = endLocation.x,
+          y2 = endLocation.y;
+
+      var x = Math.min(x1, x2);
+      var y = Math.min(y1, y2);
+      var width = Math.max(x1, x2) - x;
+      var height = Math.max(y1, y2) - y;
+
+      this.selectionBounds = regefGeometry.rectangle(x, y, width, height);
+    }
+  }, {
+    key: 'buildSelection',
+    value: function buildSelection() {
+      var config = this.config,
+          engine = this.engine,
+          selectionBounds = this.selectionBounds,
+          additional = this.additional;
+
+
+      var parts = getParts(engine, config.parts).filter(function (part) {
+        var bounds = regefGeometry.rectangle(part.registry.root.dom.getBoundingClientRect());
+        return bounds.intersection(selectionBounds) !== null;
+      });
+
+      var currentSelection = getSelection(engine);
+      var newSelection = [];
+
+      var isRelevant = typeMatches(config.types);
+      var additionalFilter = additional ? function (_ref2) {
+        var userComponent = _ref2.userComponent;
+        return currentSelection.indexOf(userComponent) < 0;
+      } : alwaysTrue;
+      var boundsMatch = config.containment ? function (itemBounds) {
+        return selectionBounds.containsRectangle(itemBounds);
+      } : function (itemBounds) {
+        return selectionBounds.intersection(itemBounds) !== null;
+      };
+
+      parts.forEach(function (part) {
+        part.registry.all().forEach(function (wrapper) {
+          var bounds = regefGeometry.rectangle(wrapper.dom.getBoundingClientRect());
+          if (isRelevant(wrapper) && additionalFilter(wrapper) && boundsMatch(bounds)) {
+            newSelection.push(wrapper.userComponent);
+          }
+        });
+      });
+
+      this.selection = additional ? currentSelection.concat(newSelection) : newSelection;
     }
   }, {
     key: 'cancel',
@@ -1779,6 +1830,8 @@ var MultiSelectionCapability = function (_Capability) {
         this.endLocation = null;
         this.possibleSingleSelection = false;
         this.progress = false;
+        this.selection = null;
+        this.selectionBounds = null;
       }
     }
   }, {
@@ -1804,6 +1857,9 @@ var MultiSelectionCapability = function (_Capability) {
       this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
       this.endLocation = locationOf$1(e);
       this.additional = Boolean(e.shiftKey);
+
+      this.buildSelectionBounds();
+      this.buildSelection();
 
       var request = this.createMultiSelectionRequest();
       requestFeedback(this.engine.editPolicies, request);

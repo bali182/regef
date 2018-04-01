@@ -1,51 +1,84 @@
 import { point, rectangle } from 'regef-geometry'
 import { ROOT_TYPE, SELECT, NODE_TYPE } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typeMatches } from './utils'
-
-const buildBounds = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
-  const x = Math.min(x1, x2)
-  const y = Math.min(y1, y2)
-  const width = Math.max(x1, x2) - x
-  const height = Math.max(y1, y2) - y
-  return rectangle(x, y, width, height)
-}
+import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typeMatches, getParts, alwaysTrue } from './utils'
 
 const locationOf = ({ clientX, clientY }) => point(clientX, clientY)
 
 export default class MultiSelectionCapability extends Capability {
-  constructor(config = { parts: null, types: [NODE_TYPE] }) {
+  constructor(config = {
+    parts: null,
+    types: [NODE_TYPE],
+    intersection: false,
+    containment: true,
+  }) {
     super()
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null
     this.startPart = null
     this.endPart = null
+    this.selectionBounds = null
+    this.selection = null
     this.additional = false
     this.config = config
   }
 
   createMultiSelectionRequest() {
-    const { startLocation, endLocation, additional, engine } = this
-    const bounds = buildBounds(startLocation, endLocation)
-    const part = this.part()
+    const { startLocation, endLocation, selectionBounds, selection } = this
     return {
       type: SELECT,
-      bounds,
+      bounds: selectionBounds,
       startLocation,
       endLocation,
-      get selection() {
-        const selection = getSelection(engine)
-        const additionalFilter = additional
-          ? ((node) => selection.indexOf(node) < 0)
-          : (() => true)
-        const partToolkit = part.toolkit
-        const newSelection = partToolkit.nodes()
-          .filter(additionalFilter)
-          .filter((node) => bounds.containsRectangle(partToolkit.bounds(node)))
-        return additional ? selection.concat(newSelection) : newSelection
-      },
+      selection,
     }
+  }
+
+  buildSelectionBounds() {
+    const { startLocation, endLocation } = this
+    if (!startLocation || !endLocation) {
+      return
+    }
+    const { x: x1, y: y1 } = startLocation
+    const { x: x2, y: y2 } = endLocation
+    const x = Math.min(x1, x2)
+    const y = Math.min(y1, y2)
+    const width = Math.max(x1, x2) - x
+    const height = Math.max(y1, y2) - y
+
+    this.selectionBounds = rectangle(x, y, width, height)
+  }
+
+  buildSelection() {
+    const { config, engine, selectionBounds, additional } = this
+
+    const parts = getParts(engine, config.parts).filter((part) => {
+      const bounds = rectangle(part.registry.root.dom.getBoundingClientRect())
+      return bounds.intersection(selectionBounds) !== null
+    })
+
+    const currentSelection = getSelection(engine)
+    const newSelection = []
+
+    const isRelevant = typeMatches(config.types)
+    const additionalFilter = additional
+      ? (({ userComponent }) => currentSelection.indexOf(userComponent) < 0)
+      : alwaysTrue
+    const boundsMatch = config.containment
+      ? (itemBounds) => selectionBounds.containsRectangle(itemBounds)
+      : (itemBounds) => selectionBounds.intersection(itemBounds) !== null
+
+    parts.forEach((part) => {
+      part.registry.all().forEach((wrapper) => {
+        const bounds = rectangle(wrapper.dom.getBoundingClientRect())
+        if (isRelevant(wrapper) && additionalFilter(wrapper) && boundsMatch(bounds)) {
+          newSelection.push(wrapper.userComponent)
+        }
+      })
+    })
+
+    this.selection = additional ? currentSelection.concat(newSelection) : newSelection
   }
 
   cancel() {
@@ -57,6 +90,8 @@ export default class MultiSelectionCapability extends Capability {
       this.endLocation = null
       this.possibleSingleSelection = false
       this.progress = false
+      this.selection = null
+      this.selectionBounds = null
     }
   }
 
@@ -80,6 +115,9 @@ export default class MultiSelectionCapability extends Capability {
     this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     this.endLocation = locationOf(e)
     this.additional = Boolean(e.shiftKey)
+
+    this.buildSelectionBounds()
+    this.buildSelection()
 
     const request = this.createMultiSelectionRequest()
     requestFeedback(this.engine.editPolicies, request)
