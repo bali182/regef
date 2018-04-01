@@ -29,9 +29,9 @@ export default class MultiSelectionCapability extends Capability {
     return {
       type: SELECT,
       bounds: selectionBounds,
+      selection: selection || [],
       startLocation,
       endLocation,
-      selection,
     }
   }
 
@@ -139,5 +139,7 @@ export default class MultiSelectionCapability extends Capability {
     perform(this.engine.editPolicies, request)
     this.progress = false
     this.additional = false
+    this.selection = null
+    this.selectionBounds = null
   }
 }

@@ -1754,9 +1754,9 @@ var MultiSelectionCapability = function (_Capability) {
       return {
         type: SELECT,
         bounds: selectionBounds,
+        selection: selection || [],
         startLocation: startLocation,
-        endLocation: endLocation,
-        selection: selection
+        endLocation: endLocation
       };
     }
   }, {
@@ -1882,6 +1882,8 @@ var MultiSelectionCapability = function (_Capability) {
       perform(this.engine.editPolicies, request);
       this.progress = false;
       this.additional = false;
+      this.selection = null;
+      this.selectionBounds = null;
     }
   }]);
   return MultiSelectionCapability;
