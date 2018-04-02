@@ -52,12 +52,8 @@ export default class DragCapability extends Capability {
     return this.offset
   }
 
-  locationCoordinates({ clientX, clientY }, part) {
-    if (part === null || part === undefined) {
-      return null
-    }
-    const { x: rootX, y: rootY } = part.registry.root.dom.getBoundingClientRect()
-    return point(clientX - rootX, clientY - rootY)
+  locationCoordinates({ clientX, clientY }) {
+    return point(clientX, clientY)
   }
 
   updateCoordinates(e, part) {
@@ -65,7 +61,6 @@ export default class DragCapability extends Capability {
       offset: this.offsetCoordinates(),
       delta: this.deltaCoordinates(e),
       location: this.locationCoordinates(e, part),
-      screen: this.screenCoordinates(e),
     }
   }
 

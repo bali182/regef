@@ -50,8 +50,9 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
 
   connectionWithTarget(source, target) {
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
-    const srcBounds = toolkit.bounds(toolkit.parent(source))
-    const tgtBounds = toolkit.bounds(target)
+    const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
+    const srcBounds = toolkit.bounds(toolkit.parent(source)).translate(containerOffset)
+    const tgtBounds = toolkit.bounds(target).translate(containerOffset)
 
     const centerToLocation = srcBounds.center().lineSegmentTo(tgtBounds.center())
     const srcBorders = [srcBounds.top(), srcBounds.right(), srcBounds.bottom(), srcBounds.left()]
@@ -73,10 +74,11 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
 
   connectionWithLocation(source, location) {
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
+    const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
     const parent = toolkit.parent(source)
-    const bounds = toolkit.bounds(parent)
+    const bounds = toolkit.bounds(parent).translate(containerOffset)
 
-    const centerToLocation = bounds.center().lineSegmentTo(location)
+    const centerToLocation = bounds.center().lineSegmentTo(location.translate(containerOffset))
     const borders = [bounds.top(), bounds.right(), bounds.bottom(), bounds.left()]
 
     const sourcePoint = borders
@@ -84,7 +86,7 @@ export default class ConnectComponentsEditPolicy extends DispatchingEditPolicy {
       .find((intersection) => intersection)
 
     if (sourcePoint) {
-      return sourcePoint.lineSegmentTo(location)
+      return sourcePoint.lineSegmentTo(location.translate(containerOffset))
     }
     return null
   }

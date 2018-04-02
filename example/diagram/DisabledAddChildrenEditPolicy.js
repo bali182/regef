@@ -14,8 +14,12 @@ export default class DisabledAddChildrenEditPolicy extends DispatchingEditPolicy
       return
     }
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
+    const root = toolkit.root()
+    const containerOffset = toolkit.bounds(root).topLeft().negated()
     toolkit.root().setState({
-      errorFeedback: components.map((c) => toolkit.bounds(c).translate(delta)),
+      errorFeedback: components.map((c) => toolkit.bounds(c)
+        .translate(delta)
+        .translate(containerOffset)),
     })
   }
 

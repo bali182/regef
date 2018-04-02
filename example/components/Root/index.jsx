@@ -38,6 +38,7 @@ export default class Root extends React.Component {
   }
   buildConnectionsRepresentation() {
     this.props.regef.toolkit().then((toolkit) => {
+      const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
       const nodes = toolkit.nodes()
       const conns = Object.keys(this.props.components).map((source) => {
         const node = this.props.components[source]
@@ -50,8 +51,8 @@ export default class Root extends React.Component {
           throw new Error(`source or target undefined ${source} ${target}`)
         }
         return {
-          source: toolkit.bounds(sourceNode),
-          target: toolkit.bounds(targetNode),
+          source: toolkit.bounds(sourceNode).translate(containerOffset),
+          target: toolkit.bounds(targetNode).translate(containerOffset),
           key: `${source}-${target}`,
         }
       })

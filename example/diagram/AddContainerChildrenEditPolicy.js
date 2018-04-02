@@ -33,7 +33,10 @@ export default class AddContainerChildrenEditPolicy extends DispatchingEditPolic
     }
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
     const children = toolkit.children(targetContainer)
-    const bounds = components.map((moved) => toolkit.bounds(moved).translate(delta))
+    const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
+    const bounds = components.map((moved) => toolkit.bounds(moved)
+      .translate(containerOffset)
+      .translate(delta))
     if (components.some((child) => children.indexOf(child) >= 0 || !child.props.step)) {
       toolkit.root().setState({ errorFeedback: bounds })
     } else {

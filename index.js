@@ -346,32 +346,11 @@ var PartToolkit = function () {
         throw new Error('Given component is not part of the diagram!');
       }
 
-      var _registry$root$dom$ge = registry.root.dom.getBoundingClientRect(),
-          rLeft = _registry$root$dom$ge.left,
-          rTop = _registry$root$dom$ge.top;
-
       var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
           left = _wrapper$dom$getBound.left,
           top = _wrapper$dom$getBound.top,
           width = _wrapper$dom$getBound.width,
           height = _wrapper$dom$getBound.height;
-
-      return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
-    }
-  }, {
-    key: 'boundsOnScreen',
-    value: function boundsOnScreen(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-
-      var _wrapper$dom$getBound2 = wrapper.dom.getBoundingClientRect(),
-          left = _wrapper$dom$getBound2.left,
-          top = _wrapper$dom$getBound2.top,
-          width = _wrapper$dom$getBound2.width,
-          height = _wrapper$dom$getBound2.height;
 
       return regefGeometry.rectangle(left, top, width, height);
     }
@@ -1294,19 +1273,11 @@ var DragCapability = function (_Capability) {
     }
   }, {
     key: 'locationCoordinates',
-    value: function locationCoordinates(_ref4, part) {
+    value: function locationCoordinates(_ref4) {
       var clientX = _ref4.clientX,
           clientY = _ref4.clientY;
 
-      if (part === null || part === undefined) {
-        return null;
-      }
-
-      var _part$registry$root$d = part.registry.root.dom.getBoundingClientRect(),
-          rootX = _part$registry$root$d.x,
-          rootY = _part$registry$root$d.y;
-
-      return regefGeometry.point(clientX - rootX, clientY - rootY);
+      return regefGeometry.point(clientX, clientY);
     }
   }, {
     key: 'updateCoordinates',
@@ -1314,8 +1285,7 @@ var DragCapability = function (_Capability) {
       this.coordinates = {
         offset: this.offsetCoordinates(),
         delta: this.deltaCoordinates(e),
-        location: this.locationCoordinates(e, part),
-        screen: this.screenCoordinates(e)
+        location: this.locationCoordinates(e, part)
       };
     }
   }, {
@@ -1531,17 +1501,6 @@ var ConnectCapability = function (_Capability) {
       };
     }
   }, {
-    key: 'buildCoordinates',
-    value: function buildCoordinates(e, part) {
-      var _part$registry$root$d = part.registry.root.dom.getBoundingClientRect(),
-          top = _part$registry$root$d.top,
-          left = _part$registry$root$d.left;
-
-      var x = e.clientX - left;
-      var y = e.clientY - top;
-      return { x: x, y: y };
-    }
-  }, {
     key: 'buildEndConnectRequest',
     value: function buildEndConnectRequest(e) {
       var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
@@ -1553,7 +1512,7 @@ var ConnectCapability = function (_Capability) {
         return null;
       }
       this.target = target;
-      this.coordinates = this.buildCoordinates(e, part);
+      this.coordinates = regefGeometry.point(e.clientX, e.clientY);
       return this.getEndConnectionRequest();
     }
   }, {
@@ -1568,7 +1527,7 @@ var ConnectCapability = function (_Capability) {
         return null;
       }
       this.source = source;
-      this.coordinates = this.buildCoordinates(e, part);
+      this.coordinates = regefGeometry.point(e.clientX, e.clientY);
       return this.getStartConnectionRequest();
     }
   }, {

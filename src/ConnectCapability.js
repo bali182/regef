@@ -45,13 +45,6 @@ export default class ConnectCapability extends Capability {
     }
   }
 
-  buildCoordinates(e, part) {
-    const { top, left } = part.registry.root.dom.getBoundingClientRect()
-    const x = e.clientX - left
-    const y = e.clientY - top
-    return { x, y }
-  }
-
   buildEndConnectRequest(e) {
     const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     if (!part) {
@@ -62,7 +55,7 @@ export default class ConnectCapability extends Capability {
       return null
     }
     this.target = target
-    this.coordinates = this.buildCoordinates(e, part)
+    this.coordinates = point(e.clientX, e.clientY)
     return this.getEndConnectionRequest()
   }
 
@@ -76,7 +69,7 @@ export default class ConnectCapability extends Capability {
       return null
     }
     this.source = source
-    this.coordinates = this.buildCoordinates(e, part)
+    this.coordinates = point(e.clientX, e.clientY)
     return this.getStartConnectionRequest()
   }
 

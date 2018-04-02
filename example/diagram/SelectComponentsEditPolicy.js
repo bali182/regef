@@ -15,8 +15,8 @@ export default class SelectComponentsEditPolicy extends DispatchingEditPolicy {
 
   requestSelectFeedback({ bounds }) {
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
-    const { x, y } = toolkit.boundsOnScreen(toolkit.root()).topLeft()
-    toolkit.root().setState({ selectionFeedback: bounds.translate({ x: -x, y: -y }) })
+    const translation = toolkit.bounds(toolkit.root()).topLeft().negated()
+    toolkit.root().setState({ selectionFeedback: bounds.translate(translation) })
   }
 
   eraseSelectFeedback() {
