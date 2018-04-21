@@ -1,4 +1,4 @@
-export { default as Diagram } from './Diagram'
+export { default as DiagramPart } from './DiagramPart'
 export { default as EditPolicy } from './EditPolicy'
 export { default as DispatchingEditPolicy } from './DispatchingEditPolicy'
 export { default as Engine } from './Engine'

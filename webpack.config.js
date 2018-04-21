@@ -2,14 +2,14 @@
 const HtmlPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: './examples/v3/index.js',
+  entry: './example/index.jsx',
   output: {
     filename: 'bundle.js',
     path: `${__dirname}/dist`,
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ['.js', '.json'],
+    extensions: ['.js', '.jsx', '.json'],
   },
   module: {
     rules: [
@@ -26,6 +26,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlPlugin({ template: 'examples/index.html' }),
+    new HtmlPlugin({ template: 'example/index.html' }),
   ],
 }

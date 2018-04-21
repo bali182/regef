@@ -1,0 +1,68 @@
+{
+  "components": {
+    "root": {
+      "type": "ROOT",
+      "children": [
+        "input",
+        "transform",
+        "transform2",
+        "output"
+      ]
+    },
+    "input": {
+      "type": "NODE",
+      "x": 81,
+      "y": 86,
+      "connections": [
+        "transform"
+      ]
+    },
+    "output": {
+      "type": "NODE",
+      "x": 681,
+      "y": 224
+    },
+    "transform": {
+      "type": "CONTAINER",
+      "x": 150,
+      "y": 161,
+      "children": [
+        "filter",
+        "map",
+        "reduce"
+      ]
+    },
+    "transform2": {
+      "type": "CONTAINER",
+      "x": 471,
+      "y": 57,
+      "children": [
+        "flatMap",
+        "concat",
+        "flatten"
+      ],
+      "connections": [
+        "output"
+      ]
+    },
+    "filter": {
+      "type": "STEP"
+    },
+    "map": {
+      "type": "STEP"
+    },
+    "reduce": {
+      "type": "STEP"
+    },
+    "flatMap": {
+      "type": "STEP"
+    },
+    "concat": {
+      "type": "STEP"
+    },
+    "flatten": {
+      "type": "STEP"
+    }
+  },
+  "selection": []
+}

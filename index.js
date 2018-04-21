@@ -4,10 +4,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var React = require('react');
-var React__default = _interopDefault(React);
 var reactDom = require('react-dom');
 var regefGeometry = require('regef-geometry');
+var React = require('react');
+var React__default = _interopDefault(React);
+var propTypes = require('prop-types');
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -83,272 +84,9 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-var Diagram = function (_React$Component) {
-  inherits(Diagram, _React$Component);
-
-  function Diagram() {
-    classCallCheck(this, Diagram);
-
-    // binding methods
-    var _this = possibleConstructorReturn(this, (Diagram.__proto__ || Object.getPrototypeOf(Diagram)).call(this));
-
-    _this.onMouseDown = _this.onMouseDown.bind(_this);
-    _this.onMouseMove = _this.onMouseMove.bind(_this);
-    _this.onMouseUp = _this.onMouseUp.bind(_this);
-    _this.onKeyDown = _this.onKeyDown.bind(_this);
-    _this.onKeyUp = _this.onKeyUp.bind(_this);
-    return _this;
-  }
-
-  createClass(Diagram, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      document.addEventListener('mousedown', this.onMouseDown);
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
-      document.addEventListener('keydown', this.onKeyDown);
-      document.addEventListener('keyup', this.onKeyUp);
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      document.removeEventListener('mousedown', this.onMouseDown);
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
-      document.removeEventListener('keydown', this.onKeyDown);
-      document.removeEventListener('keyup', this.onKeyUp);
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(e) {
-      this.props.engine.onKeyDown(e);
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp(e) {
-      this.props.engine.onKeyUp(e);
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.props.engine.onMouseDown(e);
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      this.props.engine.onMouseMove(e);
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      this.props.engine.onMouseUp(e);
-    }
-  }, {
-    key: 'getChildContext',
-    value: function getChildContext() {
-      var engine = this.props.engine;
-
-      return { regef: { engine: engine } };
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      // TODO check if it's node a root node, which is difficult because of other decorators
-      return React.Children.only(this.props.children);
-    }
-  }]);
-  return Diagram;
-}(React__default.Component);
-
-
-Diagram.childContextTypes = {
-  regef: function regef() {
-    return null;
-  }
-};
-
-var EditPolicy = function () {
-  function EditPolicy() {
-    classCallCheck(this, EditPolicy);
-
-    this.toolkit = null;
-    this.dependencies = {};
-  }
-
-  createClass(EditPolicy, [{
-    key: "perform",
-    value: function perform() /* intent */{}
-  }, {
-    key: "requestFeedback",
-    value: function requestFeedback() /* intent */{}
-  }, {
-    key: "eraseFeedback",
-    value: function eraseFeedback() /* intent */{}
-  }]);
-  return EditPolicy;
-}();
-
-
-var perform = function perform(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.perform(intent);
-  });
-};
-
-var requestFeedback = function requestFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.requestFeedback(intent);
-  });
-};
-
-var eraseFeedback = function eraseFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.eraseFeedback(intent);
-  });
-};
-
-// Data attribute keys
-var DATA_ID = 'data-regef-id';
-
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-var PALETTE_ROOT_TYPE = 'palette-root';
-var PALETTE_ENTRY_TYPE = 'palette-entry';
-
-// Request types
-var ADD = 'add';
-var CREATE = 'create';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
-
-var DispatchingEditPolicy = function (_EditPolicy) {
-  inherits(DispatchingEditPolicy, _EditPolicy);
-
-  function DispatchingEditPolicy() {
-    classCallCheck(this, DispatchingEditPolicy);
-    return possibleConstructorReturn(this, (DispatchingEditPolicy.__proto__ || Object.getPrototypeOf(DispatchingEditPolicy)).apply(this, arguments));
-  }
-
-  createClass(DispatchingEditPolicy, [{
-    key: 'perform',
-    value: function perform$$1(request) {
-      switch (request.type) {
-        case ADD:
-          return this.add(request);
-        case MOVE:
-          return this.move(request);
-        case START_CONNECTION:
-          return this.startConnection(request);
-        case END_CONNECTION:
-          return this.endConnection(request);
-        case SELECT:
-          return this.select(request);
-        case DELETE:
-          return this.delete(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'requestFeedback',
-    value: function requestFeedback$$1(request) {
-      switch (request.type) {
-        case ADD:
-          return this.requestAddFeedback(request);
-        case MOVE:
-          return this.requestMoveFeedback(request);
-        case START_CONNECTION:
-          return this.requestStartConnectionFeedback(request);
-        case END_CONNECTION:
-          return this.requestEndConnectionFeedback(request);
-        case SELECT:
-          return this.requestSelectFeedback(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'eraseFeedback',
-    value: function eraseFeedback$$1(request) {
-      switch (request.type) {
-        case ADD:
-          return this.eraseAddFeedback(request);
-        case MOVE:
-          return this.eraseMoveFeedback(request);
-        case START_CONNECTION:
-          return this.eraseStartConnectionFeedback(request);
-        case END_CONNECTION:
-          return this.eraseEndConnectionFeedback(request);
-        case SELECT:
-          return this.eraseSelectFeedback(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'add',
-    value: function add() /* request */{}
-  }, {
-    key: 'move',
-    value: function move() /* request */{}
-  }, {
-    key: 'startConnection',
-    value: function startConnection() /* request */{}
-  }, {
-    key: 'endConnection',
-    value: function endConnection() /* request */{}
-  }, {
-    key: 'select',
-    value: function select() /* request */{}
-  }, {
-    key: 'delete',
-    value: function _delete() /* request */{}
-  }, {
-    key: 'requestAddFeedback',
-    value: function requestAddFeedback() /* request */{}
-  }, {
-    key: 'requestMoveFeedback',
-    value: function requestMoveFeedback() /* request */{}
-  }, {
-    key: 'requestStartConnectionFeedback',
-    value: function requestStartConnectionFeedback() /* request */{}
-  }, {
-    key: 'requestEndConnectionFeedback',
-    value: function requestEndConnectionFeedback() /* request */{}
-  }, {
-    key: 'requestSelectFeedback',
-    value: function requestSelectFeedback() /* request */{}
-  }, {
-    key: 'eraseAddFeedback',
-    value: function eraseAddFeedback() /* request */{}
-  }, {
-    key: 'eraseMoveFeedback',
-    value: function eraseMoveFeedback() /* request */{}
-  }, {
-    key: 'eraseStartConnectionFeedback',
-    value: function eraseStartConnectionFeedback() /* request */{}
-  }, {
-    key: 'eraseEndConnectionFeedback',
-    value: function eraseEndConnectionFeedback() /* request */{}
-  }, {
-    key: 'eraseSelectFeedback',
-    value: function eraseSelectFeedback() /* request */{}
-  }]);
-  return DispatchingEditPolicy;
-}(EditPolicy);
-
 var SelectionProvider = function () {
   function SelectionProvider() {
     classCallCheck(this, SelectionProvider);
-
-    this.toolkit = null;
-    this.dependencies = {};
   }
 
   createClass(SelectionProvider, [{
@@ -358,91 +96,6 @@ var SelectionProvider = function () {
     }
   }]);
   return SelectionProvider;
-}();
-
-var DomHelper = function () {
-  function DomHelper(registry) {
-    classCallCheck(this, DomHelper);
-
-    this.registry = registry;
-  }
-
-  createClass(DomHelper, [{
-    key: "findClosest",
-    value: function findClosest(dom) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      var root = this.registry.root.dom;
-      for (var it = dom; it !== null; it = it.parentNode) {
-        var wrapper = this.registry.get(it);
-        if (wrapper !== undefined && wrapper !== null) {
-          return this.matchesType(wrapper.component, type) ? wrapper : null;
-        }
-        if (it === root) {
-          return null;
-        }
-      }
-      return null;
-    }
-  }, {
-    key: "findRelevantChildrenIntenal",
-    value: function findRelevantChildrenIntenal(node) {
-      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      if (node !== null && node.hasChildNodes()) {
-        var childNodes = node.childNodes;
-        for (var i = 0, len = childNodes.length; i < len; i += 1) {
-          var childNode = childNodes[i];
-          if (this.registry.has(childNode)) {
-            children.push(childNode);
-          } else {
-            this.findRelevantChildrenIntenal(childNode, children);
-          }
-        }
-      }
-      return children;
-    }
-  }, {
-    key: "findRelevantChildren",
-    value: function findRelevantChildren(element) {
-      return this.findRelevantChildrenIntenal(element, []);
-    }
-  }, {
-    key: "findClosestParent",
-    value: function findClosestParent(element) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (element === this.registry.root.dom) {
-        return element;
-      }
-      return this.findClosestElement(element.parentNode, type);
-    }
-  }, {
-    key: "isInsideDiagram",
-    value: function isInsideDiagram(element) {
-      return this.registry.root.dom.contains(element);
-    }
-  }, {
-    key: "matchesType",
-    value: function matchesType(component, type) {
-      if (component === null) {
-        return false;
-      }
-      if (type === null) {
-        return true;
-      }
-      if (Array.isArray(type)) {
-        for (var i = 0, len = type.length; i < len; i += 1) {
-          var it = type[i];
-          if (it === component.type) {
-            return true;
-          }
-        }
-      }
-      return type === component.type;
-    }
-  }]);
-  return DomHelper;
 }();
 
 var DOM = Symbol('DOM');
@@ -496,9 +149,13 @@ var ComponentRegistry = function () {
   createClass(ComponentRegistry, [{
     key: 'setRoot',
     value: function setRoot(root) {
+      if (root && this.root) {
+        throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
+      }
       this.root = root;
-      if (root === null || root === undefined) {
+      if (!root) {
         this.mapping.clear();
+        this.wrappers.clear();
       }
     }
   }, {
@@ -507,6 +164,7 @@ var ComponentRegistry = function () {
       if (!(wrapper instanceof ComponentWrapper)) {
         throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
       }
+      this.mapping.set(wrapper, wrapper);
       this.mapping.set(wrapper.dom, wrapper);
       this.mapping.set(wrapper.component, wrapper);
       this.mapping.set(wrapper.userComponent, wrapper);
@@ -520,6 +178,7 @@ var ComponentRegistry = function () {
     value: function unregister(input) {
       var wrapper = this.get(input);
       if (wrapper !== undefined) {
+        this.mapping.delete(wrapper);
         this.mapping.delete(wrapper.dom);
         this.mapping.delete(wrapper.component);
         this.mapping.delete(wrapper.userComponent);
@@ -572,18 +231,33 @@ var ComponentRegistry = function () {
   return ComponentRegistry;
 }();
 
+// Diagram participant types
+var ROOT_TYPE = 'root';
+var NODE_TYPE = 'node';
+var PORT_TYPE = 'port';
+var CONNECTION_TYPE = 'connection';
+
+// Request types
+var ADD = 'add';
+var CREATE = 'create';
+var MOVE = 'move';
+var SELECT = 'select';
+var DELETE = 'delete';
+var START_CONNECTION = 'start-connection';
+var END_CONNECTION = 'end-connection';
+
 var REGISTRY = Symbol('REGISTRY');
 var DOM_HELPER = Symbol('DOM_HELPER');
 
-var Toolkit = function () {
-  function Toolkit(registry) {
-    classCallCheck(this, Toolkit);
+var PartToolkit = function () {
+  function PartToolkit(registry, domHelper) {
+    classCallCheck(this, PartToolkit);
 
     this[REGISTRY] = registry;
-    this[DOM_HELPER] = new DomHelper(registry);
+    this[DOM_HELPER] = domHelper;
   }
 
-  createClass(Toolkit, [{
+  createClass(PartToolkit, [{
     key: 'root',
     value: function root() {
       var root = this[REGISTRY].root;
@@ -603,7 +277,7 @@ var Toolkit = function () {
       } else if (wrapper === registry.root) {
         return null;
       }
-      var parent = domHelper.findClosest(wrapper.dom.parentNode, null);
+      var parent = domHelper.findClosest(wrapper.dom.parentNode);
       return parent === null ? null : parent.userComponent;
     }
   }, {
@@ -672,104 +346,113 @@ var Toolkit = function () {
         throw new Error('Given component is not part of the diagram!');
       }
 
-      var _registry$root$dom$ge = registry.root.dom.getBoundingClientRect(),
-          rLeft = _registry$root$dom$ge.left,
-          rTop = _registry$root$dom$ge.top;
-
       var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
           left = _wrapper$dom$getBound.left,
           top = _wrapper$dom$getBound.top,
           width = _wrapper$dom$getBound.width,
           height = _wrapper$dom$getBound.height;
 
-      return regefGeometry.rectangle(left - rLeft, top - rTop, width, height);
+      return regefGeometry.rectangle(left, top, width, height);
     }
   }]);
-  return Toolkit;
+  return PartToolkit;
 }();
 
-var TOOLKIT = Symbol('TOOLKIT');
-var REGISTRY$1 = Symbol('REGISTRY');
-var CAPABILITIES = Symbol('CAPABILITIES');
-var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
-var EDIT_POLICIES = Symbol('EDIT_POLICIES');
-var DEPENDENCIES = Symbol('DEPENDENCIES');
-var DOM_HELPER$1 = Symbol('DOM_HELPER');
+var PartDomHelper = function () {
+  function PartDomHelper(registry) {
+    classCallCheck(this, PartDomHelper);
 
-var Engine = function () {
-  function Engine(_ref) {
-    var _this = this;
-
-    var _ref$dependencies = _ref.dependencies,
-        dependencies = _ref$dependencies === undefined ? {} : _ref$dependencies,
-        _ref$capabilities = _ref.capabilities,
-        capabilities = _ref$capabilities === undefined ? [] : _ref$capabilities,
-        _ref$editPolicies = _ref.editPolicies,
-        editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
-        _ref$selectionProvide = _ref.selectionProvider,
-        selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
-    classCallCheck(this, Engine);
-
-    this[REGISTRY$1] = new ComponentRegistry();
-    this[TOOLKIT] = new Toolkit(this.registry);
-    this[DOM_HELPER$1] = new DomHelper(this.registry);
-    this[CAPABILITIES] = capabilities;
-    this[SELECTION_PROVIDER] = selectionProvider;
-    this[EDIT_POLICIES] = editPolicies;
-    this[DEPENDENCIES] = dependencies;
-
-    /* eslint-disable no-param-reassign */
-    this.editPolicies.forEach(function (policy) {
-      policy.dependencies = dependencies;
-      policy.toolkit = _this.toolkit;
-    });
-    this.capabilities.forEach(function (capability) {
-      capability.engine = _this;
-    });
-    /* eslint-enable no-param-reassign */
-    this.selectionProvider.dependencies = dependencies;
-    this.selectionProvider.toolkit = this.toolkit;
+    this.registry = registry;
   }
 
-  createClass(Engine, [{
-    key: 'onKeyUp',
-    value: function onKeyUp(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onKeyUp(e);
-      });
+  createClass(PartDomHelper, [{
+    key: "findClosest",
+    value: function findClosest(dom) {
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        return true;
+      };
+
+      var root = this.registry.root.dom;
+      for (var it = dom; it !== null; it = it.parentNode) {
+        var wrapper = this.registry.get(it);
+        if (wrapper !== undefined && wrapper !== null) {
+          return matcher(wrapper) ? wrapper : null;
+        }
+        if (it === root) {
+          return null;
+        }
+      }
+      return null;
     }
   }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onKeyDown(e);
-      });
+    key: "findRelevantChildrenIntenal",
+    value: function findRelevantChildrenIntenal(node) {
+      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      if (node !== null && node.hasChildNodes()) {
+        var childNodes = node.childNodes;
+        for (var i = 0, len = childNodes.length; i < len; i += 1) {
+          var childNode = childNodes[i];
+          if (this.registry.has(childNode)) {
+            children.push(childNode);
+          } else {
+            this.findRelevantChildrenIntenal(childNode, children);
+          }
+        }
+      }
+      return children;
     }
   }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onMouseDown(e);
-      });
+    key: "findRelevantChildren",
+    value: function findRelevantChildren(element) {
+      return this.findRelevantChildrenIntenal(element, []);
     }
   }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onMouseMove(e);
-      });
+    key: "findClosestParent",
+    value: function findClosestParent(element) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (element === this.registry.root.dom) {
+        return element;
+      }
+      return this.findClosestElement(element.parentNode, type);
     }
   }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      this.capabilities.forEach(function (capability) {
-        return capability.onMouseUp(e);
-      });
+    key: "partContains",
+    value: function partContains(element) {
+      return this.registry.root.dom.contains(element);
+    }
+  }]);
+  return PartDomHelper;
+}();
+
+var ID = Symbol('id');
+var ENGINE = Symbol('ENGINE');
+var REGISTRY$1 = Symbol('REGISTRY');
+var TOOLKIT = Symbol('TOOLKIT');
+var DOM_HELPER$1 = Symbol('DOM_HELPER');
+
+var DiagramPartWrapper = function () {
+  function DiagramPartWrapper(id, engine) {
+    classCallCheck(this, DiagramPartWrapper);
+
+    this[ID] = id;
+    this[ENGINE] = engine;
+
+    this[REGISTRY$1] = new ComponentRegistry();
+    this[DOM_HELPER$1] = new PartDomHelper(this.registry);
+    this[TOOLKIT] = new PartToolkit(this.registry, this[DOM_HELPER$1]);
+  }
+
+  createClass(DiagramPartWrapper, [{
+    key: 'id',
+    get: function get$$1() {
+      return this[ID];
     }
   }, {
-    key: 'selection',
-    value: function selection() {
-      return this.selectionProvider.selection();
+    key: 'registry',
+    get: function get$$1() {
+      return this[REGISTRY$1];
     }
   }, {
     key: 'toolkit',
@@ -777,9 +460,238 @@ var Engine = function () {
       return this[TOOLKIT];
     }
   }, {
-    key: 'registry',
+    key: 'engine',
     get: function get$$1() {
-      return this[REGISTRY$1];
+      return this[ENGINE];
+    }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DOM_HELPER$1];
+    }
+  }]);
+  return DiagramPartWrapper;
+}();
+
+var EventManager = function () {
+  function EventManager(engine) {
+    classCallCheck(this, EventManager);
+
+    this.engine = engine;
+    this.hooked = false;
+    // binding methods
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+  }
+
+  createClass(EventManager, [{
+    key: 'hookListeners',
+    value: function hookListeners() {
+      document.addEventListener('mousedown', this.onMouseDown);
+      document.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
+      document.addEventListener('keydown', this.onKeyDown);
+      document.addEventListener('keyup', this.onKeyUp);
+
+      this.hooked = true;
+    }
+  }, {
+    key: 'unhookListeners',
+    value: function unhookListeners() {
+      document.removeEventListener('mousedown', this.onMouseDown);
+      document.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseup', this.onMouseUp);
+      document.removeEventListener('keydown', this.onKeyDown);
+      document.removeEventListener('keyup', this.onKeyUp);
+
+      this.hooked = false;
+    }
+  }, {
+    key: 'onKeyUp',
+    value: function onKeyUp(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onKeyUp(e);
+      });
+    }
+  }, {
+    key: 'onKeyDown',
+    value: function onKeyDown(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onKeyDown(e);
+      });
+    }
+  }, {
+    key: 'onMouseDown',
+    value: function onMouseDown(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onMouseDown(e);
+      });
+    }
+  }, {
+    key: 'onMouseMove',
+    value: function onMouseMove(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onMouseMove(e);
+      });
+    }
+  }, {
+    key: 'onMouseUp',
+    value: function onMouseUp(e) {
+      this.engine.capabilities.forEach(function (capability) {
+        return capability.onMouseUp(e);
+      });
+    }
+  }]);
+  return EventManager;
+}();
+
+var Toolkit = function () {
+  function Toolkit(engine) {
+    classCallCheck(this, Toolkit);
+
+    this.engine = engine;
+  }
+
+  createClass(Toolkit, [{
+    key: "forPart",
+    value: function forPart(id) {
+      var part = this.engine.part(id);
+      if (part === null) {
+        throw new Error("DiagramPart " + id + " hasn't been registered.");
+      }
+      return part ? part.toolkit : null;
+    }
+  }, {
+    key: "forComponent",
+    value: function forComponent(component) {
+      var parts = this.engine.parts();
+      for (var i = 0, length = parts.length; i < length; i += 1) {
+        var part = parts[i];
+        if (part.registry.has(component)) {
+          return part;
+        }
+      }
+      throw new Error("Component " + component + " is not registered in any DiagramParts.");
+    }
+  }]);
+  return Toolkit;
+}();
+
+var DomHelper = function () {
+  function DomHelper(engine) {
+    classCallCheck(this, DomHelper);
+
+    this.engine = engine;
+  }
+
+  createClass(DomHelper, [{
+    key: "findPart",
+    value: function findPart(dom) {
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        return true;
+      };
+
+      var parts = this.engine.parts;
+      for (var i = 0; i < parts.length; i += 1) {
+        var part = parts[i];
+        if (part.domHelper.partContains(dom)) {
+          return matcher(part) ? part : null;
+        }
+      }
+      return null;
+    }
+  }]);
+  return DomHelper;
+}();
+
+var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
+var CAPABILITIES = Symbol('CAPABILITIES');
+var DOM_HELPER$2 = Symbol('DOM_HELPER');
+var TOOLKIT$1 = Symbol('TOOLKIT');
+var EVENT_MANAGER = Symbol('EVENT_MANAGER');
+var EDIT_POLICIES = Symbol('EDIT_POLICIES');
+var PARTS = Symbol('PARTS');
+
+var valueFrom = function valueFrom(input) {
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  return input instanceof Function ? input.apply(undefined, args) : input;
+};
+var arrayFrom = function arrayFrom(input) {
+  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    args[_key2 - 1] = arguments[_key2];
+  }
+
+  var value = input instanceof Function ? input.apply(undefined, args) : input;
+  return Array.isArray(value) ? value : [value];
+};
+
+var Engine = function () {
+  function Engine(_ref) {
+    var _this = this;
+
+    var _ref$capabilities = _ref.capabilities,
+        capabilities = _ref$capabilities === undefined ? [] : _ref$capabilities,
+        _ref$editPolicies = _ref.editPolicies,
+        editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
+        _ref$selectionProvide = _ref.selectionProvider,
+        selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
+    classCallCheck(this, Engine);
+
+    this[TOOLKIT$1] = new Toolkit(this);
+    this[EVENT_MANAGER] = new EventManager(this);
+    this[DOM_HELPER$2] = new DomHelper(this);
+    this[PARTS] = new Map();
+
+    this[CAPABILITIES] = arrayFrom(capabilities, this);
+    this[EDIT_POLICIES] = arrayFrom(editPolicies, this);
+    this[SELECTION_PROVIDER] = valueFrom(selectionProvider, this);
+
+    this.capabilities.forEach(function (capability) {
+      // eslint-disable-next-line no-param-reassign
+      capability.engine = _this;
+    });
+  }
+
+  createClass(Engine, [{
+    key: 'part',
+    value: function part(id) {
+      var parts = this[PARTS];
+      if (!parts.has(id)) {
+        var part = new DiagramPartWrapper(id, this);
+        parts.set(id, part);
+      }
+      return parts.get(id);
+    }
+  }, {
+    key: 'removePart',
+    value: function removePart(id) {
+      this[PARTS].delete(id);
+    }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DOM_HELPER$2];
+    }
+  }, {
+    key: 'parts',
+    get: function get$$1() {
+      return Array.from(this[PARTS].values());
+    }
+  }, {
+    key: 'eventManager',
+    get: function get$$1() {
+      return this[EVENT_MANAGER];
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this[TOOLKIT$1];
     }
   }, {
     key: 'capabilities',
@@ -796,19 +708,200 @@ var Engine = function () {
     get: function get$$1() {
       return this[EDIT_POLICIES];
     }
-  }, {
-    key: 'dependencies',
-    get: function get$$1() {
-      return this[DEPENDENCIES];
-    }
-  }, {
-    key: 'domHelper',
-    get: function get$$1() {
-      return this[DOM_HELPER$1];
-    }
   }]);
   return Engine;
 }();
+
+var DiagramPart = function (_PureComponent) {
+  inherits(DiagramPart, _PureComponent);
+
+  function DiagramPart() {
+    classCallCheck(this, DiagramPart);
+    return possibleConstructorReturn(this, (DiagramPart.__proto__ || Object.getPrototypeOf(DiagramPart)).apply(this, arguments));
+  }
+
+  createClass(DiagramPart, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var engine = this.props.engine;
+
+      if (!engine.eventManager.hooked) {
+        engine.eventManager.hookListeners();
+      }
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      var _props = this.props,
+          id = _props.id,
+          engine = _props.engine;
+
+      engine.removePart(id);
+      if (engine.parts.length === 0) {
+        engine.eventManager.unhookListeners();
+      }
+    }
+  }, {
+    key: 'getChildContext',
+    value: function getChildContext() {
+      return { regef: { engine: this.props.engine, id: this.props.id } };
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      // TODO check type (no solution yet)
+      return React.Children.only(this.props.children);
+    }
+  }]);
+  return DiagramPart;
+}(React.PureComponent);
+
+
+DiagramPart.childContextTypes = {
+  regef: propTypes.shape({
+    engine: propTypes.instanceOf(Engine).isRequired,
+    id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
+  })
+};
+
+DiagramPart.propTypes = {
+  engine: propTypes.instanceOf(Engine).isRequired,
+  id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
+};
+
+var EditPolicy = function () {
+  function EditPolicy() {
+    classCallCheck(this, EditPolicy);
+  }
+
+  createClass(EditPolicy, [{
+    key: "perform",
+    value: function perform() /* intent */{}
+  }, {
+    key: "requestFeedback",
+    value: function requestFeedback() /* intent */{}
+  }, {
+    key: "eraseFeedback",
+    value: function eraseFeedback() /* intent */{}
+  }]);
+  return EditPolicy;
+}();
+
+var DispatchingEditPolicy = function (_EditPolicy) {
+  inherits(DispatchingEditPolicy, _EditPolicy);
+
+  function DispatchingEditPolicy() {
+    classCallCheck(this, DispatchingEditPolicy);
+    return possibleConstructorReturn(this, (DispatchingEditPolicy.__proto__ || Object.getPrototypeOf(DispatchingEditPolicy)).apply(this, arguments));
+  }
+
+  createClass(DispatchingEditPolicy, [{
+    key: 'perform',
+    value: function perform(request) {
+      switch (request.type) {
+        case ADD:
+          return this.add(request);
+        case MOVE:
+          return this.move(request);
+        case START_CONNECTION:
+          return this.startConnection(request);
+        case END_CONNECTION:
+          return this.endConnection(request);
+        case SELECT:
+          return this.select(request);
+        case DELETE:
+          return this.delete(request);
+        default:
+          throw new Error('Unknown request type ' + request.type);
+      }
+    }
+  }, {
+    key: 'requestFeedback',
+    value: function requestFeedback(request) {
+      switch (request.type) {
+        case ADD:
+          return this.requestAddFeedback(request);
+        case MOVE:
+          return this.requestMoveFeedback(request);
+        case START_CONNECTION:
+          return this.requestStartConnectionFeedback(request);
+        case END_CONNECTION:
+          return this.requestEndConnectionFeedback(request);
+        case SELECT:
+          return this.requestSelectFeedback(request);
+        default:
+          throw new Error('Unknown request type ' + request.type);
+      }
+    }
+  }, {
+    key: 'eraseFeedback',
+    value: function eraseFeedback(request) {
+      switch (request.type) {
+        case ADD:
+          return this.eraseAddFeedback(request);
+        case MOVE:
+          return this.eraseMoveFeedback(request);
+        case START_CONNECTION:
+          return this.eraseStartConnectionFeedback(request);
+        case END_CONNECTION:
+          return this.eraseEndConnectionFeedback(request);
+        case SELECT:
+          return this.eraseSelectFeedback(request);
+        default:
+          throw new Error('Unknown request type ' + request.type);
+      }
+    }
+  }, {
+    key: 'add',
+    value: function add() /* request */{}
+  }, {
+    key: 'move',
+    value: function move() /* request */{}
+  }, {
+    key: 'startConnection',
+    value: function startConnection() /* request */{}
+  }, {
+    key: 'endConnection',
+    value: function endConnection() /* request */{}
+  }, {
+    key: 'select',
+    value: function select() /* request */{}
+  }, {
+    key: 'delete',
+    value: function _delete() /* request */{}
+  }, {
+    key: 'requestAddFeedback',
+    value: function requestAddFeedback() /* request */{}
+  }, {
+    key: 'requestMoveFeedback',
+    value: function requestMoveFeedback() /* request */{}
+  }, {
+    key: 'requestStartConnectionFeedback',
+    value: function requestStartConnectionFeedback() /* request */{}
+  }, {
+    key: 'requestEndConnectionFeedback',
+    value: function requestEndConnectionFeedback() /* request */{}
+  }, {
+    key: 'requestSelectFeedback',
+    value: function requestSelectFeedback() /* request */{}
+  }, {
+    key: 'eraseAddFeedback',
+    value: function eraseAddFeedback() /* request */{}
+  }, {
+    key: 'eraseMoveFeedback',
+    value: function eraseMoveFeedback() /* request */{}
+  }, {
+    key: 'eraseStartConnectionFeedback',
+    value: function eraseStartConnectionFeedback() /* request */{}
+  }, {
+    key: 'eraseEndConnectionFeedback',
+    value: function eraseEndConnectionFeedback() /* request */{}
+  }, {
+    key: 'eraseSelectFeedback',
+    value: function eraseSelectFeedback() /* request */{}
+  }]);
+  return DispatchingEditPolicy;
+}(EditPolicy);
 
 var Capability = function () {
   function Capability() {
@@ -852,6 +945,77 @@ var Capability = function () {
   return Capability;
 }();
 
+function createDecorator(_ref) {
+  var type = _ref.type,
+      activate = _ref.activate,
+      deactivate = _ref.deactivate,
+      toolkitResolver = _ref.toolkitResolver;
+
+  return function () {
+    return function (Wrapped) {
+      var DecoratedComponent = function (_PureComponent) {
+        inherits(DecoratedComponent, _PureComponent);
+
+        function DecoratedComponent(props, context) {
+          classCallCheck(this, DecoratedComponent);
+
+          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
+
+          var id = _this.context.regef.id;
+
+          _this.partId = id;
+          _this.userComponent = null;
+          _this.type = type;
+          _this.childProps = { toolkit: toolkitResolver(_this, context.regef)
+            // binding methods
+          };_this.setUserComponent = _this.setUserComponent.bind(_this);
+          return _this;
+        }
+
+        createClass(DecoratedComponent, [{
+          key: 'setUserComponent',
+          value: function setUserComponent(ref) {
+            this.userComponent = ref;
+          }
+        }, {
+          key: 'componentDidMount',
+          value: function componentDidMount() {
+            activate(this, this.context.regef);
+          }
+        }, {
+          key: 'componentWillUnmount',
+          value: function componentWillUnmount() {
+            deactivate(this, this.context.regef);
+          }
+        }, {
+          key: 'render',
+          value: function render() {
+            var _props = this.props,
+                children = _props.children,
+                rest = objectWithoutProperties(_props, ['children']);
+
+            return React__default.createElement(
+              Wrapped,
+              _extends({}, rest, { ref: this.setUserComponent, regef: this.childProps }),
+              children
+            );
+          }
+        }]);
+        return DecoratedComponent;
+      }(React.PureComponent);
+
+      DecoratedComponent.contextTypes = {
+        regef: propTypes.shape({
+          engine: propTypes.instanceOf(Engine).isRequired,
+          id: propTypes.oneOfType([propTypes.string, propTypes.symbol])
+        })
+      };
+
+      return DecoratedComponent;
+    };
+  };
+}
+
 var matches = function matches(target, wrapper) {
   var userComponent = wrapper.userComponent,
       dom = wrapper.dom,
@@ -885,133 +1049,160 @@ var watchRegister = function watchRegister(registry, target) {
   });
 };
 
-var defaultMergeProps = function defaultMergeProps(regef) {
-  return { regef: regef };
+var registryFrom = function registryFrom(_ref) {
+  var engine = _ref.engine,
+      id = _ref.id;
+  return id === undefined ? engine.registry : engine.part(id).registry;
 };
 
-var toolkitResolver = function toolkitResolver(component, registry, toolkit) {
+var toolkitFrom = function toolkitFrom(_ref2) {
+  var engine = _ref2.engine,
+      id = _ref2.id;
+  return id === undefined ? engine.toolkit : engine.part(id).toolkit;
+};
+
+function defaultToolkitResolver(component, context) {
   return function () {
-    return watchRegister(registry, component).then(function () {
-      return toolkit;
+    return watchRegister(registryFrom(context), component).then(function () {
+      return toolkitFrom(context);
     });
   };
+}
+
+var defaultActivate = function defaultActivate(component, context) {
+  registryFrom(context).register(fromComponent(component));
 };
 
-var createDecorator = function createDecorator(_ref) {
-  var type = _ref.type,
-      activate = _ref.activate,
-      deactivate = _ref.deactivate;
-  return function () {
-    var mergeProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultMergeProps;
-    return function (Wrapped) {
-      var DecoratedComponent = function (_React$Component) {
-        inherits(DecoratedComponent, _React$Component);
-
-        function DecoratedComponent(props, context) {
-          classCallCheck(this, DecoratedComponent);
-
-          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
-
-          var engine = context.regef.engine;
-
-          _this.userComponent = null;
-          _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, engine.registry, engine.toolkit)
-            // binding methods
-          };_this.setUserComponent = _this.setUserComponent.bind(_this);
-          return _this;
-        }
-
-        createClass(DecoratedComponent, [{
-          key: 'setUserComponent',
-          value: function setUserComponent(ref) {
-            this.userComponent = ref;
-          }
-        }, {
-          key: 'componentDidMount',
-          value: function componentDidMount() {
-            activate(this, this.context.regef.engine);
-          }
-        }, {
-          key: 'componentWillUnmount',
-          value: function componentWillUnmount() {
-            deactivate(this, this.context.regef.engine);
-          }
-        }, {
-          key: 'render',
-          value: function render() {
-            var _props = this.props,
-                children = _props.children,
-                rest = objectWithoutProperties(_props, ['children']);
-
-            var regefProps = mergeProps(this.childProps);
-            return React__default.createElement(
-              Wrapped,
-              _extends({}, rest, { ref: this.setUserComponent }, regefProps),
-              children
-            );
-          }
-        }]);
-        return DecoratedComponent;
-      }(React__default.Component);
-
-      DecoratedComponent.contextTypes = {
-        regef: function regef() {
-          return null;
-        }
-      };
-
-      return DecoratedComponent;
-    };
-  };
+var defaultDecativate = function defaultDecativate(component, context) {
+  registryFrom(context).unregister(component);
 };
 
-var defaultActivate = function defaultActivate(component, engine) {
-  var wrapper = fromComponent(component);
-  engine.registry.register(wrapper);
+var rootActivate = function rootActivate(component, context) {
+  defaultActivate(component, context);
+  var registry = registryFrom(context);
+  registry.setRoot(registry.get(component));
 };
 
-var defaultDecativate = function defaultDecativate(component, engine) {
-  engine.registry.unregister(component);
-};
-
-var rootActivate = function rootActivate(component, engine) {
-  defaultActivate(component, engine);
-  engine.registry.setRoot(engine.registry.get(component));
-};
-
-var rootDeactivate = function rootDeactivate(component, engine) {
-  defaultDecativate(component, engine);
-  engine.registry.setRoot(null);
+var rootDeactivate = function rootDeactivate(component, context) {
+  defaultDecativate(component, context);
+  registryFrom(context).setRoot(null);
 };
 
 var node = createDecorator({
   type: NODE_TYPE,
   activate: defaultActivate,
-  deactivate: defaultDecativate
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var port = createDecorator({
   type: PORT_TYPE,
   activate: defaultActivate,
-  deactivate: defaultDecativate
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var root = createDecorator({
   type: ROOT_TYPE,
   activate: rootActivate,
-  deactivate: rootDeactivate
+  deactivate: rootDeactivate,
+  toolkitResolver: defaultToolkitResolver
 });
 
 var connection = createDecorator({
   type: CONNECTION_TYPE,
   activate: defaultActivate,
-  deactivate: defaultDecativate
+  deactivate: defaultDecativate,
+  toolkitResolver: defaultToolkitResolver
 });
+
+var matchesSingleType = function matchesSingleType(type) {
+  return function (_ref) {
+    var component = _ref.component;
+    return component.type === type;
+  };
+};
+
+var matchesMultiTypes = function matchesMultiTypes(types) {
+  return function (_ref2) {
+    var component = _ref2.component;
+    return types.indexOf(component.type) >= 0;
+  };
+};
+
+var matchesSinglePart = function matchesSinglePart(partId) {
+  return function (part) {
+    return part.id === partId;
+  };
+};
+
+var matchesMultiParts = function matchesMultiParts(partIds) {
+  return function (part) {
+    return partIds.indexOf(part.id) >= 0;
+  };
+};
+
+var alwaysTrue = function alwaysTrue() {
+  return true;
+};
+
+var getSelection = function getSelection(engine) {
+  if (engine && engine.selectionProvider instanceof SelectionProvider) {
+    return engine.selectionProvider.selection();
+  }
+  return [];
+};
+
+var typeMatches = function typeMatches(types) {
+  if (types === null || types === undefined) {
+    return alwaysTrue;
+  } else if (Array.isArray(types)) {
+    return matchesMultiTypes(types);
+  }
+  return matchesSingleType(types);
+};
+
+var partMatches = function partMatches(ids) {
+  if (ids === null || ids === undefined) {
+    return alwaysTrue;
+  } else if (Array.isArray(ids)) {
+    return matchesMultiParts(ids);
+  }
+  return matchesSinglePart(ids);
+};
+
+var perform = function perform(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.perform(intent);
+  });
+};
+
+var requestFeedback = function requestFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.requestFeedback(intent);
+  });
+};
+
+var eraseFeedback = function eraseFeedback(policies, intent) {
+  return policies.forEach(function (policy) {
+    return policy.eraseFeedback(intent);
+  });
+};
+
+var getParts = function getParts(engine) {
+  var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (ids === null || ids === undefined) {
+    return engine.parts;
+  }
+  return ids.map(function (id) {
+    return engine.part(id);
+  });
+};
 
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
-var buildDeltas = function buildDeltas(_ref, element) {
+var buildOffset = function buildOffset(_ref, element) {
   var clientX = _ref.clientX,
       clientY = _ref.clientY;
 
@@ -1019,18 +1210,14 @@ var buildDeltas = function buildDeltas(_ref, element) {
       x = _element$getBoundingC.x,
       y = _element$getBoundingC.y;
 
-  var deltaX = clientX - x;
-  var deltaY = clientY - y;
-  return {
-    deltaX: deltaX,
-    deltaY: deltaY
-  };
+  return regefGeometry.point(clientX - x, clientY - y);
 };
 
 var DragCapability = function (_Capability) {
   inherits(DragCapability, _Capability);
 
   function DragCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, DragCapability);
 
     var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this));
@@ -1040,51 +1227,71 @@ var DragCapability = function (_Capability) {
     _this.targetParent = null;
     _this.currentParent = null;
     _this.coordinates = null;
-    _this.eventDeltas = null;
+    _this.offset = null;
     _this.lastRequest = null;
     _this.mouseMoved = false;
     _this.startLocation = null;
+    _this.config = config;
     return _this;
   }
 
   createClass(DragCapability, [{
     key: 'findTargetedParent',
-    value: function findTargetedParent(eventTarget) {
+    value: function findTargetedParent(eventTarget, part) {
       var target = this.target,
           currentParent = this.currentParent;
 
-      var newTarget = this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES);
-      if (newTarget === null || newTarget === target || target.dom.contains(newTarget.dom) || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
+      if (!part) {
+        return null;
+      }
+      var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)); // TODO
+      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom) || getSelection(this.engine).indexOf(newTarget.userComponent) >= 0) {
         return currentParent;
       }
       return newTarget;
     }
   }, {
+    key: 'deltaCoordinates',
+    value: function deltaCoordinates(_ref2) {
+      var clientX = _ref2.clientX,
+          clientY = _ref2.clientY;
+
+      return regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
+    }
+  }, {
+    key: 'screenCoordinates',
+    value: function screenCoordinates(_ref3) {
+      var clientX = _ref3.clientX,
+          clientY = _ref3.clientY;
+
+      return regefGeometry.point(clientX, clientY);
+    }
+  }, {
+    key: 'offsetCoordinates',
+    value: function offsetCoordinates() {
+      return this.offset;
+    }
+  }, {
+    key: 'locationCoordinates',
+    value: function locationCoordinates(_ref4) {
+      var clientX = _ref4.clientX,
+          clientY = _ref4.clientY;
+
+      return regefGeometry.point(clientX, clientY);
+    }
+  }, {
     key: 'updateCoordinates',
-    value: function updateCoordinates(e) {
-      var _eventDeltas = this.eventDeltas,
-          deltaX = _eventDeltas.deltaX,
-          deltaY = _eventDeltas.deltaY;
-      var clientX = e.clientX,
-          clientY = e.clientY;
-
-      var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
-          rootX = _engine$registry$root.x,
-          rootY = _engine$registry$root.y;
-
-      var location = regefGeometry.point(clientX - rootX, clientY - rootY);
-      var offset = regefGeometry.point(deltaX, deltaY);
-      var delta = regefGeometry.point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y);
+    value: function updateCoordinates(e, part) {
       this.coordinates = {
-        location: location,
-        offset: offset,
-        delta: delta
+        offset: this.offsetCoordinates(),
+        delta: this.deltaCoordinates(e),
+        location: this.locationCoordinates(e, part)
       };
     }
   }, {
     key: 'updateParents',
-    value: function updateParents(e) {
-      var newTargetParent = this.findTargetedParent(e.target);
+    value: function updateParents(e, part) {
+      var newTargetParent = this.findTargetedParent(e.target, part);
       var targetParent = this.targetParent;
       if (targetParent !== newTargetParent) {
         this.lastTargetParent = targetParent;
@@ -1097,48 +1304,33 @@ var DragCapability = function (_Capability) {
     key: 'getMovedComponents',
     value: function getMovedComponents() {
       var target = this.target.userComponent;
-      if (this.engine.selection().indexOf(target) >= 0) {
-        return this.engine.selection();
+      var selection = getSelection(this.engine);
+      if (selection.indexOf(target) >= 0) {
+        return selection;
       }
       return [target];
     }
   }, {
     key: 'getMoveChildRequest',
     value: function getMoveChildRequest() {
-      var currentParent = this.currentParent,
-          coordinates = this.coordinates;
-      var location = coordinates.location,
-          offset = coordinates.offset,
-          delta = coordinates.delta;
-
-      return {
+      return _extends({
         type: MOVE,
         components: this.getMovedComponents(),
-        container: currentParent.component.userComponent,
-        location: location,
-        offset: offset,
-        delta: delta
-      };
+        container: this.currentParent.component.userComponent
+      }, this.coordinates);
     }
   }, {
     key: 'getAddChildRequest',
     value: function getAddChildRequest() {
       var targetParent = this.targetParent,
-          currentParent = this.currentParent,
-          coordinates = this.coordinates;
-      var location = coordinates.location,
-          offset = coordinates.offset,
-          delta = coordinates.delta;
+          currentParent = this.currentParent;
 
-      return {
+      return _extends({
         type: ADD,
         components: this.getMovedComponents(),
-        targetContainer: targetParent.component.userComponent,
-        container: currentParent.component.userComponent,
-        location: location,
-        offset: offset,
-        delta: delta
-      };
+        targetContainer: targetParent === null ? null : targetParent.component.userComponent,
+        container: currentParent.component.userComponent
+      }, this.coordinates);
     }
   }, {
     key: 'getSelectionRequest',
@@ -1160,7 +1352,7 @@ var DragCapability = function (_Capability) {
       var lastTargetParent = this.lastTargetParent,
           targetParent = this.targetParent;
 
-      if (lastRequest !== null && lastTargetParent.dom !== targetParent.dom && lastTargetParent.component !== null) {
+      if (lastRequest !== null && lastTargetParent !== targetParent) {
         eraseFeedback(this.engine.editPolicies, lastRequest);
       }
       if (request !== null) {
@@ -1168,28 +1360,20 @@ var DragCapability = function (_Capability) {
       }
     }
   }, {
-    key: 'isMoveChild',
-    value: function isMoveChild() {
-      return this.currentParent === this.targetParent;
-    }
-  }, {
-    key: 'isAddChild',
-    value: function isAddChild() {
-      return this.currentParent !== this.targetParent;
-    }
-  }, {
     key: 'buildDragRequest',
     value: function buildDragRequest(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
-        return null;
-      }
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
 
-      this.updateParents(e);
-      this.updateCoordinates(e);
+      this.updateParents(e, part);
+      this.updateCoordinates(e, part);
 
-      if (this.isMoveChild(e)) {
+      var currentParent = this.currentParent,
+          targetParent = this.targetParent;
+
+
+      if (currentParent === targetParent) {
         return this.getMoveChildRequest();
-      } else if (this.isAddChild(e)) {
+      } else if (currentParent !== targetParent) {
         return this.getAddChildRequest();
       }
       return null;
@@ -1203,7 +1387,7 @@ var DragCapability = function (_Capability) {
         }
         this.progress = false;
         this.lastRequest = null;
-        this.eventDeltas = null;
+        this.offset = null;
         this.coordinates = null;
         this.targetParent = null;
         this.target = null;
@@ -1213,14 +1397,17 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return;
       }
-      this.target = this.engine.domHelper.findClosest(e.target, NODE_TYPE);
+      this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.types));
       if (this.target !== null) {
-        var parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES);
-        this.currentParent = parent || this.engine.registry.root;
-        this.eventDeltas = buildDeltas(e, this.target.dom);
+        var parent = part.domHelper.findClosest(this.target.dom.parentNode, function (wrapper) {
+          return ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0;
+        });
+        this.currentParent = parent || part.registry.root;
+        this.offset = buildOffset(e, this.target.dom);
         this.startLocation = regefGeometry.point(e.clientX, e.clientY);
         this.mouseMoved = false;
         this.progress = true;
@@ -1234,8 +1421,7 @@ var DragCapability = function (_Capability) {
       }
       this.mouseMoved = true;
       var request = this.buildDragRequest(e);
-      var selection = this.engine.selection();
-      if (selection.indexOf(this.target.userComponent) < 0) {
+      if (getSelection(this.engine).indexOf(this.target.userComponent) < 0) {
         perform(this.engine.editPolicies, this.getSelectionRequest());
       }
       this.handleFeedback(this.lastRequest, request);
@@ -1262,22 +1448,28 @@ var DragCapability = function (_Capability) {
   return DragCapability;
 }(Capability);
 
-var ConnectMouseHandler = function (_Capability) {
-  inherits(ConnectMouseHandler, _Capability);
+var ConnectCapability = function (_Capability) {
+  inherits(ConnectCapability, _Capability);
 
-  function ConnectMouseHandler() {
-    classCallCheck(this, ConnectMouseHandler);
+  function ConnectCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      parts: null,
+      sourceTypes: [PORT_TYPE],
+      targetTypes: [ROOT_TYPE, NODE_TYPE]
+    };
+    classCallCheck(this, ConnectCapability);
 
-    var _this = possibleConstructorReturn(this, (ConnectMouseHandler.__proto__ || Object.getPrototypeOf(ConnectMouseHandler)).call(this));
+    var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this));
 
     _this.source = null;
     _this.target = null;
     _this.coordinates = null;
     _this.lastRequest = null;
+    _this.config = config;
     return _this;
   }
 
-  createClass(ConnectMouseHandler, [{
+  createClass(ConnectCapability, [{
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
@@ -1309,43 +1501,34 @@ var ConnectMouseHandler = function (_Capability) {
       };
     }
   }, {
-    key: 'buildCoordinates',
-    value: function buildCoordinates(_ref) {
-      var clientX = _ref.clientX,
-          clientY = _ref.clientY;
-
-      var _engine$registry$root = this.engine.registry.root.dom.getBoundingClientRect(),
-          top = _engine$registry$root.top,
-          left = _engine$registry$root.left;
-
-      var x = clientX - left;
-      var y = clientY - top;
-      return { x: x, y: y };
-    }
-  }, {
     key: 'buildEndConnectRequest',
     value: function buildEndConnectRequest(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return null;
       }
-
-      this.target = this.engine.domHelper.findClosest(e.target);
-      this.coordinates = this.buildCoordinates(e);
+      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes));
+      if (!target) {
+        return null;
+      }
+      this.target = target;
+      this.coordinates = regefGeometry.point(e.clientX, e.clientY);
       return this.getEndConnectionRequest();
     }
   }, {
     key: 'buildStartConnectionRequest',
     value: function buildStartConnectionRequest(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return null;
       }
-      var source = this.engine.domHelper.findClosest(e.target, PORT_TYPE);
-      if (source !== null) {
-        this.source = source;
-        this.coordinates = this.buildCoordinates(e);
-        return this.getStartConnectionRequest();
+      var source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes));
+      if (!source) {
+        return null;
       }
-      return null;
+      this.source = source;
+      this.coordinates = regefGeometry.point(e.clientX, e.clientY);
+      return this.getStartConnectionRequest();
     }
   }, {
     key: 'handleFeedback',
@@ -1393,7 +1576,7 @@ var ConnectMouseHandler = function (_Capability) {
       this.progress = false;
     }
   }]);
-  return ConnectMouseHandler;
+  return ConnectCapability;
 }(Capability);
 
 var locationOf = function locationOf(_ref, rootDom) {
@@ -1411,40 +1594,37 @@ var SingleSelectionCapability = function (_Capability) {
   inherits(SingleSelectionCapability, _Capability);
 
   function SingleSelectionCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, SingleSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this));
 
-    _this.startLocation = null;
-    _this.endLocation = null;
+    _this.location = null;
     _this.possibleSingleSelection = false;
     _this.additional = false;
     _this.selection = [];
+    _this.config = config;
     return _this;
   }
 
   createClass(SingleSelectionCapability, [{
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
-      var startLocation = this.startLocation,
-          endLocation = this.endLocation,
+      var location = this.location,
           selection = this.selection,
           additional = this.additional;
 
       return {
         type: SELECT,
-        bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
-        startLocation: startLocation,
-        endLocation: endLocation,
-        selection: additional ? this.engine.selection().concat(selection) : selection
+        bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
+        selection: additional ? getSelection(this.engine).concat(selection) : selection
       };
     }
   }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
-        this.startLocation = null;
-        this.endLocation = null;
+        this.location = null;
         this.possibleSingleSelection = false;
         this.selection = [];
         this.progress = false;
@@ -1453,16 +1633,18 @@ var SingleSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return;
       }
-      var target = this.engine.domHelper.findClosest(e.target, NODE_TYPE);
-      if (target !== null) {
-        this.startLocation = locationOf(e, this.engine.registry.root.dom);
-        this.selection = [target.userComponent];
-        this.possibleSingleSelection = true;
-        this.progress = true;
+      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.types));
+      if (!target) {
+        return;
       }
+      this.location = locationOf(e, part.registry.root.dom);
+      this.selection = [target.userComponent];
+      this.possibleSingleSelection = true;
+      this.progress = true;
     }
   }, {
     key: 'onMouseMove',
@@ -1478,7 +1660,6 @@ var SingleSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = this.startLocation;
       if (this.possibleSingleSelection) {
         this.additional = metaKey || ctrlKey;
         perform(this.engine.editPolicies, this.createSingleSelectionRequest());
@@ -1489,34 +1670,22 @@ var SingleSelectionCapability = function (_Capability) {
   return SingleSelectionCapability;
 }(Capability);
 
-var buildBounds = function buildBounds(_ref, _ref2) {
-  var x1 = _ref.x,
-      y1 = _ref.y;
-  var x2 = _ref2.x,
-      y2 = _ref2.y;
-
-  var x = Math.min(x1, x2);
-  var y = Math.min(y1, y2);
-  var width = Math.max(x1, x2) - x;
-  var height = Math.max(y1, y2) - y;
-  return regefGeometry.rectangle(x, y, width, height);
-};
-
-var locationOf$1 = function locationOf(_ref3, rootDom) {
-  var clientX = _ref3.clientX,
-      clientY = _ref3.clientY;
-
-  var _rootDom$getBoundingC = rootDom.getBoundingClientRect(),
-      x = _rootDom$getBoundingC.x,
-      y = _rootDom$getBoundingC.y;
-
-  return regefGeometry.point(clientX - x, clientY - y);
+var locationOf$1 = function locationOf(_ref) {
+  var clientX = _ref.clientX,
+      clientY = _ref.clientY;
+  return regefGeometry.point(clientX, clientY);
 };
 
 var MultiSelectionCapability = function (_Capability) {
   inherits(MultiSelectionCapability, _Capability);
 
   function MultiSelectionCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      parts: null,
+      types: [NODE_TYPE],
+      intersection: false,
+      containment: true
+    };
     classCallCheck(this, MultiSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this));
@@ -1524,7 +1693,12 @@ var MultiSelectionCapability = function (_Capability) {
     _this.startLocation = null;
     _this.endLocation = null;
     _this.lastRequest = null;
+    _this.startPart = null;
+    _this.endPart = null;
+    _this.selectionBounds = null;
+    _this.selection = null;
     _this.additional = false;
+    _this.config = config;
     return _this;
   }
 
@@ -1533,29 +1707,76 @@ var MultiSelectionCapability = function (_Capability) {
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
           endLocation = this.endLocation,
-          additional = this.additional,
-          engine = this.engine;
-      var toolkit = this.engine.toolkit;
+          selectionBounds = this.selectionBounds,
+          selection = this.selection;
 
-      var bounds = buildBounds(startLocation, endLocation);
       return {
         type: SELECT,
-        bounds: bounds,
+        bounds: selectionBounds,
+        selection: selection || [],
         startLocation: startLocation,
-        endLocation: endLocation,
-        get selection() {
-          var selection = engine.selection();
-          var additionalFilter = additional ? function (node) {
-            return selection.indexOf(node) < 0;
-          } : function () {
-            return true;
-          };
-          var newSelection = toolkit.nodes().filter(additionalFilter).filter(function (node) {
-            return bounds.containsRectangle(toolkit.bounds(node));
-          });
-          return additional ? selection.concat(newSelection) : newSelection;
-        }
+        endLocation: endLocation
       };
+    }
+  }, {
+    key: 'buildSelectionBounds',
+    value: function buildSelectionBounds() {
+      var startLocation = this.startLocation,
+          endLocation = this.endLocation;
+
+      if (!startLocation || !endLocation) {
+        return;
+      }
+      var x1 = startLocation.x,
+          y1 = startLocation.y;
+      var x2 = endLocation.x,
+          y2 = endLocation.y;
+
+      var x = Math.min(x1, x2);
+      var y = Math.min(y1, y2);
+      var width = Math.max(x1, x2) - x;
+      var height = Math.max(y1, y2) - y;
+
+      this.selectionBounds = regefGeometry.rectangle(x, y, width, height);
+    }
+  }, {
+    key: 'buildSelection',
+    value: function buildSelection() {
+      var config = this.config,
+          engine = this.engine,
+          selectionBounds = this.selectionBounds,
+          additional = this.additional;
+
+
+      var parts = getParts(engine, config.parts).filter(function (part) {
+        var bounds = regefGeometry.rectangle(part.registry.root.dom.getBoundingClientRect());
+        return bounds.intersection(selectionBounds) !== null;
+      });
+
+      var currentSelection = getSelection(engine);
+      var newSelection = [];
+
+      var isRelevant = typeMatches(config.types);
+      var additionalFilter = additional ? function (_ref2) {
+        var userComponent = _ref2.userComponent;
+        return currentSelection.indexOf(userComponent) < 0;
+      } : alwaysTrue;
+      var boundsMatch = config.containment ? function (itemBounds) {
+        return selectionBounds.containsRectangle(itemBounds);
+      } : function (itemBounds) {
+        return selectionBounds.intersection(itemBounds) !== null;
+      };
+
+      parts.forEach(function (part) {
+        part.registry.all().forEach(function (wrapper) {
+          var bounds = regefGeometry.rectangle(wrapper.dom.getBoundingClientRect());
+          if (isRelevant(wrapper) && additionalFilter(wrapper) && boundsMatch(bounds)) {
+            newSelection.push(wrapper.userComponent);
+          }
+        });
+      });
+
+      this.selection = additional ? currentSelection.concat(newSelection) : newSelection;
     }
   }, {
     key: 'cancel',
@@ -1568,18 +1789,22 @@ var MultiSelectionCapability = function (_Capability) {
         this.endLocation = null;
         this.possibleSingleSelection = false;
         this.progress = false;
+        this.selection = null;
+        this.selectionBounds = null;
       }
     }
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
-      if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      if (!part) {
         return;
       }
-      var target = this.engine.domHelper.findClosest(e.target, ROOT_TYPE);
+      var target = part.domHelper.findClosest(e.target, typeMatches(ROOT_TYPE));
       if (target !== null) {
-        this.startLocation = locationOf$1(e, this.engine.registry.root.dom);
+        this.startLocation = locationOf$1(e);
         this.progress = true;
+        this.startPart = part;
       }
     }
   }, {
@@ -1588,7 +1813,13 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.engine.registry.root.dom);
+      this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      this.endLocation = locationOf$1(e);
+      this.additional = Boolean(e.shiftKey);
+
+      this.buildSelectionBounds();
+      this.buildSelection();
+
       var request = this.createMultiSelectionRequest();
       requestFeedback(this.engine.editPolicies, request);
       this.lastRequest = request;
@@ -1599,8 +1830,10 @@ var MultiSelectionCapability = function (_Capability) {
       if (!this.progress) {
         return;
       }
-      this.endLocation = locationOf$1(e, this.engine.registry.root.dom);
-      this.additional = e.shiftKey;
+      this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+      this.endLocation = locationOf$1(e);
+      this.additional = Boolean(e.shiftKey);
+
       var request = this.createMultiSelectionRequest();
       if (this.lastRequest !== null) {
         eraseFeedback(this.engine.editPolicies, this.lastRequest);
@@ -1608,6 +1841,8 @@ var MultiSelectionCapability = function (_Capability) {
       perform(this.engine.editPolicies, request);
       this.progress = false;
       this.additional = false;
+      this.selection = null;
+      this.selectionBounds = null;
     }
   }]);
   return MultiSelectionCapability;
@@ -1617,18 +1852,34 @@ var CancelCapability = function (_Capability) {
   inherits(CancelCapability, _Capability);
 
   function CancelCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, keys: ['Escape'] };
     classCallCheck(this, CancelCapability);
-    return possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).apply(this, arguments));
+
+    var _this = possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).call(this));
+
+    _this.config = config;
+    return _this;
   }
 
   createClass(CancelCapability, [{
+    key: 'focusOnTargetedParts',
+    value: function focusOnTargetedParts(target) {
+      return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+    }
+  }, {
+    key: 'keyMatches',
+    value: function keyMatches(key) {
+      return this.config.keys.indexOf(key) >= 0;
+    }
+  }, {
     key: 'onKeyDown',
     value: function onKeyDown(_ref) {
-      var key = _ref.key;
+      var key = _ref.key,
+          target = _ref.target;
 
-      if (key === 'Escape') {
-        this.engine.capabilities.forEach(function (tracker) {
-          return tracker.cancel();
+      if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+        this.engine.capabilities.forEach(function (capability) {
+          return capability.cancel();
         });
       }
     }
@@ -1640,11 +1891,13 @@ var DeleteCapability = function (_Capability) {
   inherits(DeleteCapability, _Capability);
 
   function DeleteCapability() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, keys: ['Backspace', 'Delete'] };
     classCallCheck(this, DeleteCapability);
 
     var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this));
 
     _this.currentSelection = [];
+    _this.config = config;
     return _this;
   }
 
@@ -1657,13 +1910,23 @@ var DeleteCapability = function (_Capability) {
       };
     }
   }, {
+    key: 'focusOnTargetedParts',
+    value: function focusOnTargetedParts(target) {
+      return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+    }
+  }, {
+    key: 'keyMatches',
+    value: function keyMatches(key) {
+      return this.config.keys.indexOf(key) >= 0;
+    }
+  }, {
     key: 'onKeyDown',
     value: function onKeyDown(_ref) {
       var key = _ref.key,
           target = _ref.target;
 
-      if ((key === 'Backspace' || key === 'Delete') && this.engine.domHelper.isInsideDiagram(target)) {
-        this.currentSelection = this.engine.selection();
+      if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+        this.currentSelection = getSelection(this.engine);
         if (this.currentSelection.length > 0) {
           perform(this.engine.editPolicies, this.getDeleteRequest());
         }
@@ -1673,7 +1936,7 @@ var DeleteCapability = function (_Capability) {
   return DeleteCapability;
 }(Capability);
 
-exports.Diagram = Diagram;
+exports.DiagramPart = DiagramPart;
 exports.EditPolicy = EditPolicy;
 exports.DispatchingEditPolicy = DispatchingEditPolicy;
 exports.Engine = Engine;
@@ -1684,18 +1947,15 @@ exports.connection = connection;
 exports.node = node;
 exports.port = port;
 exports.DragCapability = DragCapability;
-exports.ConnectCapability = ConnectMouseHandler;
+exports.ConnectCapability = ConnectCapability;
 exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
-exports.DATA_ID = DATA_ID;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
-exports.PALETTE_ROOT_TYPE = PALETTE_ROOT_TYPE;
-exports.PALETTE_ENTRY_TYPE = PALETTE_ENTRY_TYPE;
 exports.ADD = ADD;
 exports.CREATE = CREATE;
 exports.MOVE = MOVE;

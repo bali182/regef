@@ -63,10 +63,6 @@ export interface EndConnectionIntent extends Intent {
 }
 
 export class EditPolicy {
-  constructor()
-  toolkit: Toolkit
-  dependencies: { [key: string]: any }
-
   perform(intent: Intent): void
   requestFeedback(intent: Intent): void
   eraseFeedback(intent): void
@@ -93,7 +89,29 @@ export class DispatchingEditPolicy extends EditPolicy {
   eraseSelectFeedback(intent: SelectionIntent): void
 }
 
-export class Toolkit {
+export default class EventManager {
+  engine: Engine
+  hooked: boolean
+  constructor(engine: Engine)
+
+  hookListeners(): void
+  unhookListeners(): void
+
+  onKeyUp(e: Event): void
+  onKeyDown(e: Event): void
+  onMouseDown(e): void
+  onMouseMove(e): void
+  onMouseUp(e): void
+}
+
+
+class Toolkit {
+  constructor(engine: Engine)
+  forPart(id: string | Symbol): PartToolkit
+  forComponent(component: ReactComponent): PartToolkit
+}
+
+class PartToolkit {
   constructor(registry: ComponentRegistry)
 
   root(): ReactComponent
@@ -108,9 +126,6 @@ export class Toolkit {
 }
 
 export class SelectionProvider {
-  toolkit: Toolkit
-  dependencies: { [key: string]: any }
-
   constructor()
 
   selection(): ReactComponent[]
@@ -124,30 +139,48 @@ export interface EngineParams {
 }
 
 export class Engine {
-  constructor(params: EngineParams)
   toolkit: Toolkit
   selectionProvider: SelectionProvider
   capabilities: Capability[]
   editPolicies: EditPolicy[]
   dependencies: { [key: string]: any }
+  parts: DiagramPartWrapper[]
+  eventManager: EventManager
+
+  constructor(params: EngineParams)
+
+  part(id: string | Symbol): DiagramPartWrapper
+  removePart(id: string | Symbol): void
 }
 
-interface DiagramProps {
+interface DiagramPartProps {
   engine: Engine
+  id?: string | Symbol
 }
 
-export class Diagram extends ReactComponent<DiagramProps, any> { /* empty */ }
+export class DiagramPart extends ReactComponent<DiagramPartProps, any> { /* empty */ }
 
-export function node(propMapper?: Function): (ReactConstructor: Function) => any
-export function port(propMapper?: Function): (ReactConstructor: Function) => any
-export function root(propMapper?: Function): (ReactConstructor: Function) => any
-export function connection(propMapper?: Function): (ReactConstructor: Function) => any
+export function node(): (ReactConstructor: Function) => any
+export function port(): (ReactConstructor: Function) => any
+export function root(): (ReactConstructor: Function) => any
+export function connection(): (ReactConstructor: Function) => any
 
 class ComponentWrapper {
-  new(dom: Node, component: ReactComponent, userComponent: ReactComponent)
   dom: Node
   component: ReactComponent
   userComponent: ReactComponent
+
+  constructor(dom: Node, component: ReactComponent, userComponent: ReactComponent)
+}
+
+class DiagramPartWrapper {
+  id: string
+  registry: ComponentRegistry
+  toolkit: PartToolkit
+  engine: Engine
+  domHelper: DomHelper
+
+  constructor(id: string, engine: Engine)
 }
 
 interface ComponentRegistry {

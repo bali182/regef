@@ -1,7 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { NODE_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { perform } from './EditPolicy'
+import { typeMatches, partMatches, perform, getSelection } from './utils'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
@@ -9,32 +9,29 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
 }
 
 export default class SingleSelectionCapability extends Capability {
-  constructor() {
+  constructor(config = { parts: null, types: [NODE_TYPE] }) {
     super()
-    this.startLocation = null
-    this.endLocation = null
+    this.location = null
     this.possibleSingleSelection = false
     this.additional = false
     this.selection = []
+    this.config = config
   }
 
   createSingleSelectionRequest() {
-    const { startLocation, endLocation, selection, additional } = this
+    const { location, selection, additional } = this
     return {
       type: SELECT,
-      bounds: rectangle(startLocation, dimension(0, 0)),
-      startLocation,
-      endLocation,
+      bounds: rectangle(location, dimension(0, 0)),
       selection: additional
-        ? this.engine.selection().concat(selection)
+        ? getSelection(this.engine).concat(selection)
         : selection,
     }
   }
 
   cancel() {
     if (this.progress) {
-      this.startLocation = null
-      this.endLocation = null
+      this.location = null
       this.possibleSingleSelection = false
       this.selection = []
       this.progress = false
@@ -42,16 +39,18 @@ export default class SingleSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return
     }
-    const target = this.engine.domHelper.findClosest(e.target, NODE_TYPE)
-    if (target !== null) {
-      this.startLocation = locationOf(e, this.engine.registry.root.dom)
-      this.selection = [target.userComponent]
-      this.possibleSingleSelection = true
-      this.progress = true
+    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.types))
+    if (!target) {
+      return
     }
+    this.location = locationOf(e, part.registry.root.dom)
+    this.selection = [target.userComponent]
+    this.possibleSingleSelection = true
+    this.progress = true
   }
 
   onMouseMove() {
@@ -62,7 +61,6 @@ export default class SingleSelectionCapability extends Capability {
     if (!this.progress) {
       return
     }
-    this.endLocation = this.startLocation
     if (this.possibleSingleSelection) {
       this.additional = metaKey || ctrlKey
       perform(this.engine.editPolicies, this.createSingleSelectionRequest())

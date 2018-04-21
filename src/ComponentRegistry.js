@@ -9,15 +9,20 @@ export default class ComponentRegistry {
     this.unregisterListeners = []
   }
   setRoot(root) {
+    if (root && this.root) {
+      throw new Error(`Diagram can only contain a single root. ${this.root} is already registered.`)
+    }
     this.root = root
-    if (root === null || root === undefined) {
+    if (!root) {
       this.mapping.clear()
+      this.wrappers.clear()
     }
   }
   register(wrapper) {
     if (!(wrapper instanceof ComponentWrapper)) {
       throw new TypeError(`ComponentWrapper instance expected, got ${wrapper}`)
     }
+    this.mapping.set(wrapper, wrapper)
     this.mapping.set(wrapper.dom, wrapper)
     this.mapping.set(wrapper.component, wrapper)
     this.mapping.set(wrapper.userComponent, wrapper)
@@ -27,6 +32,7 @@ export default class ComponentRegistry {
   unregister(input) {
     const wrapper = this.get(input)
     if (wrapper !== undefined) {
+      this.mapping.delete(wrapper)
       this.mapping.delete(wrapper.dom)
       this.mapping.delete(wrapper.component)
       this.mapping.delete(wrapper.userComponent)

@@ -1,15 +1,20 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
-import { PORT_TYPE, START_CONNECTION, END_CONNECTION } from './constants'
-import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
+import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE, ROOT_TYPE } from './constants'
+import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches } from './utils'
 
-export default class ConnectMouseHandler extends Capability {
-  constructor() {
+export default class ConnectCapability extends Capability {
+  constructor(config = {
+    parts: null,
+    sourceTypes: [PORT_TYPE],
+    targetTypes: [ROOT_TYPE, NODE_TYPE],
+  }) {
     super()
     this.source = null
     this.target = null
     this.coordinates = null
     this.lastRequest = null
+    this.config = config
   }
 
   cancel() {
@@ -40,34 +45,32 @@ export default class ConnectMouseHandler extends Capability {
     }
   }
 
-  buildCoordinates({ clientX, clientY }) {
-    const { top, left } = this.engine.registry.root.dom.getBoundingClientRect()
-    const x = clientX - left
-    const y = clientY - top
-    return { x, y }
-  }
-
   buildEndConnectRequest(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return null
     }
-
-    this.target = this.engine.domHelper.findClosest(e.target)
-    this.coordinates = this.buildCoordinates(e)
+    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes))
+    if (!target) {
+      return null
+    }
+    this.target = target
+    this.coordinates = point(e.clientX, e.clientY)
     return this.getEndConnectionRequest()
   }
 
   buildStartConnectionRequest(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return null
     }
-    const source = this.engine.domHelper.findClosest(e.target, PORT_TYPE)
-    if (source !== null) {
-      this.source = source
-      this.coordinates = this.buildCoordinates(e)
-      return this.getStartConnectionRequest()
+    const source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes))
+    if (!source) {
+      return null
     }
-    return null
+    this.source = source
+    this.coordinates = point(e.clientX, e.clientY)
+    return this.getStartConnectionRequest()
   }
 
   handleFeedback(lastRequest, request) {

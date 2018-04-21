@@ -12,7 +12,7 @@ A graphical editing tool for [React](https://reactjs.org/). Provides accessible 
 - handle customized events describing user intention
 
 ## examples
-https://github.com/bali182/regef-example
+https://github.com/bali182/regef/tree/master/example
 
 ## docs
 In progress, the APIs are still not final.

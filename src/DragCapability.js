@@ -1,62 +1,71 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform } from './EditPolicy'
+import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform, getSelection } from './utils'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
-const buildDeltas = ({ clientX, clientY }, element) => {
+const buildOffset = ({ clientX, clientY }, element) => {
   const { x, y } = element.getBoundingClientRect()
-  const deltaX = clientX - x
-  const deltaY = clientY - y
-  return {
-    deltaX,
-    deltaY,
-  }
+  return point(clientX - x, clientY - y)
 }
 
 export default class DragCapability extends Capability {
-  constructor() {
+  constructor(config = { parts: null, types: [NODE_TYPE] }) {
     super()
     this.target = null
     this.lastTargetParent = null
     this.targetParent = null
     this.currentParent = null
     this.coordinates = null
-    this.eventDeltas = null
+    this.offset = null
     this.lastRequest = null
     this.mouseMoved = false
     this.startLocation = null
+    this.config = config
   }
 
-  findTargetedParent(eventTarget) {
+  findTargetedParent(eventTarget, part) {
     const { target, currentParent } = this
-    const newTarget = this.engine.domHelper.findClosest(eventTarget, ACCEPTED_TYPES)
+    if (!part) {
+      return null
+    }
+    const newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)) // TODO
     if (newTarget === null
       || newTarget === target
-      || target.dom.contains(newTarget.dom)
-      || this.engine.selection().indexOf(newTarget.userComponent) >= 0) {
+      || (target !== null && target.dom.contains(newTarget.dom))
+      || getSelection(this.engine).indexOf(newTarget.userComponent) >= 0) {
       return currentParent
     }
     return newTarget
   }
 
-  updateCoordinates(e) {
-    const { deltaX, deltaY } = this.eventDeltas
-    const { clientX, clientY } = e
-    const { x: rootX, y: rootY } = this.engine.registry.root.dom.getBoundingClientRect()
-    const location = point(clientX - rootX, clientY - rootY)
-    const offset = point(deltaX, deltaY)
-    const delta = point(e.clientX - this.startLocation.x, e.clientY - this.startLocation.y)
+  deltaCoordinates({ clientX, clientY }) {
+    return point(clientX - this.startLocation.x, clientY - this.startLocation.y)
+  }
+
+  screenCoordinates({ clientX, clientY }) {
+    return point(clientX, clientY)
+  }
+
+  offsetCoordinates() {
+    return this.offset
+  }
+
+  locationCoordinates({ clientX, clientY }) {
+    return point(clientX, clientY)
+  }
+
+  updateCoordinates(e, part) {
     this.coordinates = {
-      location,
-      offset,
-      delta,
+      offset: this.offsetCoordinates(),
+      delta: this.deltaCoordinates(e),
+      location: this.locationCoordinates(e, part),
     }
   }
 
-  updateParents(e) {
-    const newTargetParent = this.findTargetedParent(e.target)
+  updateParents(e, part) {
+    const newTargetParent = this.findTargetedParent(e.target, part)
     const targetParent = this.targetParent
     if (targetParent !== newTargetParent) {
       this.lastTargetParent = targetParent
@@ -68,36 +77,30 @@ export default class DragCapability extends Capability {
 
   getMovedComponents() {
     const target = this.target.userComponent
-    if (this.engine.selection().indexOf(target) >= 0) {
-      return this.engine.selection()
+    const selection = getSelection(this.engine)
+    if (selection.indexOf(target) >= 0) {
+      return selection
     }
     return [target]
   }
 
   getMoveChildRequest() {
-    const { currentParent, coordinates } = this
-    const { location, offset, delta } = coordinates
     return {
       type: MOVE,
       components: this.getMovedComponents(),
-      container: currentParent.component.userComponent,
-      location,
-      offset,
-      delta,
+      container: this.currentParent.component.userComponent,
+      ...this.coordinates,
     }
   }
 
   getAddChildRequest() {
-    const { targetParent, currentParent, coordinates } = this
-    const { location, offset, delta } = coordinates
+    const { targetParent, currentParent } = this
     return {
       type: ADD,
       components: this.getMovedComponents(),
-      targetContainer: targetParent.component.userComponent,
+      targetContainer: targetParent === null ? null : targetParent.component.userComponent,
       container: currentParent.component.userComponent,
-      location,
-      offset,
-      delta,
+      ...this.coordinates,
     }
   }
 
@@ -116,8 +119,7 @@ export default class DragCapability extends Capability {
     const { lastTargetParent, targetParent } = this
     if (
       lastRequest !== null &&
-      lastTargetParent.dom !== targetParent.dom &&
-      lastTargetParent.component !== null
+      lastTargetParent !== targetParent
     ) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
@@ -126,25 +128,17 @@ export default class DragCapability extends Capability {
     }
   }
 
-  isMoveChild() {
-    return this.currentParent === this.targetParent
-  }
-
-  isAddChild() {
-    return this.currentParent !== this.targetParent
-  }
-
   buildDragRequest(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
-      return null
-    }
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
 
-    this.updateParents(e)
-    this.updateCoordinates(e)
+    this.updateParents(e, part)
+    this.updateCoordinates(e, part)
 
-    if (this.isMoveChild(e)) {
+    const { currentParent, targetParent } = this
+
+    if (currentParent === targetParent) {
       return this.getMoveChildRequest()
-    } else if (this.isAddChild(e)) {
+    } else if (currentParent !== targetParent) {
       return this.getAddChildRequest()
     }
     return null
@@ -157,7 +151,7 @@ export default class DragCapability extends Capability {
       }
       this.progress = false
       this.lastRequest = null
-      this.eventDeltas = null
+      this.offset = null
       this.coordinates = null
       this.targetParent = null
       this.target = null
@@ -166,14 +160,18 @@ export default class DragCapability extends Capability {
   }
 
   onMouseDown(e) {
-    if (!this.engine.domHelper.isInsideDiagram(e.target)) {
+    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    if (!part) {
       return
     }
-    this.target = this.engine.domHelper.findClosest(e.target, NODE_TYPE)
+    this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.types))
     if (this.target !== null) {
-      const parent = this.engine.domHelper.findClosest(this.target.dom.parentNode, ACCEPTED_TYPES)
-      this.currentParent = parent || this.engine.registry.root
-      this.eventDeltas = buildDeltas(e, this.target.dom)
+      const parent = part.domHelper.findClosest(
+        this.target.dom.parentNode,
+        (wrapper) => ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0,
+      )
+      this.currentParent = parent || part.registry.root
+      this.offset = buildOffset(e, this.target.dom)
       this.startLocation = point(e.clientX, e.clientY)
       this.mouseMoved = false
       this.progress = true
@@ -186,8 +184,7 @@ export default class DragCapability extends Capability {
     }
     this.mouseMoved = true
     const request = this.buildDragRequest(e)
-    const selection = this.engine.selection()
-    if (selection.indexOf(this.target.userComponent) < 0) {
+    if (getSelection(this.engine).indexOf(this.target.userComponent) < 0) {
       perform(this.engine.editPolicies, this.getSelectionRequest())
     }
     this.handleFeedback(this.lastRequest, request)
