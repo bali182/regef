@@ -1200,6 +1200,16 @@ var getParts = function getParts(engine) {
   });
 };
 
+// https://stackoverflow.com/a/12737882/1126273
+var isLeftButton = function isLeftButton(e) {
+  if ('buttons' in e) {
+    return e.buttons === 1;
+  } else if ('which' in e) {
+    return e.which === 1;
+  }
+  return e.button === 1;
+};
+
 var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
 
 var buildOffset = function buildOffset(_ref, element) {
@@ -1397,6 +1407,9 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
+      if (!isLeftButton(e)) {
+        return;
+      }
       var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
       if (!part) {
         return;
@@ -1543,6 +1556,9 @@ var ConnectCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
+      if (!isLeftButton(e)) {
+        return;
+      }
       var request = this.buildStartConnectionRequest(e);
       if (request !== null) {
         this.progress = true;
@@ -1633,6 +1649,9 @@ var SingleSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
+      if (!isLeftButton(e)) {
+        return;
+      }
       var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
       if (!part) {
         return;
@@ -1796,6 +1815,9 @@ var MultiSelectionCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
+      if (!isLeftButton(e)) {
+        return;
+      }
       var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
       if (!part) {
         return;

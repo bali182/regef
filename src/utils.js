@@ -50,3 +50,13 @@ export const getParts = (engine, ids = null) => {
   }
   return ids.map((id) => engine.part(id))
 }
+
+// https://stackoverflow.com/a/12737882/1126273
+export const isLeftButton = (e) => {
+  if ('buttons' in e) {
+    return e.buttons === 1
+  } else if ('which' in e) {
+    return e.which === 1
+  }
+  return e.button === 1
+}

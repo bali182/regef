@@ -1,7 +1,7 @@
 import { point, rectangle } from 'regef-geometry'
 import { ROOT_TYPE, SELECT, NODE_TYPE } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typeMatches, getParts, alwaysTrue } from './utils'
+import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typeMatches, getParts, alwaysTrue, isLeftButton } from './utils'
 
 const locationOf = ({ clientX, clientY }) => point(clientX, clientY)
 
@@ -96,6 +96,9 @@ export default class MultiSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
+    if (!isLeftButton(e)) {
+      return
+    }
     const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     if (!part) {
       return
