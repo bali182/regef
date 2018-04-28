@@ -1,7 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { NODE_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { typeMatches, partMatches, perform, getSelection } from './utils'
+import { typeMatches, partMatches, perform, getSelection, isLeftButton } from './utils'
 
 const locationOf = ({ clientX, clientY }, rootDom) => {
   const { x, y } = rootDom.getBoundingClientRect()
@@ -39,6 +39,9 @@ export default class SingleSelectionCapability extends Capability {
   }
 
   onMouseDown(e) {
+    if (!isLeftButton(e)) {
+      return
+    }
     const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     if (!part) {
       return

@@ -1,7 +1,7 @@
 import { point, rectangle, dimension } from 'regef-geometry'
 import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
 import Capability from './Capability'
-import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform, getSelection } from './utils'
+import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform, getSelection, isLeftButton } from './utils'
 
 const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
 
@@ -160,6 +160,9 @@ export default class DragCapability extends Capability {
   }
 
   onMouseDown(e) {
+    if (!isLeftButton(e)) {
+      return
+    }
     const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     if (!part) {
       return

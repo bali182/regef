@@ -1,7 +1,7 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
 import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE, ROOT_TYPE } from './constants'
-import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches } from './utils'
+import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches, isLeftButton } from './utils'
 
 export default class ConnectCapability extends Capability {
   constructor(config = {
@@ -84,6 +84,9 @@ export default class ConnectCapability extends Capability {
   }
 
   onMouseDown(e) {
+    if (!isLeftButton(e)) {
+      return
+    }
     const request = this.buildStartConnectionRequest(e)
     if (request !== null) {
       this.progress = true
