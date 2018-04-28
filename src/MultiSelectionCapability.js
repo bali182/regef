@@ -6,13 +6,13 @@ import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typ
 const locationOf = ({ clientX, clientY }) => point(clientX, clientY)
 
 export default class MultiSelectionCapability extends Capability {
-  constructor(config = {
+  constructor(engine, config = {
     parts: null,
     types: [NODE_TYPE],
     intersection: false,
     containment: true,
   }) {
-    super()
+    super(engine)
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null

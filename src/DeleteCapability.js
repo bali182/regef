@@ -3,8 +3,8 @@ import { DELETE } from './constants'
 import { perform, partMatches, getSelection } from './utils'
 
 export default class DeleteCapability extends Capability {
-  constructor(config = { parts: null, keys: ['Backspace', 'Delete'] }) {
-    super()
+  constructor(engine, config = { parts: null, keys: ['Backspace', 'Delete'] }) {
+    super(engine)
     this.currentSelection = []
     this.config = config
   }

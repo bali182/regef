@@ -84,20 +84,6 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
-var SelectionProvider = function () {
-  function SelectionProvider() {
-    classCallCheck(this, SelectionProvider);
-  }
-
-  createClass(SelectionProvider, [{
-    key: "selection",
-    value: function selection() {
-      return [];
-    }
-  }]);
-  return SelectionProvider;
-}();
-
 var DOM = Symbol('DOM');
 var COMPONENT = Symbol('COMPONENT');
 var USER_COMPONENT = Symbol('USER_COMPONENT');
@@ -615,32 +601,15 @@ var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var PARTS = Symbol('PARTS');
 
-var valueFrom = function valueFrom(input) {
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  return input instanceof Function ? input.apply(undefined, args) : input;
-};
-var arrayFrom = function arrayFrom(input) {
-  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    args[_key2 - 1] = arguments[_key2];
-  }
-
-  var value = input instanceof Function ? input.apply(undefined, args) : input;
-  return Array.isArray(value) ? value : [value];
-};
-
 var Engine = function () {
-  function Engine(_ref) {
-    var _this = this;
-
-    var _ref$capabilities = _ref.capabilities,
-        capabilities = _ref$capabilities === undefined ? [] : _ref$capabilities,
-        _ref$editPolicies = _ref.editPolicies,
-        editPolicies = _ref$editPolicies === undefined ? [] : _ref$editPolicies,
-        _ref$selectionProvide = _ref.selectionProvider,
-        selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
+  function Engine() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {
+      return {
+        capabilities: [],
+        editPolicies: [],
+        selectionProvider: null
+      };
+    };
     classCallCheck(this, Engine);
 
     this[TOOLKIT$1] = new Toolkit(this);
@@ -648,14 +617,14 @@ var Engine = function () {
     this[DOM_HELPER$2] = new DomHelper(this);
     this[PARTS] = new Map();
 
-    this[CAPABILITIES] = arrayFrom(capabilities, this);
-    this[EDIT_POLICIES] = arrayFrom(editPolicies, this);
-    this[SELECTION_PROVIDER] = valueFrom(selectionProvider, this);
+    var _config = config(this),
+        capabilities = _config.capabilities,
+        editPolicies = _config.editPolicies,
+        selectionProvider = _config.selectionProvider;
 
-    this.capabilities.forEach(function (capability) {
-      // eslint-disable-next-line no-param-reassign
-      capability.engine = _this;
-    });
+    this[CAPABILITIES] = capabilities;
+    this[EDIT_POLICIES] = editPolicies;
+    this[SELECTION_PROVIDER] = selectionProvider;
   }
 
   createClass(Engine, [{
@@ -904,11 +873,11 @@ var DispatchingEditPolicy = function (_EditPolicy) {
 }(EditPolicy);
 
 var Capability = function () {
-  function Capability() {
+  function Capability(engine) {
     classCallCheck(this, Capability);
 
     this.progress = false;
-    this.engine = null;
+    this.engine = engine;
   }
 
   createClass(Capability, [{
@@ -943,6 +912,20 @@ var Capability = function () {
     }
   }]);
   return Capability;
+}();
+
+var SelectionProvider = function () {
+  function SelectionProvider() {
+    classCallCheck(this, SelectionProvider);
+  }
+
+  createClass(SelectionProvider, [{
+    key: "selection",
+    value: function selection() {
+      return [];
+    }
+  }]);
+  return SelectionProvider;
 }();
 
 function createDecorator(_ref) {
@@ -1226,11 +1209,11 @@ var buildOffset = function buildOffset(_ref, element) {
 var DragCapability = function (_Capability) {
   inherits(DragCapability, _Capability);
 
-  function DragCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
+  function DragCapability(engine) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, DragCapability);
 
-    var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this));
+    var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this, engine));
 
     _this.target = null;
     _this.lastTargetParent = null;
@@ -1464,15 +1447,15 @@ var DragCapability = function (_Capability) {
 var ConnectCapability = function (_Capability) {
   inherits(ConnectCapability, _Capability);
 
-  function ConnectCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+  function ConnectCapability(engine) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
       parts: null,
       sourceTypes: [PORT_TYPE],
       targetTypes: [ROOT_TYPE, NODE_TYPE]
     };
     classCallCheck(this, ConnectCapability);
 
-    var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this));
+    var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this, engine));
 
     _this.source = null;
     _this.target = null;
@@ -1609,11 +1592,11 @@ var locationOf = function locationOf(_ref, rootDom) {
 var SingleSelectionCapability = function (_Capability) {
   inherits(SingleSelectionCapability, _Capability);
 
-  function SingleSelectionCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, types: [NODE_TYPE] };
+  function SingleSelectionCapability(engine) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, types: [NODE_TYPE] };
     classCallCheck(this, SingleSelectionCapability);
 
-    var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this));
+    var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this, engine));
 
     _this.location = null;
     _this.possibleSingleSelection = false;
@@ -1698,8 +1681,8 @@ var locationOf$1 = function locationOf(_ref) {
 var MultiSelectionCapability = function (_Capability) {
   inherits(MultiSelectionCapability, _Capability);
 
-  function MultiSelectionCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+  function MultiSelectionCapability(engine) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
       parts: null,
       types: [NODE_TYPE],
       intersection: false,
@@ -1707,7 +1690,7 @@ var MultiSelectionCapability = function (_Capability) {
     };
     classCallCheck(this, MultiSelectionCapability);
 
-    var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this));
+    var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this, engine));
 
     _this.startLocation = null;
     _this.endLocation = null;
@@ -1873,11 +1856,11 @@ var MultiSelectionCapability = function (_Capability) {
 var CancelCapability = function (_Capability) {
   inherits(CancelCapability, _Capability);
 
-  function CancelCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, keys: ['Escape'] };
+  function CancelCapability(engine) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, keys: ['Escape'] };
     classCallCheck(this, CancelCapability);
 
-    var _this = possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).call(this));
+    var _this = possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).call(this, engine));
 
     _this.config = config;
     return _this;
@@ -1912,11 +1895,11 @@ var CancelCapability = function (_Capability) {
 var DeleteCapability = function (_Capability) {
   inherits(DeleteCapability, _Capability);
 
-  function DeleteCapability() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { parts: null, keys: ['Backspace', 'Delete'] };
+  function DeleteCapability(engine) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, keys: ['Backspace', 'Delete'] };
     classCallCheck(this, DeleteCapability);
 
-    var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this));
+    var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this, engine));
 
     _this.currentSelection = [];
     _this.config = config;

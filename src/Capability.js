@@ -1,7 +1,7 @@
 export default class Capability {
-  constructor() {
+  constructor(engine) {
     this.progress = false
-    this.engine = null
+    this.engine = engine
   }
   onKeyDown() {
     // emtpy

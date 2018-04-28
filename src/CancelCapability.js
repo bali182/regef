@@ -2,8 +2,8 @@ import Capability from './Capability'
 import { partMatches } from './utils'
 
 export default class CancelCapability extends Capability {
-  constructor(config = { parts: null, keys: ['Escape'] }) {
-    super()
+  constructor(engine, config = { parts: null, keys: ['Escape'] }) {
+    super(engine)
     this.config = config
   }
 
