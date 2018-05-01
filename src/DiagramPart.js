@@ -11,8 +11,13 @@ export default class DiagramPart extends PureComponent {
   }
   componentWillUnmount() {
     const { id, engine } = this.props
-    engine.removePart(id)
-    if (engine.parts.length === 0) {
+    const parts = engine.__partsMap()
+    const part = parts.get(id)
+    if (part && part.registry) {
+      part.registry.setRoot(null)
+    }
+    parts.delete(id)
+    if (parts.size === 0) {
       engine.eventManager.unhookListeners()
     }
   }

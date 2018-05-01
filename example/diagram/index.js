@@ -30,16 +30,16 @@ const createEngine = (store) => {
       (action) => store.dispatch(action),
     ),
   }
-  return new Engine({
-    capabilities: () => [
-      new DragCapability(),
-      new ConnectCapability(),
-      new SingleSelectionCapability(),
-      new MultiSelectionCapability(),
-      new CancelCapability(),
-      new DeleteCapability(),
+  return new Engine((engine) => ({
+    capabilities: [
+      new DragCapability(engine),
+      new ConnectCapability(engine),
+      new SingleSelectionCapability(engine),
+      new MultiSelectionCapability(engine),
+      new CancelCapability(engine),
+      new DeleteCapability(engine),
     ],
-    editPolicies: (engine) => [
+    editPolicies: [
       new MoveRootChildrenEditPolicy(engine, dependencies),
       new AddContainerChildrenEditPolicy(engine, dependencies),
       new MoveContainerChildrenEditPolicy(engine, dependencies),
@@ -49,8 +49,8 @@ const createEngine = (store) => {
       new DisabledAddChildrenEditPolicy(engine, dependencies),
       new LoggerEditPolicy(),
     ],
-    selectionProvider: (engine) => new DiagramSelectionProvider(engine, dependencies),
-  })
+    selectionProvider: new DiagramSelectionProvider(engine, dependencies),
+  }))
 }
 
 export default createEngine

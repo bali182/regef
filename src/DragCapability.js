@@ -11,8 +11,8 @@ const buildOffset = ({ clientX, clientY }, element) => {
 }
 
 export default class DragCapability extends Capability {
-  constructor(config = { parts: null, types: [NODE_TYPE] }) {
-    super()
+  constructor(engine, config = { parts: null, types: [NODE_TYPE] }) {
+    super(engine)
     this.target = null
     this.lastTargetParent = null
     this.targetParent = null

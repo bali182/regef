@@ -9,8 +9,8 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
 }
 
 export default class SingleSelectionCapability extends Capability {
-  constructor(config = { parts: null, types: [NODE_TYPE] }) {
-    super()
+  constructor(engine, config = { parts: null, types: [NODE_TYPE] }) {
+    super(engine)
     this.location = null
     this.possibleSingleSelection = false
     this.additional = false
