@@ -7,9 +7,11 @@ import { watchRegister } from './watchers'
 const registryFrom = ({ engine, id }) => (engine.__partsMap().has(id)
   ? engine.part(id).registry
   : null)
+
 const toolkitFrom = ({ engine, id }) => (engine.__partsMap().has(id)
   ? engine.part(id).toolkit
   : null)
+
 const ensurePartRegistered = ({ engine, id }) => {
   const parts = engine.__partsMap()
   if (!parts.has(id)) {
@@ -18,6 +20,7 @@ const ensurePartRegistered = ({ engine, id }) => {
 }
 
 function defaultToolkitResolver(component, context) {
+  ensurePartRegistered(context)
   return () => watchRegister(registryFrom(context), component).then(() => toolkitFrom(context))
 }
 

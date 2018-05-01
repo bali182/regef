@@ -1037,11 +1037,13 @@ var registryFrom = function registryFrom(_ref) {
       id = _ref.id;
   return engine.__partsMap().has(id) ? engine.part(id).registry : null;
 };
+
 var toolkitFrom = function toolkitFrom(_ref2) {
   var engine = _ref2.engine,
       id = _ref2.id;
   return engine.__partsMap().has(id) ? engine.part(id).toolkit : null;
 };
+
 var ensurePartRegistered = function ensurePartRegistered(_ref3) {
   var engine = _ref3.engine,
       id = _ref3.id;
@@ -1053,6 +1055,7 @@ var ensurePartRegistered = function ensurePartRegistered(_ref3) {
 };
 
 function defaultToolkitResolver(component, context) {
+  ensurePartRegistered(context);
   return function () {
     return watchRegister(registryFrom(context), component).then(function () {
       return toolkitFrom(context);
