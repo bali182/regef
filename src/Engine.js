@@ -1,4 +1,3 @@
-import SelectionProvider from './SelectionProvider'
 import EventManager from './EventManager'
 import Toolkit from './Toolkit'
 import DomHelper from './DomHelper'
@@ -11,31 +10,22 @@ const EVENT_MANAGER = Symbol('EVENT_MANAGER')
 const EDIT_POLICIES = Symbol('EDIT_POLICIES')
 const PARTS = Symbol('PARTS')
 
-const valueFrom = (input, ...args) => (input instanceof Function ? input(...args) : input)
-const arrayFrom = (input, ...args) => {
-  const value = input instanceof Function ? input(...args) : input
-  return Array.isArray(value) ? value : [value]
-}
-
 export default class Engine {
-  constructor({
-    capabilities = [],
-    editPolicies = [],
-    selectionProvider = new SelectionProvider(),
-  }) {
+  constructor(config = () => ({
+    capabilities: [],
+    editPolicies: [],
+    selectionProvider: null,
+  })) {
     this[TOOLKIT] = new Toolkit(this)
     this[EVENT_MANAGER] = new EventManager(this)
     this[DOM_HELPER] = new DomHelper(this)
     this[PARTS] = new Map()
 
-    this[CAPABILITIES] = arrayFrom(capabilities, this)
-    this[EDIT_POLICIES] = arrayFrom(editPolicies, this)
-    this[SELECTION_PROVIDER] = valueFrom(selectionProvider, this)
+    const { capabilities, editPolicies, selectionProvider } = config(this)
 
-    this.capabilities.forEach((capability) => {
-      // eslint-disable-next-line no-param-reassign
-      capability.engine = this
-    })
+    this[CAPABILITIES] = capabilities
+    this[EDIT_POLICIES] = editPolicies
+    this[SELECTION_PROVIDER] = selectionProvider
   }
   __partsMap() { return this[PARTS] }
   part(id) { return this[PARTS].get(id) }

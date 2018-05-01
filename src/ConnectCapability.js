@@ -4,12 +4,12 @@ import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE, ROOT_TYPE } fro
 import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches, isLeftButton } from './utils'
 
 export default class ConnectCapability extends Capability {
-  constructor(config = {
+  constructor(engine, config = {
     parts: null,
     sourceTypes: [PORT_TYPE],
     targetTypes: [ROOT_TYPE, NODE_TYPE],
   }) {
-    super()
+    super(engine)
     this.source = null
     this.target = null
     this.coordinates = null
