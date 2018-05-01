@@ -1,24 +1,36 @@
 import { NODE_TYPE, PORT_TYPE, ROOT_TYPE, CONNECTION_TYPE } from './constants'
+import DiagramPartWrapper from './DiagramPartWrapper'
 import createDecorator from './createDecorator'
 import { fromComponent } from './ComponentWrapper'
 import { watchRegister } from './watchers'
 
-const registryFrom = ({ engine, id }) =>
-  (id === undefined ? engine.registry : engine.part(id).registry)
-
-const toolkitFrom = ({ engine, id }) =>
-  (id === undefined ? engine.toolkit : engine.part(id).toolkit)
+const registryFrom = ({ engine, id }) => (engine.__partsMap().has(id)
+  ? engine.part(id).registry
+  : null)
+const toolkitFrom = ({ engine, id }) => (engine.__partsMap().has(id)
+  ? engine.part(id).toolkit
+  : null)
+const ensurePartRegistered = ({ engine, id }) => {
+  const parts = engine.__partsMap()
+  if (!parts.has(id)) {
+    parts.set(id, new DiagramPartWrapper(id, this))
+  }
+}
 
 function defaultToolkitResolver(component, context) {
   return () => watchRegister(registryFrom(context), component).then(() => toolkitFrom(context))
 }
 
 const defaultActivate = (component, context) => {
+  ensurePartRegistered(context)
   registryFrom(context).register(fromComponent(component))
 }
 
 const defaultDecativate = (component, context) => {
-  registryFrom(context).unregister(component)
+  const registry = registryFrom(context)
+  if (registry) {
+    registry.unregister(component)
+  }
 }
 
 const rootActivate = (component, context) => {
@@ -29,7 +41,10 @@ const rootActivate = (component, context) => {
 
 const rootDeactivate = (component, context) => {
   defaultDecativate(component, context)
-  registryFrom(context).setRoot(null)
+  const registry = registryFrom(context)
+  if (registry) {
+    registry.setRoot(null)
+  }
 }
 
 export const node = createDecorator({

@@ -1,5 +1,4 @@
 import SelectionProvider from './SelectionProvider'
-import DiagramPartWrapper from './DiagramPartWrapper'
 import EventManager from './EventManager'
 import Toolkit from './Toolkit'
 import DomHelper from './DomHelper'
@@ -38,18 +37,8 @@ export default class Engine {
       capability.engine = this
     })
   }
-
-  part(id) {
-    const parts = this[PARTS]
-    if (!parts.has(id)) {
-      const part = new DiagramPartWrapper(id, this)
-      parts.set(id, part)
-    }
-    return parts.get(id)
-  }
-
-  removePart(id) { this[PARTS].delete(id) }
-
+  __partsMap() { return this[PARTS] }
+  part(id) { return this[PARTS].get(id) }
   get domHelper() { return this[DOM_HELPER] }
   get parts() { return Array.from(this[PARTS].values()) }
   get eventManager() { return this[EVENT_MANAGER] }

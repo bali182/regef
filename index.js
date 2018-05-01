@@ -4,11 +4,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var reactDom = require('react-dom');
-var regefGeometry = require('regef-geometry');
 var React = require('react');
 var React__default = _interopDefault(React);
 var propTypes = require('prop-types');
+var reactDom = require('react-dom');
+var regefGeometry = require('regef-geometry');
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -96,381 +96,6 @@ var SelectionProvider = function () {
     }
   }]);
   return SelectionProvider;
-}();
-
-var DOM = Symbol('DOM');
-var COMPONENT = Symbol('COMPONENT');
-var USER_COMPONENT = Symbol('USER_COMPONENT');
-
-var ComponentWrapper = function () {
-  function ComponentWrapper(dom, component, userComponent) {
-    classCallCheck(this, ComponentWrapper);
-
-    this[DOM] = dom;
-    this[COMPONENT] = component;
-    this[USER_COMPONENT] = userComponent;
-  }
-
-  createClass(ComponentWrapper, [{
-    key: 'dom',
-    get: function get$$1() {
-      return this[DOM];
-    }
-  }, {
-    key: 'component',
-    get: function get$$1() {
-      return this[COMPONENT];
-    }
-  }, {
-    key: 'userComponent',
-    get: function get$$1() {
-      return this[USER_COMPONENT];
-    }
-  }]);
-  return ComponentWrapper;
-}();
-
-
-var fromComponent = function fromComponent(component) {
-  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
-};
-
-var ComponentRegistry = function () {
-  function ComponentRegistry() {
-    classCallCheck(this, ComponentRegistry);
-
-    this.mapping = new Map();
-    this.wrappers = new Set();
-    this.root = null;
-    this.registerListeners = [];
-    this.unregisterListeners = [];
-  }
-
-  createClass(ComponentRegistry, [{
-    key: 'setRoot',
-    value: function setRoot(root) {
-      if (root && this.root) {
-        throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
-      }
-      this.root = root;
-      if (!root) {
-        this.mapping.clear();
-        this.wrappers.clear();
-      }
-    }
-  }, {
-    key: 'register',
-    value: function register(wrapper) {
-      if (!(wrapper instanceof ComponentWrapper)) {
-        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
-      }
-      this.mapping.set(wrapper, wrapper);
-      this.mapping.set(wrapper.dom, wrapper);
-      this.mapping.set(wrapper.component, wrapper);
-      this.mapping.set(wrapper.userComponent, wrapper);
-      this.wrappers.add(wrapper);
-      this.registerListeners.forEach(function (listener) {
-        return listener(wrapper);
-      });
-    }
-  }, {
-    key: 'unregister',
-    value: function unregister(input) {
-      var wrapper = this.get(input);
-      if (wrapper !== undefined) {
-        this.mapping.delete(wrapper);
-        this.mapping.delete(wrapper.dom);
-        this.mapping.delete(wrapper.component);
-        this.mapping.delete(wrapper.userComponent);
-        this.wrappers.delete(wrapper);
-        this.unregisterListeners.forEach(function (listener) {
-          return listener(wrapper);
-        });
-      }
-    }
-  }, {
-    key: 'get',
-    value: function get$$1(input) {
-      return this.mapping.get(input);
-    }
-  }, {
-    key: 'all',
-    value: function all() {
-      return Array.from(this.wrappers);
-    }
-  }, {
-    key: 'has',
-    value: function has(input) {
-      return this.mapping.has(input);
-    }
-  }, {
-    key: 'addRegisterListener',
-    value: function addRegisterListener(listener) {
-      this.registerListeners.push(listener);
-    }
-  }, {
-    key: 'addUnregisterListener',
-    value: function addUnregisterListener(listener) {
-      this.unregisterListeners.push(listener);
-    }
-  }, {
-    key: 'removeRegisterListener',
-    value: function removeRegisterListener(listener) {
-      this.registerListeners = this.registerListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }, {
-    key: 'removeUnregisterListener',
-    value: function removeUnregisterListener(listener) {
-      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }]);
-  return ComponentRegistry;
-}();
-
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-
-// Request types
-var ADD = 'add';
-var CREATE = 'create';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
-
-var REGISTRY = Symbol('REGISTRY');
-var DOM_HELPER = Symbol('DOM_HELPER');
-
-var PartToolkit = function () {
-  function PartToolkit(registry, domHelper) {
-    classCallCheck(this, PartToolkit);
-
-    this[REGISTRY] = registry;
-    this[DOM_HELPER] = domHelper;
-  }
-
-  createClass(PartToolkit, [{
-    key: 'root',
-    value: function root() {
-      var root = this[REGISTRY].root;
-      if (root === undefined || root === null) {
-        throw new Error('No root component!');
-      }
-      return this[REGISTRY].root.component.userComponent;
-    }
-  }, {
-    key: 'parent',
-    value: function parent(component) {
-      var domHelper = this[DOM_HELPER];
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      } else if (wrapper === registry.root) {
-        return null;
-      }
-      var parent = domHelper.findClosest(wrapper.dom.parentNode);
-      return parent === null ? null : parent.userComponent;
-    }
-  }, {
-    key: 'children',
-    value: function children(component) {
-      var registry = this[REGISTRY];
-      var domHelper = this[DOM_HELPER];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-      var domChildren = domHelper.findRelevantChildren(wrapper.dom);
-      var children = [];
-      for (var i = 0, length = domChildren.length; i < length; i += 1) {
-        var child = registry.get(domChildren[i]);
-        if (child !== undefined && child !== null) {
-          children.push(child.userComponent);
-        }
-      }
-      return children;
-    }
-  }, {
-    key: 'editPolicy',
-    value: function editPolicy(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-      return wrapper.component.editPolicy;
-    }
-  }, {
-    key: 'ofType',
-    value: function ofType(type) {
-      var all = this[REGISTRY].all();
-      var ofType = [];
-      for (var i = 0, length = all.length; i < length; i += 1) {
-        var wrapper = all[i];
-        if (wrapper.component.type === type) {
-          ofType.push(wrapper.userComponent);
-        }
-      }
-      return ofType;
-    }
-  }, {
-    key: 'nodes',
-    value: function nodes() {
-      return this.ofType(NODE_TYPE);
-    }
-  }, {
-    key: 'ports',
-    value: function ports() {
-      return this.ofType(PORT_TYPE);
-    }
-  }, {
-    key: 'connections',
-    value: function connections() {
-      return this.ofType(CONNECTION_TYPE);
-    }
-  }, {
-    key: 'bounds',
-    value: function bounds(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-
-      var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
-          left = _wrapper$dom$getBound.left,
-          top = _wrapper$dom$getBound.top,
-          width = _wrapper$dom$getBound.width,
-          height = _wrapper$dom$getBound.height;
-
-      return regefGeometry.rectangle(left, top, width, height);
-    }
-  }]);
-  return PartToolkit;
-}();
-
-var PartDomHelper = function () {
-  function PartDomHelper(registry) {
-    classCallCheck(this, PartDomHelper);
-
-    this.registry = registry;
-  }
-
-  createClass(PartDomHelper, [{
-    key: "findClosest",
-    value: function findClosest(dom) {
-      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
-        return true;
-      };
-
-      var root = this.registry.root.dom;
-      for (var it = dom; it !== null; it = it.parentNode) {
-        var wrapper = this.registry.get(it);
-        if (wrapper !== undefined && wrapper !== null) {
-          return matcher(wrapper) ? wrapper : null;
-        }
-        if (it === root) {
-          return null;
-        }
-      }
-      return null;
-    }
-  }, {
-    key: "findRelevantChildrenIntenal",
-    value: function findRelevantChildrenIntenal(node) {
-      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      if (node !== null && node.hasChildNodes()) {
-        var childNodes = node.childNodes;
-        for (var i = 0, len = childNodes.length; i < len; i += 1) {
-          var childNode = childNodes[i];
-          if (this.registry.has(childNode)) {
-            children.push(childNode);
-          } else {
-            this.findRelevantChildrenIntenal(childNode, children);
-          }
-        }
-      }
-      return children;
-    }
-  }, {
-    key: "findRelevantChildren",
-    value: function findRelevantChildren(element) {
-      return this.findRelevantChildrenIntenal(element, []);
-    }
-  }, {
-    key: "findClosestParent",
-    value: function findClosestParent(element) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (element === this.registry.root.dom) {
-        return element;
-      }
-      return this.findClosestElement(element.parentNode, type);
-    }
-  }, {
-    key: "partContains",
-    value: function partContains(element) {
-      return this.registry.root.dom.contains(element);
-    }
-  }]);
-  return PartDomHelper;
-}();
-
-var ID = Symbol('id');
-var ENGINE = Symbol('ENGINE');
-var REGISTRY$1 = Symbol('REGISTRY');
-var TOOLKIT = Symbol('TOOLKIT');
-var DOM_HELPER$1 = Symbol('DOM_HELPER');
-
-var DiagramPartWrapper = function () {
-  function DiagramPartWrapper(id, engine) {
-    classCallCheck(this, DiagramPartWrapper);
-
-    this[ID] = id;
-    this[ENGINE] = engine;
-
-    this[REGISTRY$1] = new ComponentRegistry();
-    this[DOM_HELPER$1] = new PartDomHelper(this.registry);
-    this[TOOLKIT] = new PartToolkit(this.registry, this[DOM_HELPER$1]);
-  }
-
-  createClass(DiagramPartWrapper, [{
-    key: 'id',
-    get: function get$$1() {
-      return this[ID];
-    }
-  }, {
-    key: 'registry',
-    get: function get$$1() {
-      return this[REGISTRY$1];
-    }
-  }, {
-    key: 'toolkit',
-    get: function get$$1() {
-      return this[TOOLKIT];
-    }
-  }, {
-    key: 'engine',
-    get: function get$$1() {
-      return this[ENGINE];
-    }
-  }, {
-    key: 'domHelper',
-    get: function get$$1() {
-      return this[DOM_HELPER$1];
-    }
-  }]);
-  return DiagramPartWrapper;
 }();
 
 var EventManager = function () {
@@ -609,8 +234,8 @@ var DomHelper = function () {
 
 var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
 var CAPABILITIES = Symbol('CAPABILITIES');
-var DOM_HELPER$2 = Symbol('DOM_HELPER');
-var TOOLKIT$1 = Symbol('TOOLKIT');
+var DOM_HELPER = Symbol('DOM_HELPER');
+var TOOLKIT = Symbol('TOOLKIT');
 var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var PARTS = Symbol('PARTS');
@@ -643,9 +268,9 @@ var Engine = function () {
         selectionProvider = _ref$selectionProvide === undefined ? new SelectionProvider() : _ref$selectionProvide;
     classCallCheck(this, Engine);
 
-    this[TOOLKIT$1] = new Toolkit(this);
+    this[TOOLKIT] = new Toolkit(this);
     this[EVENT_MANAGER] = new EventManager(this);
-    this[DOM_HELPER$2] = new DomHelper(this);
+    this[DOM_HELPER] = new DomHelper(this);
     this[PARTS] = new Map();
 
     this[CAPABILITIES] = arrayFrom(capabilities, this);
@@ -659,24 +284,19 @@ var Engine = function () {
   }
 
   createClass(Engine, [{
-    key: 'part',
-    value: function part(id) {
-      var parts = this[PARTS];
-      if (!parts.has(id)) {
-        var part = new DiagramPartWrapper(id, this);
-        parts.set(id, part);
-      }
-      return parts.get(id);
+    key: '__partsMap',
+    value: function __partsMap() {
+      return this[PARTS];
     }
   }, {
-    key: 'removePart',
-    value: function removePart(id) {
-      this[PARTS].delete(id);
+    key: 'part',
+    value: function part(id) {
+      return this[PARTS].get(id);
     }
   }, {
     key: 'domHelper',
     get: function get$$1() {
-      return this[DOM_HELPER$2];
+      return this[DOM_HELPER];
     }
   }, {
     key: 'parts',
@@ -691,7 +311,7 @@ var Engine = function () {
   }, {
     key: 'toolkit',
     get: function get$$1() {
-      return this[TOOLKIT$1];
+      return this[TOOLKIT];
     }
   }, {
     key: 'capabilities',
@@ -736,8 +356,13 @@ var DiagramPart = function (_PureComponent) {
           id = _props.id,
           engine = _props.engine;
 
-      engine.removePart(id);
-      if (engine.parts.length === 0) {
+      var parts = engine.__partsMap();
+      var part = parts.get(id);
+      if (part && part.registry) {
+        part.registry.setRoot(null);
+      }
+      parts.delete(id);
+      if (parts.size === 0) {
         engine.eventManager.unhookListeners();
       }
     }
@@ -786,6 +411,21 @@ var EditPolicy = function () {
   }]);
   return EditPolicy;
 }();
+
+// Diagram participant types
+var ROOT_TYPE = 'root';
+var NODE_TYPE = 'node';
+var PORT_TYPE = 'port';
+var CONNECTION_TYPE = 'connection';
+
+// Request types
+var ADD = 'add';
+var CREATE = 'create';
+var MOVE = 'move';
+var SELECT = 'select';
+var DELETE = 'delete';
+var START_CONNECTION = 'start-connection';
+var END_CONNECTION = 'end-connection';
 
 var DispatchingEditPolicy = function (_EditPolicy) {
   inherits(DispatchingEditPolicy, _EditPolicy);
@@ -945,6 +585,366 @@ var Capability = function () {
   return Capability;
 }();
 
+var DOM = Symbol('DOM');
+var COMPONENT = Symbol('COMPONENT');
+var USER_COMPONENT = Symbol('USER_COMPONENT');
+
+var ComponentWrapper = function () {
+  function ComponentWrapper(dom, component, userComponent) {
+    classCallCheck(this, ComponentWrapper);
+
+    this[DOM] = dom;
+    this[COMPONENT] = component;
+    this[USER_COMPONENT] = userComponent;
+  }
+
+  createClass(ComponentWrapper, [{
+    key: 'dom',
+    get: function get$$1() {
+      return this[DOM];
+    }
+  }, {
+    key: 'component',
+    get: function get$$1() {
+      return this[COMPONENT];
+    }
+  }, {
+    key: 'userComponent',
+    get: function get$$1() {
+      return this[USER_COMPONENT];
+    }
+  }]);
+  return ComponentWrapper;
+}();
+
+
+var fromComponent = function fromComponent(component) {
+  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
+};
+
+var ComponentRegistry = function () {
+  function ComponentRegistry() {
+    classCallCheck(this, ComponentRegistry);
+
+    this.mapping = new Map();
+    this.wrappers = new Set();
+    this.root = null;
+    this.registerListeners = [];
+    this.unregisterListeners = [];
+  }
+
+  createClass(ComponentRegistry, [{
+    key: 'setRoot',
+    value: function setRoot(root) {
+      if (root && this.root) {
+        throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
+      }
+      this.root = root;
+      if (!root) {
+        this.mapping.clear();
+        this.wrappers.clear();
+      }
+    }
+  }, {
+    key: 'register',
+    value: function register(wrapper) {
+      if (!(wrapper instanceof ComponentWrapper)) {
+        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
+      }
+      this.mapping.set(wrapper, wrapper);
+      this.mapping.set(wrapper.dom, wrapper);
+      this.mapping.set(wrapper.component, wrapper);
+      this.mapping.set(wrapper.userComponent, wrapper);
+      this.wrappers.add(wrapper);
+      this.registerListeners.forEach(function (listener) {
+        return listener(wrapper);
+      });
+    }
+  }, {
+    key: 'unregister',
+    value: function unregister(input) {
+      var wrapper = this.get(input);
+      if (wrapper !== undefined) {
+        this.mapping.delete(wrapper);
+        this.mapping.delete(wrapper.dom);
+        this.mapping.delete(wrapper.component);
+        this.mapping.delete(wrapper.userComponent);
+        this.wrappers.delete(wrapper);
+        this.unregisterListeners.forEach(function (listener) {
+          return listener(wrapper);
+        });
+      }
+    }
+  }, {
+    key: 'get',
+    value: function get$$1(input) {
+      return this.mapping.get(input);
+    }
+  }, {
+    key: 'all',
+    value: function all() {
+      return Array.from(this.wrappers);
+    }
+  }, {
+    key: 'has',
+    value: function has(input) {
+      return this.mapping.has(input);
+    }
+  }, {
+    key: 'addRegisterListener',
+    value: function addRegisterListener(listener) {
+      this.registerListeners.push(listener);
+    }
+  }, {
+    key: 'addUnregisterListener',
+    value: function addUnregisterListener(listener) {
+      this.unregisterListeners.push(listener);
+    }
+  }, {
+    key: 'removeRegisterListener',
+    value: function removeRegisterListener(listener) {
+      this.registerListeners = this.registerListeners.filter(function (e) {
+        return e !== listener;
+      });
+    }
+  }, {
+    key: 'removeUnregisterListener',
+    value: function removeUnregisterListener(listener) {
+      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
+        return e !== listener;
+      });
+    }
+  }]);
+  return ComponentRegistry;
+}();
+
+var REGISTRY = Symbol('REGISTRY');
+var DOM_HELPER$1 = Symbol('DOM_HELPER');
+
+var PartToolkit = function () {
+  function PartToolkit(registry, domHelper) {
+    classCallCheck(this, PartToolkit);
+
+    this[REGISTRY] = registry;
+    this[DOM_HELPER$1] = domHelper;
+  }
+
+  createClass(PartToolkit, [{
+    key: 'root',
+    value: function root() {
+      var root = this[REGISTRY].root;
+      if (root === undefined || root === null) {
+        throw new Error('No root component!');
+      }
+      return this[REGISTRY].root.component.userComponent;
+    }
+  }, {
+    key: 'parent',
+    value: function parent(component) {
+      var domHelper = this[DOM_HELPER$1];
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      } else if (wrapper === registry.root) {
+        return null;
+      }
+      var parent = domHelper.findClosest(wrapper.dom.parentNode);
+      return parent === null ? null : parent.userComponent;
+    }
+  }, {
+    key: 'children',
+    value: function children(component) {
+      var registry = this[REGISTRY];
+      var domHelper = this[DOM_HELPER$1];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+      var domChildren = domHelper.findRelevantChildren(wrapper.dom);
+      var children = [];
+      for (var i = 0, length = domChildren.length; i < length; i += 1) {
+        var child = registry.get(domChildren[i]);
+        if (child !== undefined && child !== null) {
+          children.push(child.userComponent);
+        }
+      }
+      return children;
+    }
+  }, {
+    key: 'editPolicy',
+    value: function editPolicy(component) {
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+      return wrapper.component.editPolicy;
+    }
+  }, {
+    key: 'ofType',
+    value: function ofType(type) {
+      var all = this[REGISTRY].all();
+      var ofType = [];
+      for (var i = 0, length = all.length; i < length; i += 1) {
+        var wrapper = all[i];
+        if (wrapper.component.type === type) {
+          ofType.push(wrapper.userComponent);
+        }
+      }
+      return ofType;
+    }
+  }, {
+    key: 'nodes',
+    value: function nodes() {
+      return this.ofType(NODE_TYPE);
+    }
+  }, {
+    key: 'ports',
+    value: function ports() {
+      return this.ofType(PORT_TYPE);
+    }
+  }, {
+    key: 'connections',
+    value: function connections() {
+      return this.ofType(CONNECTION_TYPE);
+    }
+  }, {
+    key: 'bounds',
+    value: function bounds(component) {
+      var registry = this[REGISTRY];
+      var wrapper = registry.get(component);
+      if (wrapper === undefined || wrapper === null) {
+        throw new Error('Given component is not part of the diagram!');
+      }
+
+      var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
+          left = _wrapper$dom$getBound.left,
+          top = _wrapper$dom$getBound.top,
+          width = _wrapper$dom$getBound.width,
+          height = _wrapper$dom$getBound.height;
+
+      return regefGeometry.rectangle(left, top, width, height);
+    }
+  }]);
+  return PartToolkit;
+}();
+
+var PartDomHelper = function () {
+  function PartDomHelper(registry) {
+    classCallCheck(this, PartDomHelper);
+
+    this.registry = registry;
+  }
+
+  createClass(PartDomHelper, [{
+    key: "findClosest",
+    value: function findClosest(dom) {
+      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+        return true;
+      };
+
+      var root = this.registry.root.dom;
+      for (var it = dom; it !== null; it = it.parentNode) {
+        var wrapper = this.registry.get(it);
+        if (wrapper !== undefined && wrapper !== null) {
+          return matcher(wrapper) ? wrapper : null;
+        }
+        if (it === root) {
+          return null;
+        }
+      }
+      return null;
+    }
+  }, {
+    key: "findRelevantChildrenIntenal",
+    value: function findRelevantChildrenIntenal(node) {
+      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      if (node !== null && node.hasChildNodes()) {
+        var childNodes = node.childNodes;
+        for (var i = 0, len = childNodes.length; i < len; i += 1) {
+          var childNode = childNodes[i];
+          if (this.registry.has(childNode)) {
+            children.push(childNode);
+          } else {
+            this.findRelevantChildrenIntenal(childNode, children);
+          }
+        }
+      }
+      return children;
+    }
+  }, {
+    key: "findRelevantChildren",
+    value: function findRelevantChildren(element) {
+      return this.findRelevantChildrenIntenal(element, []);
+    }
+  }, {
+    key: "findClosestParent",
+    value: function findClosestParent(element) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (element === this.registry.root.dom) {
+        return element;
+      }
+      return this.findClosestElement(element.parentNode, type);
+    }
+  }, {
+    key: "partContains",
+    value: function partContains(element) {
+      return this.registry.root.dom.contains(element);
+    }
+  }]);
+  return PartDomHelper;
+}();
+
+var ID = Symbol('id');
+var ENGINE = Symbol('ENGINE');
+var REGISTRY$1 = Symbol('REGISTRY');
+var TOOLKIT$1 = Symbol('TOOLKIT');
+var DOM_HELPER$2 = Symbol('DOM_HELPER');
+
+var DiagramPartWrapper = function () {
+  function DiagramPartWrapper(id, engine) {
+    classCallCheck(this, DiagramPartWrapper);
+
+    this[ID] = id;
+    this[ENGINE] = engine;
+
+    this[REGISTRY$1] = new ComponentRegistry();
+    this[DOM_HELPER$2] = new PartDomHelper(this.registry);
+    this[TOOLKIT$1] = new PartToolkit(this.registry, this[DOM_HELPER$2]);
+  }
+
+  createClass(DiagramPartWrapper, [{
+    key: 'id',
+    get: function get$$1() {
+      return this[ID];
+    }
+  }, {
+    key: 'registry',
+    get: function get$$1() {
+      return this[REGISTRY$1];
+    }
+  }, {
+    key: 'toolkit',
+    get: function get$$1() {
+      return this[TOOLKIT$1];
+    }
+  }, {
+    key: 'engine',
+    get: function get$$1() {
+      return this[ENGINE];
+    }
+  }, {
+    key: 'domHelper',
+    get: function get$$1() {
+      return this[DOM_HELPER$2];
+    }
+  }]);
+  return DiagramPartWrapper;
+}();
+
 function createDecorator(_ref) {
   var type = _ref.type,
       activate = _ref.activate,
@@ -1049,16 +1049,26 @@ var watchRegister = function watchRegister(registry, target) {
   });
 };
 
+var _this = undefined;
+
 var registryFrom = function registryFrom(_ref) {
   var engine = _ref.engine,
       id = _ref.id;
-  return id === undefined ? engine.registry : engine.part(id).registry;
+  return engine.__partsMap().has(id) ? engine.part(id).registry : null;
 };
-
 var toolkitFrom = function toolkitFrom(_ref2) {
   var engine = _ref2.engine,
       id = _ref2.id;
-  return id === undefined ? engine.toolkit : engine.part(id).toolkit;
+  return engine.__partsMap().has(id) ? engine.part(id).toolkit : null;
+};
+var ensurePartRegistered = function ensurePartRegistered(_ref3) {
+  var engine = _ref3.engine,
+      id = _ref3.id;
+
+  var parts = engine.__partsMap();
+  if (!parts.has(id)) {
+    parts.set(id, new DiagramPartWrapper(id, _this));
+  }
 };
 
 function defaultToolkitResolver(component, context) {
@@ -1070,11 +1080,15 @@ function defaultToolkitResolver(component, context) {
 }
 
 var defaultActivate = function defaultActivate(component, context) {
+  ensurePartRegistered(context);
   registryFrom(context).register(fromComponent(component));
 };
 
 var defaultDecativate = function defaultDecativate(component, context) {
-  registryFrom(context).unregister(component);
+  var registry = registryFrom(context);
+  if (registry) {
+    registry.unregister(component);
+  }
 };
 
 var rootActivate = function rootActivate(component, context) {
@@ -1085,7 +1099,10 @@ var rootActivate = function rootActivate(component, context) {
 
 var rootDeactivate = function rootDeactivate(component, context) {
   defaultDecativate(component, context);
-  registryFrom(context).setRoot(null);
+  var registry = registryFrom(context);
+  if (registry) {
+    registry.setRoot(null);
+  }
 };
 
 var node = createDecorator({
