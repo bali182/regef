@@ -13,7 +13,7 @@ const toolkitFrom = ({ engine, id }) => (engine.__partsMap().has(id)
 const ensurePartRegistered = ({ engine, id }) => {
   const parts = engine.__partsMap()
   if (!parts.has(id)) {
-    parts.set(id, new DiagramPartWrapper(id, this))
+    parts.set(id, new DiagramPartWrapper(id, engine))
   }
 }
 

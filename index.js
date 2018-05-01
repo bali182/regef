@@ -1049,8 +1049,6 @@ var watchRegister = function watchRegister(registry, target) {
   });
 };
 
-var _this = undefined;
-
 var registryFrom = function registryFrom(_ref) {
   var engine = _ref.engine,
       id = _ref.id;
@@ -1067,7 +1065,7 @@ var ensurePartRegistered = function ensurePartRegistered(_ref3) {
 
   var parts = engine.__partsMap();
   if (!parts.has(id)) {
-    parts.set(id, new DiagramPartWrapper(id, _this));
+    parts.set(id, new DiagramPartWrapper(id, engine));
   }
 };
 
