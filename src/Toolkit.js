@@ -10,7 +10,7 @@ export default class Toolkit {
     return part ? part.toolkit : null
   }
   forComponent(component) {
-    const parts = this.engine.parts()
+    const parts = this.engine.parts
     for (let i = 0, length = parts.length; i < length; i += 1) {
       const part = parts[i]
       if (part.registry.has(component)) {

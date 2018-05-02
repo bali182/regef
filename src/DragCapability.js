@@ -31,10 +31,23 @@ export default class DragCapability extends Capability {
       return null
     }
     const newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)) // TODO
-    if (newTarget === null
-      || newTarget === target
-      || (target !== null && target.dom.contains(newTarget.dom))
-      || getSelection(this.engine).indexOf(newTarget.userComponent) >= 0) {
+    if (
+      newTarget === null ||
+      newTarget === target ||
+      (target !== null && target.dom.contains(newTarget.dom))) {
+      return currentParent
+    }
+    const selection = getSelection(this.engine)
+    const affectedParts = selection.map((comp) => this.engine.toolkit.forComponent(comp))
+    if (new Set(affectedParts).size !== 1) {
+      return newTarget
+    }
+    const affectedParents = selection.map((comp, i) => affectedParts[i].toolkit.parent(comp))
+    if (new Set(affectedParents).size !== 1) {
+      return newTarget
+    }
+    const targets = [newTarget.userComponent, target.userComponent]
+    if (targets.every((userComponent) => selection.indexOf(userComponent) >= 0)) {
       return currentParent
     }
     return newTarget

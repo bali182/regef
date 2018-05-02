@@ -178,7 +178,7 @@ var Toolkit = function () {
   }, {
     key: "forComponent",
     value: function forComponent(component) {
-      var parts = this.engine.parts();
+      var parts = this.engine.parts;
       for (var i = 0, length = parts.length; i < length; i += 1) {
         var part = parts[i];
         if (part.registry.has(component)) {
@@ -1249,6 +1249,8 @@ var DragCapability = function (_Capability) {
   createClass(DragCapability, [{
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget, part) {
+      var _this2 = this;
+
       var target = this.target,
           currentParent = this.currentParent;
 
@@ -1256,7 +1258,26 @@ var DragCapability = function (_Capability) {
         return null;
       }
       var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)); // TODO
-      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom) || getSelection(this.engine).indexOf(newTarget.userComponent) >= 0) {
+      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom)) {
+        return currentParent;
+      }
+      var selection = getSelection(this.engine);
+      var affectedParts = selection.map(function (comp) {
+        return _this2.engine.toolkit.forComponent(comp);
+      });
+      if (new Set(affectedParts).size !== 1) {
+        return newTarget;
+      }
+      var affectedParents = selection.map(function (comp, i) {
+        return affectedParts[i].toolkit.parent(comp);
+      });
+      if (new Set(affectedParents).size !== 1) {
+        return newTarget;
+      }
+      var targets = [newTarget.userComponent, target.userComponent];
+      if (targets.every(function (userComponent) {
+        return selection.indexOf(userComponent) >= 0;
+      })) {
         return currentParent;
       }
       return newTarget;
