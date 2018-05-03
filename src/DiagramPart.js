@@ -1,5 +1,6 @@
-import { Children, PureComponent } from 'react'
-import { instanceOf, string, shape, symbol, oneOfType } from 'prop-types'
+import React, { Children, PureComponent } from 'react'
+import { instanceOf, string, symbol, oneOfType } from 'prop-types'
+import { RegefContext } from './RegefContext'
 import Engine from './Engine'
 
 export default class DiagramPart extends PureComponent {
@@ -21,20 +22,12 @@ export default class DiagramPart extends PureComponent {
       engine.eventManager.unhookListeners()
     }
   }
-  getChildContext() {
-    return { regef: { engine: this.props.engine, id: this.props.id } }
-  }
   render() {
-    // TODO check type (no solution yet)
-    return Children.only(this.props.children)
+    const { id, engine } = this.props
+    return (<RegefContext.Provider value={{ id, engine }}>
+      {Children.only(this.props.children)}
+    </RegefContext.Provider>)
   }
-}
-
-DiagramPart.childContextTypes = {
-  regef: shape({
-    engine: instanceOf(Engine).isRequired,
-    id: oneOfType([string, symbol]).isRequired,
-  }),
 }
 
 DiagramPart.propTypes = {

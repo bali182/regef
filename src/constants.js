@@ -1,3 +1,5 @@
+export const REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay'
+
 // Diagram participant types
 export const ROOT_TYPE = 'root'
 export const NODE_TYPE = 'node'

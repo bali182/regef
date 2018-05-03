@@ -11,11 +11,16 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
 export default class SingleSelectionCapability extends Capability {
   constructor(engine, config = { parts: null, types: [NODE_TYPE] }) {
     super(engine)
+    this.config = config
+    this.init()
+  }
+
+  init() {
+    this.progress = false
     this.location = null
     this.possibleSingleSelection = false
     this.additional = false
     this.selection = []
-    this.config = config
   }
 
   createSingleSelectionRequest() {
@@ -31,10 +36,7 @@ export default class SingleSelectionCapability extends Capability {
 
   cancel() {
     if (this.progress) {
-      this.location = null
-      this.possibleSingleSelection = false
-      this.selection = []
-      this.progress = false
+      this.init()
     }
   }
 
@@ -69,5 +71,6 @@ export default class SingleSelectionCapability extends Capability {
       perform(this.engine.editPolicies, this.createSingleSelectionRequest())
       this.additional = false
     }
+    this.init()
   }
 }

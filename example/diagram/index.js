@@ -20,7 +20,6 @@ import SelectComponentsEditPolicy from './SelectComponentsEditPolicy'
 import MoveRootChildrenEditPolicy from './MoveRootChildrenEditPolicy'
 import DeleteComponentsEditPolicy from './DeleteComponentsEditPolicy'
 import DisabledAddChildrenEditPolicy from './DisabledAddChildrenEditPolicy'
-import LoggerEditPolicy from './LoggerEditPolicy'
 
 const createEngine = (store) => {
   const dependencies = {
@@ -32,12 +31,12 @@ const createEngine = (store) => {
   }
   return new Engine((engine) => ({
     capabilities: [
-      new DragCapability(engine),
       new ConnectCapability(engine),
       new SingleSelectionCapability(engine),
       new MultiSelectionCapability(engine),
       new CancelCapability(engine),
       new DeleteCapability(engine),
+      new DragCapability(engine),
     ],
     editPolicies: [
       new MoveRootChildrenEditPolicy(engine, dependencies),
@@ -47,7 +46,7 @@ const createEngine = (store) => {
       new SelectComponentsEditPolicy(engine, dependencies),
       new DeleteComponentsEditPolicy(engine, dependencies),
       new DisabledAddChildrenEditPolicy(engine, dependencies),
-      new LoggerEditPolicy(),
+      // new LoggerEditPolicy(),
     ],
     selectionProvider: new DiagramSelectionProvider(engine, dependencies),
   }))

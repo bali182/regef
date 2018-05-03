@@ -13,6 +13,12 @@ export default class MultiSelectionCapability extends Capability {
     containment: true,
   }) {
     super(engine)
+    this.config = config
+    this.init()
+  }
+
+  init() {
+    this.progress = false
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null
@@ -21,7 +27,6 @@ export default class MultiSelectionCapability extends Capability {
     this.selectionBounds = null
     this.selection = null
     this.additional = false
-    this.config = config
   }
 
   createMultiSelectionRequest() {

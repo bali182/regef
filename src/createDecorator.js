@@ -1,17 +1,17 @@
 import React, { PureComponent } from 'react'
-import { oneOfType, string, symbol, shape, instanceOf } from 'prop-types'
-import Engine from './Engine'
+import { withRegefContext } from './RegefContext'
+import { REGEF_PROP_KEY } from './constants'
 
 function createDecorator({ type, activate, deactivate, toolkitResolver }) {
   return () => (Wrapped) => {
     class DecoratedComponent extends PureComponent {
-      constructor(props, context) {
-        super(props, context)
-        const { regef: { id } } = this.context
-        this.partId = id
+      constructor(props) {
+        super(props)
+        const regef = props[REGEF_PROP_KEY]
+        this.partId = regef
         this.userComponent = null
         this.type = type
-        this.childProps = { toolkit: toolkitResolver(this, context.regef) }
+        this.childProps = { toolkit: toolkitResolver(this, regef) }
         // binding methods
         this.setUserComponent = this.setUserComponent.bind(this)
       }
@@ -19,10 +19,10 @@ function createDecorator({ type, activate, deactivate, toolkitResolver }) {
         this.userComponent = ref
       }
       componentDidMount() {
-        activate(this, this.context.regef)
+        activate(this, this.props[REGEF_PROP_KEY])
       }
       componentWillUnmount() {
-        deactivate(this, this.context.regef)
+        deactivate(this, this.props[REGEF_PROP_KEY])
       }
       render() {
         const { children, ...rest } = this.props
@@ -31,15 +31,7 @@ function createDecorator({ type, activate, deactivate, toolkitResolver }) {
         </Wrapped>)
       }
     }
-
-    DecoratedComponent.contextTypes = {
-      regef: shape({
-        engine: instanceOf(Engine).isRequired,
-        id: oneOfType([string, symbol]),
-      }),
-    }
-
-    return DecoratedComponent
+    return withRegefContext(DecoratedComponent)
   }
 }
 

@@ -35,14 +35,17 @@ export const partMatches = (ids) => {
   return matchesSinglePart(ids)
 }
 
-export const perform = (policies, intent) => policies
-  .forEach((policy) => policy.perform(intent))
+const onEachPolicy = (callback) => (policies, intent) => {
+  if (Array.isArray(policies) && intent && intent.type) {
+    for (let i = 0; i < policies.length; i += 1) {
+      callback(policies[i], intent)
+    }
+  }
+}
 
-export const requestFeedback = (policies, intent) => policies
-  .forEach((policy) => policy.requestFeedback(intent))
-
-export const eraseFeedback = (policies, intent) => policies
-  .forEach((policy) => policy.eraseFeedback(intent))
+export const perform = onEachPolicy((policy, intent) => policy.perform(intent))
+export const requestFeedback = onEachPolicy((policy, intent) => policy.requestFeedback(intent))
+export const eraseFeedback = onEachPolicy((policy, intent) => policy.eraseFeedback(intent))
 
 export const getParts = (engine, ids = null) => {
   if (ids === null || ids === undefined) {

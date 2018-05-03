@@ -10,6 +10,23 @@ var propTypes = require('prop-types');
 var reactDom = require('react-dom');
 var regefGeometry = require('regef-geometry');
 
+var REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay';
+
+// Diagram participant types
+var ROOT_TYPE = 'root';
+var NODE_TYPE = 'node';
+var PORT_TYPE = 'port';
+var CONNECTION_TYPE = 'connection';
+
+// Request types
+var ADD = 'add';
+var CREATE = 'create';
+var MOVE = 'move';
+var SELECT = 'select';
+var DELETE = 'delete';
+var START_CONNECTION = 'start-connection';
+var END_CONNECTION = 'end-connection';
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -33,6 +50,21 @@ var createClass = function () {
     return Constructor;
   };
 }();
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
 
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -83,6 +115,24 @@ var possibleConstructorReturn = function (self, call) {
 
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
+
+var RegefContext = React__default.createContext({
+  id: null,
+  engine: null
+});
+
+function withRegefContext(Wrapped) {
+  function WithRegefContext(props) {
+    return React__default.createElement(
+      RegefContext.Consumer,
+      null,
+      function (regef) {
+        return React__default.createElement(Wrapped, _extends({}, props, defineProperty({}, REGEF_PROP_KEY, regef)));
+      }
+    );
+  }
+  return WithRegefContext;
+}
 
 var EventManager = function () {
   function EventManager(engine) {
@@ -336,27 +386,22 @@ var DiagramPart = function (_PureComponent) {
       }
     }
   }, {
-    key: 'getChildContext',
-    value: function getChildContext() {
-      return { regef: { engine: this.props.engine, id: this.props.id } };
-    }
-  }, {
     key: 'render',
     value: function render() {
-      // TODO check type (no solution yet)
-      return React.Children.only(this.props.children);
+      var _props2 = this.props,
+          id = _props2.id,
+          engine = _props2.engine;
+
+      return React__default.createElement(
+        RegefContext.Provider,
+        { value: { id: id, engine: engine } },
+        React.Children.only(this.props.children)
+      );
     }
   }]);
   return DiagramPart;
 }(React.PureComponent);
 
-
-DiagramPart.childContextTypes = {
-  regef: propTypes.shape({
-    engine: propTypes.instanceOf(Engine).isRequired,
-    id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
-  })
-};
 
 DiagramPart.propTypes = {
   engine: propTypes.instanceOf(Engine).isRequired,
@@ -380,21 +425,6 @@ var EditPolicy = function () {
   }]);
   return EditPolicy;
 }();
-
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-
-// Request types
-var ADD = 'add';
-var CREATE = 'create';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
 
 var DispatchingEditPolicy = function (_EditPolicy) {
   inherits(DispatchingEditPolicy, _EditPolicy);
@@ -609,23 +639,28 @@ var ComponentRegistry = function () {
   function ComponentRegistry() {
     classCallCheck(this, ComponentRegistry);
 
-    this.mapping = new Map();
-    this.wrappers = new Set();
-    this.root = null;
-    this.registerListeners = [];
-    this.unregisterListeners = [];
+    this.init();
   }
 
   createClass(ComponentRegistry, [{
+    key: 'init',
+    value: function init() {
+      this.mapping = new Map();
+      this.wrappers = new Set();
+      this.root = null;
+      this.registerListeners = [];
+      this.unregisterListeners = [];
+    }
+  }, {
     key: 'setRoot',
     value: function setRoot(root) {
       if (root && this.root) {
         throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
       }
-      this.root = root;
-      if (!root) {
-        this.mapping.clear();
-        this.wrappers.clear();
+      if (root) {
+        this.root = root;
+      } else {
+        this.init();
       }
     }
   }, {
@@ -939,17 +974,16 @@ function createDecorator(_ref) {
       var DecoratedComponent = function (_PureComponent) {
         inherits(DecoratedComponent, _PureComponent);
 
-        function DecoratedComponent(props, context) {
+        function DecoratedComponent(props) {
           classCallCheck(this, DecoratedComponent);
 
-          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
+          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props));
 
-          var id = _this.context.regef.id;
-
-          _this.partId = id;
+          var regef = props[REGEF_PROP_KEY];
+          _this.partId = regef;
           _this.userComponent = null;
           _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, context.regef)
+          _this.childProps = { toolkit: toolkitResolver(_this, regef)
             // binding methods
           };_this.setUserComponent = _this.setUserComponent.bind(_this);
           return _this;
@@ -963,12 +997,12 @@ function createDecorator(_ref) {
         }, {
           key: 'componentDidMount',
           value: function componentDidMount() {
-            activate(this, this.context.regef);
+            activate(this, this.props[REGEF_PROP_KEY]);
           }
         }, {
           key: 'componentWillUnmount',
           value: function componentWillUnmount() {
-            deactivate(this, this.context.regef);
+            deactivate(this, this.props[REGEF_PROP_KEY]);
           }
         }, {
           key: 'render',
@@ -987,14 +1021,7 @@ function createDecorator(_ref) {
         return DecoratedComponent;
       }(React.PureComponent);
 
-      DecoratedComponent.contextTypes = {
-        regef: propTypes.shape({
-          engine: propTypes.instanceOf(Engine).isRequired,
-          id: propTypes.oneOfType([propTypes.string, propTypes.symbol])
-        })
-      };
-
-      return DecoratedComponent;
+      return withRegefContext(DecoratedComponent);
     };
   };
 }
@@ -1172,23 +1199,25 @@ var partMatches = function partMatches(ids) {
   return matchesSinglePart(ids);
 };
 
-var perform = function perform(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.perform(intent);
-  });
+var onEachPolicy = function onEachPolicy(callback) {
+  return function (policies, intent) {
+    if (Array.isArray(policies) && intent && intent.type) {
+      for (var i = 0; i < policies.length; i += 1) {
+        callback(policies[i], intent);
+      }
+    }
+  };
 };
 
-var requestFeedback = function requestFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.requestFeedback(intent);
-  });
-};
-
-var eraseFeedback = function eraseFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.eraseFeedback(intent);
-  });
-};
+var perform = onEachPolicy(function (policy, intent) {
+  return policy.perform(intent);
+});
+var requestFeedback = onEachPolicy(function (policy, intent) {
+  return policy.requestFeedback(intent);
+});
+var eraseFeedback = onEachPolicy(function (policy, intent) {
+  return policy.eraseFeedback(intent);
+});
 
 var getParts = function getParts(engine) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -1233,20 +1262,26 @@ var DragCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this, engine));
 
-    _this.target = null;
-    _this.lastTargetParent = null;
-    _this.targetParent = null;
-    _this.currentParent = null;
-    _this.coordinates = null;
-    _this.offset = null;
-    _this.lastRequest = null;
-    _this.mouseMoved = false;
-    _this.startLocation = null;
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(DragCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.target = null;
+      this.lastTargetParent = null;
+      this.targetParent = null;
+      this.currentParent = null;
+      this.coordinates = null;
+      this.offset = null;
+      this.lastRequest = null;
+      this.mouseMoved = false;
+      this.startLocation = null;
+    }
+  }, {
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget, part) {
       var _this2 = this;
@@ -1417,13 +1452,7 @@ var DragCapability = function (_Capability) {
         if (this.lastRequest !== null && this.targetParent !== null) {
           eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
-        this.progress = false;
-        this.lastRequest = null;
-        this.offset = null;
-        this.coordinates = null;
-        this.targetParent = null;
-        this.target = null;
-        this.currentParent = null;
+        this.init();
       }
     }
   }, {
@@ -1477,7 +1506,7 @@ var DragCapability = function (_Capability) {
       if (request !== null && this.mouseMoved) {
         perform(this.engine.editPolicies, request);
       }
-      this.progress = false;
+      this.init();
     }
   }]);
   return DragCapability;
@@ -1496,24 +1525,28 @@ var ConnectCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this, engine));
 
-    _this.source = null;
-    _this.target = null;
-    _this.coordinates = null;
-    _this.lastRequest = null;
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(ConnectCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.source = null;
+      this.target = null;
+      this.coordinates = null;
+      this.lastRequest = null;
+    }
+  }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null) {
           eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
-        this.source = null;
-        this.target = null;
-        this.progress = false;
+        this.init();
       }
     }
   }, {
@@ -1611,7 +1644,7 @@ var ConnectCapability = function (_Capability) {
       if (request !== null) {
         perform(this.engine.editPolicies, request);
       }
-      this.progress = false;
+      this.init();
     }
   }]);
   return ConnectCapability;
@@ -1637,15 +1670,21 @@ var SingleSelectionCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this, engine));
 
-    _this.location = null;
-    _this.possibleSingleSelection = false;
-    _this.additional = false;
-    _this.selection = [];
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(SingleSelectionCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.location = null;
+      this.possibleSingleSelection = false;
+      this.additional = false;
+      this.selection = [];
+    }
+  }, {
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
       var location = this.location,
@@ -1662,10 +1701,7 @@ var SingleSelectionCapability = function (_Capability) {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
-        this.location = null;
-        this.possibleSingleSelection = false;
-        this.selection = [];
-        this.progress = false;
+        this.init();
       }
     }
   }, {
@@ -1706,6 +1742,7 @@ var SingleSelectionCapability = function (_Capability) {
         perform(this.engine.editPolicies, this.createSingleSelectionRequest());
         this.additional = false;
       }
+      this.init();
     }
   }]);
   return SingleSelectionCapability;
@@ -1731,19 +1768,25 @@ var MultiSelectionCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this, engine));
 
-    _this.startLocation = null;
-    _this.endLocation = null;
-    _this.lastRequest = null;
-    _this.startPart = null;
-    _this.endPart = null;
-    _this.selectionBounds = null;
-    _this.selection = null;
-    _this.additional = false;
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(MultiSelectionCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.startLocation = null;
+      this.endLocation = null;
+      this.lastRequest = null;
+      this.startPart = null;
+      this.endPart = null;
+      this.selectionBounds = null;
+      this.selection = null;
+      this.additional = false;
+    }
+  }, {
     key: 'createMultiSelectionRequest',
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1940,12 +1983,18 @@ var DeleteCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this, engine));
 
-    _this.currentSelection = [];
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(DeleteCapability, [{
+    key: 'init',
+    value: function init() {
+      this.currentSelection = [];
+      this.progress = false;
+    }
+  }, {
     key: 'getDeleteRequest',
     value: function getDeleteRequest() {
       return {
@@ -1975,6 +2024,7 @@ var DeleteCapability = function (_Capability) {
           perform(this.engine.editPolicies, this.getDeleteRequest());
         }
       }
+      this.init();
     }
   }]);
   return DeleteCapability;
@@ -1996,6 +2046,7 @@ exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
+exports.REGEF_PROP_KEY = REGEF_PROP_KEY;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
