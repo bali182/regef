@@ -10,11 +10,16 @@ export default class ConnectCapability extends Capability {
     targetTypes: [ROOT_TYPE, NODE_TYPE],
   }) {
     super(engine)
+    this.config = config
+    this.init()
+  }
+
+  init() {
+    this.progress = false
     this.source = null
     this.target = null
     this.coordinates = null
     this.lastRequest = null
-    this.config = config
   }
 
   cancel() {
@@ -22,9 +27,7 @@ export default class ConnectCapability extends Capability {
       if (this.lastRequest !== null) {
         eraseFeedback(this.engine.editPolicies, this.lastRequest)
       }
-      this.source = null
-      this.target = null
-      this.progress = false
+      this.init()
     }
   }
 
@@ -115,6 +118,6 @@ export default class ConnectCapability extends Capability {
     if (request !== null) {
       perform(this.engine.editPolicies, request)
     }
-    this.progress = false
+    this.init()
   }
 }

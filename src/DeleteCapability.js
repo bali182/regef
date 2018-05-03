@@ -5,8 +5,13 @@ import { perform, partMatches, getSelection } from './utils'
 export default class DeleteCapability extends Capability {
   constructor(engine, config = { parts: null, keys: ['Backspace', 'Delete'] }) {
     super(engine)
-    this.currentSelection = []
     this.config = config
+    this.init()
+  }
+
+  init() {
+    this.currentSelection = []
+    this.progress = false
   }
 
   getDeleteRequest() {
@@ -31,5 +36,6 @@ export default class DeleteCapability extends Capability {
         perform(this.engine.editPolicies, this.getDeleteRequest())
       }
     }
+    this.init()
   }
 }

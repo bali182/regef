@@ -13,6 +13,12 @@ const buildOffset = ({ clientX, clientY }, element) => {
 export default class DragCapability extends Capability {
   constructor(engine, config = { parts: null, types: [NODE_TYPE] }) {
     super(engine)
+    this.config = config
+    this.init()
+  }
+
+  init() {
+    this.progress = false
     this.target = null
     this.lastTargetParent = null
     this.targetParent = null
@@ -22,7 +28,6 @@ export default class DragCapability extends Capability {
     this.lastRequest = null
     this.mouseMoved = false
     this.startLocation = null
-    this.config = config
   }
 
   findTargetedParent(eventTarget, part) {
@@ -162,13 +167,7 @@ export default class DragCapability extends Capability {
       if (this.lastRequest !== null && this.targetParent !== null) {
         eraseFeedback(this.engine.editPolicies, this.lastRequest)
       }
-      this.progress = false
-      this.lastRequest = null
-      this.offset = null
-      this.coordinates = null
-      this.targetParent = null
-      this.target = null
-      this.currentParent = null
+      this.init()
     }
   }
 
@@ -220,6 +219,6 @@ export default class DragCapability extends Capability {
     if (request !== null && this.mouseMoved) {
       perform(this.engine.editPolicies, request)
     }
-    this.progress = false
+    this.init()
   }
 }

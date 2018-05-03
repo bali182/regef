@@ -639,23 +639,28 @@ var ComponentRegistry = function () {
   function ComponentRegistry() {
     classCallCheck(this, ComponentRegistry);
 
-    this.mapping = new Map();
-    this.wrappers = new Set();
-    this.root = null;
-    this.registerListeners = [];
-    this.unregisterListeners = [];
+    this.init();
   }
 
   createClass(ComponentRegistry, [{
+    key: 'init',
+    value: function init() {
+      this.mapping = new Map();
+      this.wrappers = new Set();
+      this.root = null;
+      this.registerListeners = [];
+      this.unregisterListeners = [];
+    }
+  }, {
     key: 'setRoot',
     value: function setRoot(root) {
       if (root && this.root) {
         throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
       }
-      this.root = root;
-      if (!root) {
-        this.mapping.clear();
-        this.wrappers.clear();
+      if (root) {
+        this.root = root;
+      } else {
+        this.init();
       }
     }
   }, {
@@ -1194,23 +1199,25 @@ var partMatches = function partMatches(ids) {
   return matchesSinglePart(ids);
 };
 
-var perform = function perform(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.perform(intent);
-  });
+var onEachPolicy = function onEachPolicy(callback) {
+  return function (policies, intent) {
+    if (Array.isArray(policies) && intent && intent.type) {
+      for (var i = 0; i < policies.length; i += 1) {
+        callback(policies[i], intent);
+      }
+    }
+  };
 };
 
-var requestFeedback = function requestFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.requestFeedback(intent);
-  });
-};
-
-var eraseFeedback = function eraseFeedback(policies, intent) {
-  return policies.forEach(function (policy) {
-    return policy.eraseFeedback(intent);
-  });
-};
+var perform = onEachPolicy(function (policy, intent) {
+  return policy.perform(intent);
+});
+var requestFeedback = onEachPolicy(function (policy, intent) {
+  return policy.requestFeedback(intent);
+});
+var eraseFeedback = onEachPolicy(function (policy, intent) {
+  return policy.eraseFeedback(intent);
+});
 
 var getParts = function getParts(engine) {
   var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -1255,20 +1262,26 @@ var DragCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this, engine));
 
-    _this.target = null;
-    _this.lastTargetParent = null;
-    _this.targetParent = null;
-    _this.currentParent = null;
-    _this.coordinates = null;
-    _this.offset = null;
-    _this.lastRequest = null;
-    _this.mouseMoved = false;
-    _this.startLocation = null;
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(DragCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.target = null;
+      this.lastTargetParent = null;
+      this.targetParent = null;
+      this.currentParent = null;
+      this.coordinates = null;
+      this.offset = null;
+      this.lastRequest = null;
+      this.mouseMoved = false;
+      this.startLocation = null;
+    }
+  }, {
     key: 'findTargetedParent',
     value: function findTargetedParent(eventTarget, part) {
       var _this2 = this;
@@ -1439,13 +1452,7 @@ var DragCapability = function (_Capability) {
         if (this.lastRequest !== null && this.targetParent !== null) {
           eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
-        this.progress = false;
-        this.lastRequest = null;
-        this.offset = null;
-        this.coordinates = null;
-        this.targetParent = null;
-        this.target = null;
-        this.currentParent = null;
+        this.init();
       }
     }
   }, {
@@ -1499,7 +1506,7 @@ var DragCapability = function (_Capability) {
       if (request !== null && this.mouseMoved) {
         perform(this.engine.editPolicies, request);
       }
-      this.progress = false;
+      this.init();
     }
   }]);
   return DragCapability;
@@ -1518,24 +1525,28 @@ var ConnectCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this, engine));
 
-    _this.source = null;
-    _this.target = null;
-    _this.coordinates = null;
-    _this.lastRequest = null;
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(ConnectCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.source = null;
+      this.target = null;
+      this.coordinates = null;
+      this.lastRequest = null;
+    }
+  }, {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
         if (this.lastRequest !== null) {
           eraseFeedback(this.engine.editPolicies, this.lastRequest);
         }
-        this.source = null;
-        this.target = null;
-        this.progress = false;
+        this.init();
       }
     }
   }, {
@@ -1633,7 +1644,7 @@ var ConnectCapability = function (_Capability) {
       if (request !== null) {
         perform(this.engine.editPolicies, request);
       }
-      this.progress = false;
+      this.init();
     }
   }]);
   return ConnectCapability;
@@ -1659,15 +1670,21 @@ var SingleSelectionCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this, engine));
 
-    _this.location = null;
-    _this.possibleSingleSelection = false;
-    _this.additional = false;
-    _this.selection = [];
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(SingleSelectionCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.location = null;
+      this.possibleSingleSelection = false;
+      this.additional = false;
+      this.selection = [];
+    }
+  }, {
     key: 'createSingleSelectionRequest',
     value: function createSingleSelectionRequest() {
       var location = this.location,
@@ -1684,10 +1701,7 @@ var SingleSelectionCapability = function (_Capability) {
     key: 'cancel',
     value: function cancel() {
       if (this.progress) {
-        this.location = null;
-        this.possibleSingleSelection = false;
-        this.selection = [];
-        this.progress = false;
+        this.init();
       }
     }
   }, {
@@ -1728,6 +1742,7 @@ var SingleSelectionCapability = function (_Capability) {
         perform(this.engine.editPolicies, this.createSingleSelectionRequest());
         this.additional = false;
       }
+      this.init();
     }
   }]);
   return SingleSelectionCapability;
@@ -1753,19 +1768,25 @@ var MultiSelectionCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this, engine));
 
-    _this.startLocation = null;
-    _this.endLocation = null;
-    _this.lastRequest = null;
-    _this.startPart = null;
-    _this.endPart = null;
-    _this.selectionBounds = null;
-    _this.selection = null;
-    _this.additional = false;
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(MultiSelectionCapability, [{
+    key: 'init',
+    value: function init() {
+      this.progress = false;
+      this.startLocation = null;
+      this.endLocation = null;
+      this.lastRequest = null;
+      this.startPart = null;
+      this.endPart = null;
+      this.selectionBounds = null;
+      this.selection = null;
+      this.additional = false;
+    }
+  }, {
     key: 'createMultiSelectionRequest',
     value: function createMultiSelectionRequest() {
       var startLocation = this.startLocation,
@@ -1962,12 +1983,18 @@ var DeleteCapability = function (_Capability) {
 
     var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this, engine));
 
-    _this.currentSelection = [];
     _this.config = config;
+    _this.init();
     return _this;
   }
 
   createClass(DeleteCapability, [{
+    key: 'init',
+    value: function init() {
+      this.currentSelection = [];
+      this.progress = false;
+    }
+  }, {
     key: 'getDeleteRequest',
     value: function getDeleteRequest() {
       return {
@@ -1997,6 +2024,7 @@ var DeleteCapability = function (_Capability) {
           perform(this.engine.editPolicies, this.getDeleteRequest());
         }
       }
+      this.init();
     }
   }]);
   return DeleteCapability;

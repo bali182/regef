@@ -6,7 +6,7 @@ import { DiagramPart } from '../src/index'
 import createStore from './state'
 import createEngine from './diagram'
 import Root from './components/Root'
-import { DIAGRAM, PALETTE } from './diagram/constants'
+import { DIAGRAM } from './diagram/constants'
 
 const rootContainerStyle = {
   margin: '10vh',
@@ -27,7 +27,6 @@ class Wrapper extends React.Component {
     if (this.state.mounted) {
       return [
         <DiagramPart engine={engine} id={DIAGRAM} key={'DIAGRAM'}><Root /></DiagramPart>,
-        <DiagramPart engine={engine} id={PALETTE} key={'PALETTE'}><Root /></DiagramPart>,
       ]
     }
     return null

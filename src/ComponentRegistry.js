@@ -2,6 +2,9 @@ import ComponentWrapper from './ComponentWrapper'
 
 export default class ComponentRegistry {
   constructor() {
+    this.init()
+  }
+  init() {
     this.mapping = new Map()
     this.wrappers = new Set()
     this.root = null
@@ -12,10 +15,10 @@ export default class ComponentRegistry {
     if (root && this.root) {
       throw new Error(`Diagram can only contain a single root. ${this.root} is already registered.`)
     }
-    this.root = root
-    if (!root) {
-      this.mapping.clear()
-      this.wrappers.clear()
+    if (root) {
+      this.root = root
+    } else {
+      this.init()
     }
   }
   register(wrapper) {
