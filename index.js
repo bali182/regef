@@ -10,6 +10,23 @@ var propTypes = require('prop-types');
 var reactDom = require('react-dom');
 var regefGeometry = require('regef-geometry');
 
+var REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay';
+
+// Diagram participant types
+var ROOT_TYPE = 'root';
+var NODE_TYPE = 'node';
+var PORT_TYPE = 'port';
+var CONNECTION_TYPE = 'connection';
+
+// Request types
+var ADD = 'add';
+var CREATE = 'create';
+var MOVE = 'move';
+var SELECT = 'select';
+var DELETE = 'delete';
+var START_CONNECTION = 'start-connection';
+var END_CONNECTION = 'end-connection';
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -33,6 +50,21 @@ var createClass = function () {
     return Constructor;
   };
 }();
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
 
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -83,6 +115,24 @@ var possibleConstructorReturn = function (self, call) {
 
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
+
+var RegefContext = React__default.createContext({
+  id: null,
+  engine: null
+});
+
+function withRegefContext(Wrapped) {
+  function WithRegefContext(props) {
+    return React__default.createElement(
+      RegefContext.Consumer,
+      null,
+      function (regef) {
+        return React__default.createElement(Wrapped, _extends({}, props, defineProperty({}, REGEF_PROP_KEY, regef)));
+      }
+    );
+  }
+  return WithRegefContext;
+}
 
 var EventManager = function () {
   function EventManager(engine) {
@@ -336,27 +386,22 @@ var DiagramPart = function (_PureComponent) {
       }
     }
   }, {
-    key: 'getChildContext',
-    value: function getChildContext() {
-      return { regef: { engine: this.props.engine, id: this.props.id } };
-    }
-  }, {
     key: 'render',
     value: function render() {
-      // TODO check type (no solution yet)
-      return React.Children.only(this.props.children);
+      var _props2 = this.props,
+          id = _props2.id,
+          engine = _props2.engine;
+
+      return React__default.createElement(
+        RegefContext.Provider,
+        { value: { id: id, engine: engine } },
+        React.Children.only(this.props.children)
+      );
     }
   }]);
   return DiagramPart;
 }(React.PureComponent);
 
-
-DiagramPart.childContextTypes = {
-  regef: propTypes.shape({
-    engine: propTypes.instanceOf(Engine).isRequired,
-    id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
-  })
-};
 
 DiagramPart.propTypes = {
   engine: propTypes.instanceOf(Engine).isRequired,
@@ -380,21 +425,6 @@ var EditPolicy = function () {
   }]);
   return EditPolicy;
 }();
-
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-
-// Request types
-var ADD = 'add';
-var CREATE = 'create';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
 
 var DispatchingEditPolicy = function (_EditPolicy) {
   inherits(DispatchingEditPolicy, _EditPolicy);
@@ -939,17 +969,16 @@ function createDecorator(_ref) {
       var DecoratedComponent = function (_PureComponent) {
         inherits(DecoratedComponent, _PureComponent);
 
-        function DecoratedComponent(props, context) {
+        function DecoratedComponent(props) {
           classCallCheck(this, DecoratedComponent);
 
-          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props, context));
+          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props));
 
-          var id = _this.context.regef.id;
-
-          _this.partId = id;
+          var regef = props[REGEF_PROP_KEY];
+          _this.partId = regef;
           _this.userComponent = null;
           _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, context.regef)
+          _this.childProps = { toolkit: toolkitResolver(_this, regef)
             // binding methods
           };_this.setUserComponent = _this.setUserComponent.bind(_this);
           return _this;
@@ -963,12 +992,12 @@ function createDecorator(_ref) {
         }, {
           key: 'componentDidMount',
           value: function componentDidMount() {
-            activate(this, this.context.regef);
+            activate(this, this.props[REGEF_PROP_KEY]);
           }
         }, {
           key: 'componentWillUnmount',
           value: function componentWillUnmount() {
-            deactivate(this, this.context.regef);
+            deactivate(this, this.props[REGEF_PROP_KEY]);
           }
         }, {
           key: 'render',
@@ -987,14 +1016,7 @@ function createDecorator(_ref) {
         return DecoratedComponent;
       }(React.PureComponent);
 
-      DecoratedComponent.contextTypes = {
-        regef: propTypes.shape({
-          engine: propTypes.instanceOf(Engine).isRequired,
-          id: propTypes.oneOfType([propTypes.string, propTypes.symbol])
-        })
-      };
-
-      return DecoratedComponent;
+      return withRegefContext(DecoratedComponent);
     };
   };
 }
@@ -1996,6 +2018,7 @@ exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
+exports.REGEF_PROP_KEY = REGEF_PROP_KEY;
 exports.ROOT_TYPE = ROOT_TYPE;
 exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
