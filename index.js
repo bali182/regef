@@ -20,7 +20,6 @@ var CONNECTION_TYPE = 'connection';
 
 // Request types
 var ADD = 'add';
-var CREATE = 'create';
 var MOVE = 'move';
 var SELECT = 'select';
 var DELETE = 'delete';
@@ -2052,7 +2051,6 @@ exports.NODE_TYPE = NODE_TYPE;
 exports.PORT_TYPE = PORT_TYPE;
 exports.CONNECTION_TYPE = CONNECTION_TYPE;
 exports.ADD = ADD;
-exports.CREATE = CREATE;
 exports.MOVE = MOVE;
 exports.SELECT = SELECT;
 exports.DELETE = DELETE;

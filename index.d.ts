@@ -1,21 +1,27 @@
-import { Component } from 'react';
-import { Rectangle, Point } from 'regef-geometry';
+import { Component, ComponentType } from "react";
+import { Rectangle, Point } from "regef-geometry";
 
-declare export const SELECT;
-declare export const DELETE;
-declare export const MOVE_CHILDREN;
-declare export const ADD_CHILDREN;
-declare export const START_CONNECTION;
-declare export const END_CONNECTION;
+export declare const ADD = "add";
+export declare const MOVE = "move";
+export declare const SELECT = "select";
+export declare const DELETE = "delete";
+export declare const START_CONNECTION = "start-connection";
+export declare const END_CONNECTION = "end-connection";
 
-export type IntentType = 'select' | 'delete' | 'move' | 'add' | 'start-connection' | 'end-connection';
+export type IntentType =
+  | "add"
+  | "move"
+  | "select"
+  | "delete"
+  | "start-connection"
+  | "end-connection";
 
 export interface Intent {
   type: IntentType;
 }
 
 export interface SelectionIntent extends Intent {
-  type: 'select';
+  type: "select";
   bounds: Rectangle;
   startLocation: Point;
   endLocation: Point;
@@ -23,7 +29,7 @@ export interface SelectionIntent extends Intent {
 }
 
 export interface MoveIntent extends Intent {
-  type: 'move';
+  type: "move";
   components: Component[];
   container: Component;
   location: Point;
@@ -32,13 +38,12 @@ export interface MoveIntent extends Intent {
 }
 
 export interface DeleteIntent extends Intent {
-  type: 'delete';
+  type: "delete";
   selection: Component[];
 }
 
-
 export interface AddIntent extends Intent {
-  type: 'add';
+  type: "add";
   components: Component[];
   targetContainer: Component;
   container: Component;
@@ -48,13 +53,13 @@ export interface AddIntent extends Intent {
 }
 
 export interface StartConnectionIntent extends Intent {
-  type: 'start-connection';
+  type: "start-connection";
   source: Component;
   location: Point;
 }
 
 export interface EndConnectionIntent extends Intent {
-  type: 'end-connection';
+  type: "end-connection";
   source: Component;
   target: Component;
   location: Point;
@@ -102,20 +107,19 @@ export default class EventManager {
   onMouseUp(e): void;
 }
 
-
-class Toolkit {
+declare class Toolkit {
   constructor(engine: Engine);
   forPart(id: string | Symbol): PartToolkit;
   forComponent(component: Component): PartToolkit;
 }
 
-class PartToolkit {
+declare class PartToolkit {
   constructor(registry: ComponentRegistry);
 
   root(): Component;
-  parent(component: Component): Component?;
+  parent(component: Component): Component;
   children(component: Component): Component[];
-  editPolicy(component): EditPolicy?;
+  editPolicy(component): EditPolicy;
   ofType(type: string): Component[];
   nodes(): Component[];
   ports(): Component[];
@@ -130,10 +134,9 @@ export class SelectionProvider {
 }
 
 export interface EngineParams {
-  selectionProvider: SelectionProvider;
-  capabilities: Capability[];
-  editPolicies: EditPolicy[];
-  dependencies: { [key: string]: any };
+  selectionProvider?: SelectionProvider;
+  capabilities?: Capability[];
+  editPolicies?: EditPolicy[];
 }
 
 export class Engine {
@@ -141,11 +144,10 @@ export class Engine {
   selectionProvider: SelectionProvider;
   capabilities: Capability[];
   editPolicies: EditPolicy[];
-  dependencies: { [key: string]: any };
   parts: DiagramPartWrapper[];
   eventManager: EventManager;
 
-  constructor(params: EngineParams);
+  constructor(initializer: (engine: Engine) => EngineParams);
 
   part(id: string | Symbol): DiagramPartWrapper;
   removePart(id: string | Symbol): void;
@@ -156,14 +158,31 @@ interface DiagramPartProps {
   id?: string | Symbol;
 }
 
-export class DiagramPart extends Component<DiagramPartProps, any> { /* empty */ };
+export class DiagramPart extends Component<DiagramPartProps, any> {
+  /* empty */
+}
 
-export function node(): (ReactConstructor: Function) => any;
-export function port(): (ReactConstructor: Function) => any;
-export function root(): (ReactConstructor: Function) => any;
-export function connection(): (ReactConstructor: Function) => any;
+export interface RegefComponentProps {
+  regef: { toolkit: () => Promise<Toolkit> };
+}
 
-class ComponentWrapper {
+export function node<P extends RegefComponentProps>(): (
+  ConnComponent: ComponentType<P>
+) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>;
+
+export function port<P extends RegefComponentProps>(): (
+  ConnComponent: ComponentType<P>
+) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>;
+
+export function root<P extends RegefComponentProps>(): (
+  ConnComponent: ComponentType<P>
+) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>;
+
+export function connection<P extends RegefComponentProps>(): (
+  ConnComponent: ComponentType<P>
+) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>;
+
+declare class ComponentWrapper {
   dom: Node;
   component: Component;
   userComponent: Component;
@@ -171,7 +190,7 @@ class ComponentWrapper {
   constructor(dom: Node, component: Component, userComponent: Component);
 }
 
-class DiagramPartWrapper {
+declare class DiagramPartWrapper {
   id: string;
   registry: ComponentRegistry;
   toolkit: PartToolkit;
@@ -194,7 +213,7 @@ interface ComponentRegistry {
   removeUnregisterListener(listener: Function): void;
 }
 
-class DomHelper {
+declare class DomHelper {
   registry: ComponentRegistry;
 
   constructor(registry: ComponentRegistry);
@@ -220,9 +239,21 @@ export class Capability {
   onKeyUp(e: Event);
 }
 
-export class DragCapability extends Capability { /* implementation not relevant */ }
-export class ConnectCapability extends Capability { /* implementation not relevant */ }
-export class SingleSelectionCapability extends Capability { /* implementation not relevant */ }
-export class MultiSelectionCapability extends Capability { /* implementation not relevant */ }
-export class CancelCapability extends Capability { /* implementation not relevant */ }
-export class DeleteCapability extends Capability { /* implementation not relevant */ }
+export class DragCapability extends Capability {
+  /* implementation not relevant */
+}
+export class ConnectCapability extends Capability {
+  /* implementation not relevant */
+}
+export class SingleSelectionCapability extends Capability {
+  /* implementation not relevant */
+}
+export class MultiSelectionCapability extends Capability {
+  /* implementation not relevant */
+}
+export class CancelCapability extends Capability {
+  /* implementation not relevant */
+}
+export class DeleteCapability extends Capability {
+  /* implementation not relevant */
+}

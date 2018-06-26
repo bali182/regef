@@ -8,7 +8,6 @@ export const CONNECTION_TYPE = 'connection'
 
 // Request types
 export const ADD = 'add'
-export const CREATE = 'create'
 export const MOVE = 'move'
 export const SELECT = 'select'
 export const DELETE = 'delete'
