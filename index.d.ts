@@ -8,13 +8,7 @@ export declare const DELETE = "delete";
 export declare const START_CONNECTION = "start-connection";
 export declare const END_CONNECTION = "end-connection";
 
-export type IntentType =
-  | "add"
-  | "move"
-  | "select"
-  | "delete"
-  | "start-connection"
-  | "end-connection";
+export type IntentType = "add" | "move" | "select" | "delete" | "start-connection" | "end-connection";
 
 export interface Intent {
   type: IntentType;
@@ -68,7 +62,7 @@ export interface EndConnectionIntent extends Intent {
 export class EditPolicy {
   perform(intent: Intent): void;
   requestFeedback(intent: Intent): void;
-  eraseFeedback(intent): void;
+  eraseFeedback(intent: Intent): void;
 }
 
 export class DispatchingEditPolicy extends EditPolicy {
@@ -102,9 +96,9 @@ export default class EventManager {
 
   onKeyUp(e: Event): void;
   onKeyDown(e: Event): void;
-  onMouseDown(e): void;
-  onMouseMove(e): void;
-  onMouseUp(e): void;
+  onMouseDown(e: Event): void;
+  onMouseMove(e: Event): void;
+  onMouseUp(e: Event): void;
 }
 
 declare class Toolkit {
@@ -119,12 +113,12 @@ declare class PartToolkit {
   root(): Component;
   parent(component: Component): Component;
   children(component: Component): Component[];
-  editPolicy(component): EditPolicy;
+  editPolicy(component: Component): EditPolicy;
   ofType(type: string): Component[];
   nodes(): Component[];
   ports(): Component[];
   connections(): Component[];
-  bounds(component): Rectangle;
+  bounds(component: Component): Rectangle;
 }
 
 export class SelectionProvider {
@@ -135,14 +129,14 @@ export class SelectionProvider {
 
 export interface EngineParams {
   selectionProvider?: SelectionProvider;
-  capabilities?: Capability[];
+  capabilities?: Capability<any>[];
   editPolicies?: EditPolicy[];
 }
 
 export class Engine {
   toolkit: Toolkit;
   selectionProvider: SelectionProvider;
-  capabilities: Capability[];
+  capabilities: Capability<any>[];
   editPolicies: EditPolicy[];
   parts: DiagramPartWrapper[];
   eventManager: EventManager;
@@ -201,7 +195,7 @@ declare class DiagramPartWrapper {
 }
 
 interface ComponentRegistry {
-  setRoot(root): void;
+  setRoot(root: ComponentWrapper): void;
   register(wrapper: ComponentWrapper): void;
   unregister(input: Node | Component): void;
   get(input: Node | Component): void;
@@ -225,35 +219,55 @@ declare class DomHelper {
   matchesType(component: Component, type: string): boolean;
 }
 
-export class Capability {
+export class Capability<Config> {
   progress: boolean;
   engine: Engine;
+  config: Config;
 
-  constructor();
+  constructor(engine: Engine, config: Config);
 
   cancel(): void;
   onMouseDown(e: Event): void;
   onMouseMove(e: Event): void;
   onMouseUp(e: Event): void;
-  onKeyDown(e: Event);
-  onKeyUp(e: Event);
+  onKeyDown(e: Event): void;
+  onKeyUp(e: Event): void;
 }
 
-export class DragCapability extends Capability {
-  /* implementation not relevant */
+interface BaseConfig {
+  parts?: ReadonlyArray<Symbol | string>;
 }
-export class ConnectCapability extends Capability {
-  /* implementation not relevant */
+
+export interface DragCapabilityConfig extends BaseConfig {
+  types?: ReadonlyArray<Symbol | string>;
 }
-export class SingleSelectionCapability extends Capability {
-  /* implementation not relevant */
+
+export interface ConnectCapabilityConfig extends BaseConfig {
+  sourceTypes?: ReadonlyArray<Symbol | string>;
+  targetTypes?: ReadonlyArray<Symbol | string>;
 }
-export class MultiSelectionCapability extends Capability {
-  /* implementation not relevant */
+
+export interface SingleSelectionCapabilityConfig extends BaseConfig {
+  types?: ReadonlyArray<Symbol | string>;
 }
-export class CancelCapability extends Capability {
-  /* implementation not relevant */
+
+export interface MultiSelectionCapabilityConfig extends BaseConfig {
+  types?: ReadonlyArray<Symbol | string>;
+  intersection?: boolean;
+  containment?: boolean;
 }
-export class DeleteCapability extends Capability {
-  /* implementation not relevant */
+
+export interface CancelCapabilityConfig extends BaseConfig {
+  keys?: ReadonlyArray<string>;
 }
+
+export interface DeleteCapabilityConfig extends BaseConfig {
+  keys?: ReadonlyArray<string>;
+}
+
+export class DragCapability extends Capability<DragCapabilityConfig> {}
+export class ConnectCapability extends Capability<ConnectCapabilityConfig> {}
+export class SingleSelectionCapability extends Capability<SingleSelectionCapabilityConfig> {}
+export class MultiSelectionCapability extends Capability<MultiSelectionCapabilityConfig> {}
+export class CancelCapability extends Capability<CancelCapabilityConfig> {}
+export class DeleteCapability extends Capability<DeleteCapabilityConfig> {}
