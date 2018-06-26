@@ -224,7 +224,7 @@ export class Capability<Config> {
   engine: Engine;
   config: Config;
 
-  constructor(engine: Engine, config: Config);
+  constructor(engine: Engine, config?: Config);
 
   cancel(): void;
   onMouseDown(e: Event): void;
