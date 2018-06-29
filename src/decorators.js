@@ -9,7 +9,7 @@ const registryFrom = ({ engine, id }) => (engine.__partsMap().has(id)
   : null)
 
 const toolkitFrom = ({ engine, id }) => (engine.__partsMap().has(id)
-  ? engine.part(id).toolkit
+  ? engine.toolkit
   : null)
 
 const ensurePartRegistered = ({ engine, id }) => {

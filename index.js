@@ -1067,7 +1067,7 @@ var registryFrom = function registryFrom(_ref) {
 var toolkitFrom = function toolkitFrom(_ref2) {
   var engine = _ref2.engine,
       id = _ref2.id;
-  return engine.__partsMap().has(id) ? engine.part(id).toolkit : null;
+  return engine.__partsMap().has(id) ? engine.toolkit : null;
 };
 
 var ensurePartRegistered = function ensurePartRegistered(_ref3) {

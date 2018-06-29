@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { root } from '../../../src/index'
+import { DIAGRAM } from '../../diagram/constants'
 
 import RootView from './RootView'
 
@@ -37,7 +38,8 @@ export default class Root extends React.Component {
     }
   }
   buildConnectionsRepresentation() {
-    this.props.regef.toolkit().then((toolkit) => {
+    this.props.regef.toolkit().then((tkRoot) => {
+      const toolkit = tkRoot.forPart(DIAGRAM)
       const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
       const nodes = toolkit.nodes()
       const conns = Object.keys(this.props.components).map((source) => {
