@@ -7,7 +7,7 @@ export default class ConnectCapability extends Capability {
   constructor(engine, config = {
     parts: null,
     sourceTypes: [PORT_TYPE],
-    targetTypes: [ROOT_TYPE, NODE_TYPE],
+    targetTypes: [PORT_TYPE, ROOT_TYPE, NODE_TYPE],
   }) {
     super(engine)
     this.config = config

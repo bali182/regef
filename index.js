@@ -1518,7 +1518,7 @@ var ConnectCapability = function (_Capability) {
     var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
       parts: null,
       sourceTypes: [PORT_TYPE],
-      targetTypes: [ROOT_TYPE, NODE_TYPE]
+      targetTypes: [PORT_TYPE, ROOT_TYPE, NODE_TYPE]
     };
     classCallCheck(this, ConnectCapability);
 
