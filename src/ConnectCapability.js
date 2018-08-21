@@ -1,16 +1,25 @@
 import { point } from 'regef-geometry'
 import Capability from './Capability'
-import { PORT_TYPE, START_CONNECTION, END_CONNECTION, NODE_TYPE, ROOT_TYPE } from './constants'
-import { eraseFeedback, requestFeedback, perform, partMatches, typeMatches, isLeftButton } from './utils'
+import { START_CONNECTION, END_CONNECTION } from './constants'
+import {
+  eraseFeedback,
+  requestFeedback,
+  perform,
+  partMatches,
+  typeMatches,
+  isLeftButton,
+} from './utils'
+
+const DEFAULT_CONFIG = {
+  parts: null,
+  sourceTypes: [],
+  targetTypes: [],
+}
 
 export default class ConnectCapability extends Capability {
-  constructor(engine, config = {
-    parts: null,
-    sourceTypes: [PORT_TYPE],
-    targetTypes: [PORT_TYPE, ROOT_TYPE, NODE_TYPE],
-  }) {
+  constructor(engine, config = {}) {
     super(engine)
-    this.config = config
+    this.config = { ...DEFAULT_CONFIG, ...config }
     this.init()
   }
 
@@ -77,8 +86,7 @@ export default class ConnectCapability extends Capability {
   }
 
   handleFeedback(lastRequest, request) {
-    if (lastRequest !== null
-      && (request === null || request.target !== lastRequest.target)) {
+    if (lastRequest !== null && (request === null || request.target !== lastRequest.target)) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
     if (request !== null) {

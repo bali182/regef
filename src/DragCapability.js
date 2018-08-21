@@ -1,19 +1,31 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { MOVE, ADD, NODE_TYPE, ROOT_TYPE, SELECT } from './constants'
+import { MOVE, ADD, SELECT } from './constants'
 import Capability from './Capability'
-import { typeMatches, partMatches, eraseFeedback, requestFeedback, perform, getSelection, isLeftButton } from './utils'
-
-const ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE]
+import {
+  typeMatches,
+  partMatches,
+  eraseFeedback,
+  requestFeedback,
+  perform,
+  getSelection,
+  isLeftButton,
+} from './utils'
 
 const buildOffset = ({ clientX, clientY }, element) => {
   const { x, y } = element.getBoundingClientRect()
   return point(clientX - x, clientY - y)
 }
 
+const DEFAULT_CONFIG = {
+  parts: null,
+  draggables: [],
+  hosts: [],
+}
+
 export default class DragCapability extends Capability {
-  constructor(engine, config = { parts: null, types: [NODE_TYPE] }) {
+  constructor(engine, config = {}) {
     super(engine)
-    this.config = config
+    this.config = { ...DEFAULT_CONFIG, ...config }
     this.init()
   }
 
@@ -35,11 +47,12 @@ export default class DragCapability extends Capability {
     if (!part) {
       return null
     }
-    const newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)) // TODO
+    const newTarget = part.domHelper.findClosest(eventTarget, typeMatches(this.config.hosts))
     if (
       newTarget === null ||
       newTarget === target ||
-      (target !== null && target.dom.contains(newTarget.dom))) {
+      (target !== null && target.dom.contains(newTarget.dom))
+    ) {
       return currentParent
     }
     const selection = getSelection(this.engine)
@@ -135,10 +148,7 @@ export default class DragCapability extends Capability {
 
   handleFeedback(lastRequest, request) {
     const { lastTargetParent, targetParent } = this
-    if (
-      lastRequest !== null &&
-      lastTargetParent !== targetParent
-    ) {
+    if (lastRequest !== null && lastTargetParent !== targetParent) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
     if (request !== null) {
@@ -179,11 +189,11 @@ export default class DragCapability extends Capability {
     if (!part) {
       return
     }
-    this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.types))
+    this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.draggables))
     if (this.target !== null) {
       const parent = part.domHelper.findClosest(
         this.target.dom.parentNode,
-        (wrapper) => ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0,
+        (wrapper) => this.config.hosts.indexOf(wrapper.component.type) >= 0,
       )
       this.currentParent = parent || part.registry.root
       this.offset = buildOffset(e, this.target.dom)

@@ -5,7 +5,7 @@ export { default as Engine } from './Engine'
 export { default as Capability } from './Capability'
 export { default as SelectionProvider } from './SelectionProvider'
 
-export { root, connection, node, port } from './decorators'
+export { default as component } from './decorator'
 
 export { default as DragCapability } from './DragCapability'
 export { default as ConnectCapability } from './ConnectCapability'

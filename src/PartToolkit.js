@@ -1,5 +1,4 @@
 import { rectangle } from 'regef-geometry'
-import { NODE_TYPE, PORT_TYPE, CONNECTION_TYPE } from './constants'
 
 const REGISTRY = Symbol('REGISTRY')
 const DOM_HELPER = Symbol('DOM_HELPER')
@@ -68,18 +67,6 @@ export default class PartToolkit {
       }
     }
     return ofType
-  }
-
-  nodes() {
-    return this.ofType(NODE_TYPE)
-  }
-
-  ports() {
-    return this.ofType(PORT_TYPE)
-  }
-
-  connections() {
-    return this.ofType(CONNECTION_TYPE)
   }
 
   bounds(component) {

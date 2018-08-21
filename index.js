@@ -12,12 +12,6 @@ var regefGeometry = require('regef-geometry');
 
 var REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay';
 
-// Diagram participant types
-var ROOT_TYPE = 'root';
-var NODE_TYPE = 'node';
-var PORT_TYPE = 'port';
-var CONNECTION_TYPE = 'connection';
-
 // Request types
 var ADD = 'add';
 var MOVE = 'move';
@@ -274,6 +268,8 @@ var TOOLKIT = Symbol('TOOLKIT');
 var EVENT_MANAGER = Symbol('EVENT_MANAGER');
 var EDIT_POLICIES = Symbol('EDIT_POLICIES');
 var PARTS = Symbol('PARTS');
+var TYPES = Symbol('TYPES');
+var ROOT_TYPE = Symbol('ROOT_TYPE');
 
 var Engine = function () {
   function Engine() {
@@ -281,7 +277,9 @@ var Engine = function () {
       return {
         capabilities: [],
         editPolicies: [],
-        selectionProvider: null
+        selectionProvider: null,
+        rootType: null,
+        types: []
       };
     };
     classCallCheck(this, Engine);
@@ -294,11 +292,15 @@ var Engine = function () {
     var _config = config(this),
         capabilities = _config.capabilities,
         editPolicies = _config.editPolicies,
-        selectionProvider = _config.selectionProvider;
+        selectionProvider = _config.selectionProvider,
+        rootType = _config.rootType,
+        types = _config.types;
 
     this[CAPABILITIES] = capabilities;
     this[EDIT_POLICIES] = editPolicies;
     this[SELECTION_PROVIDER] = selectionProvider;
+    this[TYPES] = types;
+    this[ROOT_TYPE] = rootType;
   }
 
   createClass(Engine, [{
@@ -345,6 +347,16 @@ var Engine = function () {
     key: 'editPolicies',
     get: function get$$1() {
       return this[EDIT_POLICIES];
+    }
+  }, {
+    key: 'rootType',
+    get: function get$$1() {
+      return this[ROOT_TYPE];
+    }
+  }, {
+    key: 'types',
+    get: function get$$1() {
+      return this[TYPES];
     }
   }]);
   return Engine;
@@ -634,6 +646,39 @@ var fromComponent = function fromComponent(component) {
   return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
 };
 
+var matches = function matches(target, wrapper) {
+  var userComponent = wrapper.userComponent,
+      dom = wrapper.dom,
+      component = wrapper.component;
+
+  return wrapper === target || userComponent === target || dom === target || component === target;
+};
+
+var watchRegister = function watchRegister(registry, target) {
+  return new Promise(function (resolve, reject) {
+    if (!registry || !target) {
+      reject(new Error('registry or target was falsy value'));
+      return;
+    }
+    if (registry.has(target)) {
+      resolve();
+      return;
+    }
+    var listener = function listener(wrapper) {
+      if (wrapper && matches(target, wrapper)) {
+        try {
+          resolve();
+        } catch (e) {
+          reject(e);
+        } finally {
+          registry.removeRegisterListener(listener);
+        }
+      }
+    };
+    registry.addRegisterListener(listener);
+  });
+};
+
 var ComponentRegistry = function () {
   function ComponentRegistry() {
     classCallCheck(this, ComponentRegistry);
@@ -812,21 +857,6 @@ var PartToolkit = function () {
       return ofType;
     }
   }, {
-    key: 'nodes',
-    value: function nodes() {
-      return this.ofType(NODE_TYPE);
-    }
-  }, {
-    key: 'ports',
-    value: function ports() {
-      return this.ofType(PORT_TYPE);
-    }
-  }, {
-    key: 'connections',
-    value: function connections() {
-      return this.ofType(CONNECTION_TYPE);
-    }
-  }, {
     key: 'bounds',
     value: function bounds(component) {
       var registry = this[REGISTRY];
@@ -962,106 +992,14 @@ var DiagramPartWrapper = function () {
   return DiagramPartWrapper;
 }();
 
-function createDecorator(_ref) {
-  var type = _ref.type,
-      activate = _ref.activate,
-      deactivate = _ref.deactivate,
-      toolkitResolver = _ref.toolkitResolver;
-
-  return function () {
-    return function (Wrapped) {
-      var DecoratedComponent = function (_PureComponent) {
-        inherits(DecoratedComponent, _PureComponent);
-
-        function DecoratedComponent(props) {
-          classCallCheck(this, DecoratedComponent);
-
-          var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props));
-
-          var regef = props[REGEF_PROP_KEY];
-          _this.partId = regef;
-          _this.userComponent = null;
-          _this.type = type;
-          _this.childProps = { toolkit: toolkitResolver(_this, regef)
-            // binding methods
-          };_this.setUserComponent = _this.setUserComponent.bind(_this);
-          return _this;
-        }
-
-        createClass(DecoratedComponent, [{
-          key: 'setUserComponent',
-          value: function setUserComponent(ref) {
-            this.userComponent = ref;
-          }
-        }, {
-          key: 'componentDidMount',
-          value: function componentDidMount() {
-            activate(this, this.props[REGEF_PROP_KEY]);
-          }
-        }, {
-          key: 'componentWillUnmount',
-          value: function componentWillUnmount() {
-            deactivate(this, this.props[REGEF_PROP_KEY]);
-          }
-        }, {
-          key: 'render',
-          value: function render() {
-            var _props = this.props,
-                children = _props.children,
-                rest = objectWithoutProperties(_props, ['children']);
-
-            return React__default.createElement(
-              Wrapped,
-              _extends({}, rest, { ref: this.setUserComponent, regef: this.childProps }),
-              children
-            );
-          }
-        }]);
-        return DecoratedComponent;
-      }(React.PureComponent);
-
-      return withRegefContext(DecoratedComponent);
-    };
-  };
-}
-
-var matches = function matches(target, wrapper) {
-  var userComponent = wrapper.userComponent,
-      dom = wrapper.dom,
-      component = wrapper.component;
-
-  return wrapper === target || userComponent === target || dom === target || component === target;
-};
-
-var watchRegister = function watchRegister(registry, target) {
-  return new Promise(function (resolve, reject) {
-    if (!registry || !target) {
-      reject(new Error('registry or target was falsy value'));
-      return;
-    }
-    if (registry.has(target)) {
-      resolve();
-      return;
-    }
-    var listener = function listener(wrapper) {
-      if (wrapper && matches(target, wrapper)) {
-        try {
-          resolve();
-        } catch (e) {
-          reject(e);
-        } finally {
-          registry.removeRegisterListener(listener);
-        }
-      }
-    };
-    registry.addRegisterListener(listener);
-  });
-};
-
 var registryFrom = function registryFrom(_ref) {
   var engine = _ref.engine,
       id = _ref.id;
-  return engine.__partsMap().has(id) ? engine.part(id).registry : null;
+
+  if (engine.__partsMap().has(id)) {
+    return engine.part(id).registry;
+  }
+  return null;
 };
 
 var toolkitFrom = function toolkitFrom(_ref2) {
@@ -1080,68 +1018,118 @@ var ensurePartRegistered = function ensurePartRegistered(_ref3) {
   }
 };
 
-function defaultToolkitResolver(component, context) {
+function toolkitResolver(comp, context) {
   ensurePartRegistered(context);
   return function () {
-    return watchRegister(registryFrom(context), component).then(function () {
+    return watchRegister(registryFrom(context), comp).then(function () {
       return toolkitFrom(context);
     });
   };
 }
 
-var defaultActivate = function defaultActivate(component, context) {
+var defaultActivate = function defaultActivate(comp, context) {
   ensurePartRegistered(context);
-  registryFrom(context).register(fromComponent(component));
+  registryFrom(context).register(fromComponent(comp));
 };
 
-var defaultDecativate = function defaultDecativate(component, context) {
+var defaultDecativate = function defaultDecativate(comp, context) {
   var registry = registryFrom(context);
   if (registry) {
-    registry.unregister(component);
+    registry.unregister(comp);
   }
 };
 
-var rootActivate = function rootActivate(component, context) {
-  defaultActivate(component, context);
+var rootActivate = function rootActivate(comp, context) {
+  defaultActivate(comp, context);
   var registry = registryFrom(context);
-  registry.setRoot(registry.get(component));
+  registry.setRoot(registry.get(comp));
 };
 
-var rootDeactivate = function rootDeactivate(component, context) {
-  defaultDecativate(component, context);
+var rootDeactivate = function rootDeactivate(comp, context) {
+  defaultDecativate(comp, context);
   var registry = registryFrom(context);
   if (registry) {
     registry.setRoot(null);
   }
 };
 
-var node = createDecorator({
-  type: NODE_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate,
-  toolkitResolver: defaultToolkitResolver
-});
+var getEngine = function getEngine(comp) {
+  return comp.props[REGEF_PROP_KEY].engine;
+};
 
-var port = createDecorator({
-  type: PORT_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate,
-  toolkitResolver: defaultToolkitResolver
-});
+function component(type) {
+  return function DecoratedDiagramComponent(Wrapped) {
+    var DecoratedComponent = function (_PureComponent) {
+      inherits(DecoratedComponent, _PureComponent);
 
-var root = createDecorator({
-  type: ROOT_TYPE,
-  activate: rootActivate,
-  deactivate: rootDeactivate,
-  toolkitResolver: defaultToolkitResolver
-});
+      function DecoratedComponent(props) {
+        classCallCheck(this, DecoratedComponent);
 
-var connection = createDecorator({
-  type: CONNECTION_TYPE,
-  activate: defaultActivate,
-  deactivate: defaultDecativate,
-  toolkitResolver: defaultToolkitResolver
-});
+        var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props));
+
+        var regef = props[REGEF_PROP_KEY];
+        _this.userComponent = null;
+        _this.type = type;
+        _this.childProps = { toolkit: toolkitResolver(_this, regef)
+          // binding methods
+        };_this.setUserComponent = _this.setUserComponent.bind(_this);
+        var types = regef.engine.types;
+        if (types.indexOf(type) < 0) {
+          var typesStr = types.map(function (tpe) {
+            return '"' + tpe + '"';
+          }).join(',');
+          throw new TypeError('Not a valid component type "' + type + '". Please select one from ' + typesStr + ', or add "' + type + '" to the engine\'s "types" array.');
+        }
+        return _this;
+      }
+
+      createClass(DecoratedComponent, [{
+        key: 'setUserComponent',
+        value: function setUserComponent(ref) {
+          this.userComponent = ref;
+        }
+      }, {
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+          var engine = getEngine(this);
+          var context = this.props[REGEF_PROP_KEY];
+          if (this.type === engine.rootType) {
+            rootActivate(this, context);
+          } else {
+            defaultActivate(this, context);
+          }
+        }
+      }, {
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+          var engine = getEngine(this);
+          var context = this.props[REGEF_PROP_KEY];
+          if (this.type === engine.rootType) {
+            rootDeactivate(this, context);
+          } else {
+            defaultDecativate(this, context);
+          }
+        }
+      }, {
+        key: 'render',
+        value: function render() {
+          var _props = this.props,
+              children = _props.children,
+              rest = objectWithoutProperties(_props, ['children']);
+
+          return React__default.createElement(
+            Wrapped,
+            _extends({}, rest, { ref: this.setUserComponent, regef: this.childProps }),
+            children
+          );
+        }
+      }]);
+      return DecoratedComponent;
+    }(React.PureComponent);
+
+    return withRegefContext(DecoratedComponent);
+  };
+}
 
 var matchesSingleType = function matchesSingleType(type) {
   return function (_ref) {
@@ -1239,8 +1227,6 @@ var isLeftButton = function isLeftButton(e) {
   return e.button === 1;
 };
 
-var ACCEPTED_TYPES = [NODE_TYPE, ROOT_TYPE];
-
 var buildOffset = function buildOffset(_ref, element) {
   var clientX = _ref.clientX,
       clientY = _ref.clientY;
@@ -1252,16 +1238,22 @@ var buildOffset = function buildOffset(_ref, element) {
   return regefGeometry.point(clientX - x, clientY - y);
 };
 
+var DEFAULT_CONFIG = {
+  parts: null,
+  draggables: [],
+  hosts: []
+};
+
 var DragCapability = function (_Capability) {
   inherits(DragCapability, _Capability);
 
   function DragCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, types: [NODE_TYPE] };
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, DragCapability);
 
     var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this, engine));
 
-    _this.config = config;
+    _this.config = _extends({}, DEFAULT_CONFIG, config);
     _this.init();
     return _this;
   }
@@ -1291,7 +1283,7 @@ var DragCapability = function (_Capability) {
       if (!part) {
         return null;
       }
-      var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(ACCEPTED_TYPES)); // TODO
+      var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(this.config.hosts));
       if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom)) {
         return currentParent;
       }
@@ -1457,6 +1449,8 @@ var DragCapability = function (_Capability) {
   }, {
     key: 'onMouseDown',
     value: function onMouseDown(e) {
+      var _this3 = this;
+
       if (!isLeftButton(e)) {
         return;
       }
@@ -1464,10 +1458,10 @@ var DragCapability = function (_Capability) {
       if (!part) {
         return;
       }
-      this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.types));
+      this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.draggables));
       if (this.target !== null) {
         var parent = part.domHelper.findClosest(this.target.dom.parentNode, function (wrapper) {
-          return ACCEPTED_TYPES.indexOf(wrapper.component.type) >= 0;
+          return _this3.config.hosts.indexOf(wrapper.component.type) >= 0;
         });
         this.currentParent = parent || part.registry.root;
         this.offset = buildOffset(e, this.target.dom);
@@ -1511,20 +1505,22 @@ var DragCapability = function (_Capability) {
   return DragCapability;
 }(Capability);
 
+var DEFAULT_CONFIG$1 = {
+  parts: null,
+  sourceTypes: [],
+  targetTypes: []
+};
+
 var ConnectCapability = function (_Capability) {
   inherits(ConnectCapability, _Capability);
 
   function ConnectCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-      parts: null,
-      sourceTypes: [PORT_TYPE],
-      targetTypes: [PORT_TYPE, ROOT_TYPE, NODE_TYPE]
-    };
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, ConnectCapability);
 
     var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this, engine));
 
-    _this.config = config;
+    _this.config = _extends({}, DEFAULT_CONFIG$1, config);
     _this.init();
     return _this;
   }
@@ -1660,16 +1656,21 @@ var locationOf = function locationOf(_ref, rootDom) {
   return regefGeometry.point(clientX - x, clientY - y);
 };
 
+var DEFAULT_CONFIG$2 = {
+  parts: null,
+  selectables: []
+};
+
 var SingleSelectionCapability = function (_Capability) {
   inherits(SingleSelectionCapability, _Capability);
 
   function SingleSelectionCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, types: [NODE_TYPE] };
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, SingleSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this, engine));
 
-    _this.config = config;
+    _this.config = _extends({}, DEFAULT_CONFIG$2, config);
     _this.init();
     return _this;
   }
@@ -1713,7 +1714,7 @@ var SingleSelectionCapability = function (_Capability) {
       if (!part) {
         return;
       }
-      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.types));
+      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.selectables));
       if (!target) {
         return;
       }
@@ -1753,21 +1754,23 @@ var locationOf$1 = function locationOf(_ref) {
   return regefGeometry.point(clientX, clientY);
 };
 
+var DEFAULT_CONFIG$3 = {
+  parts: null,
+  selectables: [],
+  intersection: false,
+  containment: true
+};
+
 var MultiSelectionCapability = function (_Capability) {
   inherits(MultiSelectionCapability, _Capability);
 
   function MultiSelectionCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-      parts: null,
-      types: [NODE_TYPE],
-      intersection: false,
-      containment: true
-    };
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, MultiSelectionCapability);
 
     var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this, engine));
 
-    _this.config = config;
+    _this.config = _extends({}, DEFAULT_CONFIG$3, config);
     _this.init();
     return _this;
   }
@@ -1839,7 +1842,7 @@ var MultiSelectionCapability = function (_Capability) {
       var currentSelection = getSelection(engine);
       var newSelection = [];
 
-      var isRelevant = typeMatches(config.types);
+      var isRelevant = typeMatches(config.selectables);
       var additionalFilter = additional ? function (_ref2) {
         var userComponent = _ref2.userComponent;
         return currentSelection.indexOf(userComponent) < 0;
@@ -1886,7 +1889,7 @@ var MultiSelectionCapability = function (_Capability) {
       if (!part) {
         return;
       }
-      var target = part.domHelper.findClosest(e.target, typeMatches(ROOT_TYPE));
+      var target = part.domHelper.findClosest(e.target, typeMatches(this.engine.rootType));
       if (target !== null) {
         this.startLocation = locationOf$1(e);
         this.progress = true;
@@ -1934,16 +1937,21 @@ var MultiSelectionCapability = function (_Capability) {
   return MultiSelectionCapability;
 }(Capability);
 
+var DEFAULT_CONFIG$4 = {
+  parts: null,
+  keys: ['Escape']
+};
+
 var CancelCapability = function (_Capability) {
   inherits(CancelCapability, _Capability);
 
   function CancelCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, keys: ['Escape'] };
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, CancelCapability);
 
     var _this = possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).call(this, engine));
 
-    _this.config = config;
+    _this.config = _extends({}, DEFAULT_CONFIG$4, config);
     return _this;
   }
 
@@ -1973,16 +1981,21 @@ var CancelCapability = function (_Capability) {
   return CancelCapability;
 }(Capability);
 
+var DEFAULT_CONFIG$5 = {
+  parts: null,
+  keys: ['Backspace', 'Delete']
+};
+
 var DeleteCapability = function (_Capability) {
   inherits(DeleteCapability, _Capability);
 
   function DeleteCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { parts: null, keys: ['Backspace', 'Delete'] };
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     classCallCheck(this, DeleteCapability);
 
     var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this, engine));
 
-    _this.config = config;
+    _this.config = _extends({}, DEFAULT_CONFIG$5, config);
     _this.init();
     return _this;
   }
@@ -2035,10 +2048,7 @@ exports.DispatchingEditPolicy = DispatchingEditPolicy;
 exports.Engine = Engine;
 exports.Capability = Capability;
 exports.SelectionProvider = SelectionProvider;
-exports.root = root;
-exports.connection = connection;
-exports.node = node;
-exports.port = port;
+exports.component = component;
 exports.DragCapability = DragCapability;
 exports.ConnectCapability = ConnectCapability;
 exports.SingleSelectionCapability = SingleSelectionCapability;
@@ -2046,10 +2056,6 @@ exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
 exports.REGEF_PROP_KEY = REGEF_PROP_KEY;
-exports.ROOT_TYPE = ROOT_TYPE;
-exports.NODE_TYPE = NODE_TYPE;
-exports.PORT_TYPE = PORT_TYPE;
-exports.CONNECTION_TYPE = CONNECTION_TYPE;
 exports.ADD = ADD;
 exports.MOVE = MOVE;
 exports.SELECT = SELECT;

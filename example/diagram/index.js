@@ -6,10 +6,17 @@ import {
   SingleSelectionCapability, // ok
   MultiSelectionCapability,
   CancelCapability, // ok
-  DeleteCapability, // ok
+  DeleteCapability,
 } from '../../src/index'
 
-import { addChildren, addConnection, deleteComponent, setChildren, setPosition, setSelection } from '../state/actions'
+import {
+  addChildren,
+  addConnection,
+  deleteComponent,
+  setChildren,
+  setPosition,
+  setSelection,
+} from '../state/actions'
 
 import DiagramSelectionProvider from './DiagramSelectionProvider'
 
@@ -20,6 +27,7 @@ import SelectComponentsEditPolicy from './SelectComponentsEditPolicy'
 import MoveRootChildrenEditPolicy from './MoveRootChildrenEditPolicy'
 import DeleteComponentsEditPolicy from './DeleteComponentsEditPolicy'
 import DisabledAddChildrenEditPolicy from './DisabledAddChildrenEditPolicy'
+import { NODE, PORT, ROOT } from './constants'
 
 const createEngine = (store) => {
   const dependencies = {
@@ -31,12 +39,12 @@ const createEngine = (store) => {
   }
   return new Engine((engine) => ({
     capabilities: [
-      new ConnectCapability(engine),
-      new SingleSelectionCapability(engine),
-      new MultiSelectionCapability(engine),
+      new ConnectCapability(engine, { sourceTypes: [PORT], targetTypes: [NODE, ROOT] }),
+      new SingleSelectionCapability(engine, { selectables: [NODE] }),
+      new MultiSelectionCapability(engine, { selectables: [NODE] }),
       new CancelCapability(engine),
       new DeleteCapability(engine),
-      new DragCapability(engine),
+      new DragCapability(engine, { draggables: [NODE], hosts: [ROOT, NODE] }),
     ],
     editPolicies: [
       new MoveRootChildrenEditPolicy(engine, dependencies),
@@ -49,6 +57,8 @@ const createEngine = (store) => {
       // new LoggerEditPolicy(),
     ],
     selectionProvider: new DiagramSelectionProvider(engine, dependencies),
+    rootType: ROOT,
+    types: [ROOT, NODE, PORT],
   }))
 }
 

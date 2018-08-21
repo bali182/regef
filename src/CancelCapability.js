@@ -1,10 +1,15 @@
 import Capability from './Capability'
 import { partMatches } from './utils'
 
+const DEFAULT_CONFIG = {
+  parts: null,
+  keys: ['Escape'],
+}
+
 export default class CancelCapability extends Capability {
-  constructor(engine, config = { parts: null, keys: ['Escape'] }) {
+  constructor(engine, config = {}) {
     super(engine)
-    this.config = config
+    this.config = { ...DEFAULT_CONFIG, ...config }
   }
 
   focusOnTargetedParts(target) {

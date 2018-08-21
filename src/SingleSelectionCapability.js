@@ -1,5 +1,5 @@
 import { point, rectangle, dimension } from 'regef-geometry'
-import { NODE_TYPE, SELECT } from './constants'
+import { SELECT } from './constants'
 import Capability from './Capability'
 import { typeMatches, partMatches, perform, getSelection, isLeftButton } from './utils'
 
@@ -8,10 +8,15 @@ const locationOf = ({ clientX, clientY }, rootDom) => {
   return point(clientX - x, clientY - y)
 }
 
+const DEFAULT_CONFIG = {
+  parts: null,
+  selectables: [],
+}
+
 export default class SingleSelectionCapability extends Capability {
-  constructor(engine, config = { parts: null, types: [NODE_TYPE] }) {
+  constructor(engine, config = {}) {
     super(engine)
-    this.config = config
+    this.config = { ...DEFAULT_CONFIG, ...config }
     this.init()
   }
 
@@ -28,9 +33,7 @@ export default class SingleSelectionCapability extends Capability {
     return {
       type: SELECT,
       bounds: rectangle(location, dimension(0, 0)),
-      selection: additional
-        ? getSelection(this.engine).concat(selection)
-        : selection,
+      selection: additional ? getSelection(this.engine).concat(selection) : selection,
     }
   }
 
@@ -48,7 +51,7 @@ export default class SingleSelectionCapability extends Capability {
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.types))
+    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.selectables))
     if (!target) {
       return
     }

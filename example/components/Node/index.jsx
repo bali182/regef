@@ -1,18 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { node } from '../../../src/index'
+import { component } from '../../../src/index'
 
 import NodeView from './NodeView'
 import Port from '../Port'
+import { NODE } from '../../diagram/constants'
 
 const stateToProps = ({ components, selection }, { id }) => ({
   node: components[id],
   selected: selection.indexOf(id) >= 0,
 })
 
-@connect(stateToProps)
-@node()
-export default class Node extends React.Component {
+export class _Node extends React.Component {
   constructor() {
     super()
     this.state = {
@@ -31,16 +30,25 @@ export default class Node extends React.Component {
   }
 
   render() {
-    const { id, selected, node: { x, y } } = this.props
-    return (<NodeView
-      x={x}
-      y={y}
-      id={id}
-      selected={selected}
-      onMouseEnter={this.onMouseEnter}
-      onMouseLeave={this.onMouseLeave}
-    >
-      <Port visible={this.state.portVisible} />
-    </NodeView>)
+    const {
+      id,
+      selected,
+      node: { x, y },
+    } = this.props
+    return (
+      <NodeView
+        x={x}
+        y={y}
+        id={id}
+        selected={selected}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+      >
+        <Port visible={this.state.portVisible} />
+      </NodeView>
+    )
   }
 }
+
+export const NodeWithRegef = component(NODE)(_Node)
+export default connect(stateToProps)(NodeWithRegef)

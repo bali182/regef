@@ -2,10 +2,15 @@ import Capability from './Capability'
 import { DELETE } from './constants'
 import { perform, partMatches, getSelection } from './utils'
 
+const DEFAULT_CONFIG = {
+  parts: null,
+  keys: ['Backspace', 'Delete'],
+}
+
 export default class DeleteCapability extends Capability {
-  constructor(engine, config = { parts: null, keys: ['Backspace', 'Delete'] }) {
+  constructor(engine, config = {}) {
     super(engine)
-    this.config = config
+    this.config = { ...DEFAULT_CONFIG, ...config }
     this.init()
   }
 

@@ -1,11 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { node } from '../../../src/index'
+import { component } from '../../../src/index'
 
 import ContainerView from './ContainerView'
 import Port from '../Port'
 import Step from '../Step'
 import LineFeedback from './LineFeedback'
+import { NODE } from '../../diagram/constants'
 
 const stateToProps = ({ components, selection }, { id }) => ({
   container: components[id],
@@ -13,9 +14,7 @@ const stateToProps = ({ components, selection }, { id }) => ({
   components,
 })
 
-@connect(stateToProps)
-@node()
-export default class Container extends React.Component {
+export class _Container extends React.Component {
   constructor() {
     super()
     this.state = {
@@ -35,7 +34,10 @@ export default class Container extends React.Component {
   }
 
   renderChildren() {
-    const { components, container: { children } } = this.props
+    const {
+      components,
+      container: { children },
+    } = this.props
     const { insertionFeedback } = this.state
     const childComponents = children.map((id) => {
       const { type } = components[id]
@@ -58,17 +60,26 @@ export default class Container extends React.Component {
   }
 
   render() {
-    const { id, selected, container: { x, y } } = this.props
-    return (<ContainerView
-      x={x}
-      y={y}
-      id={id}
-      selected={selected}
-      onMouseEnter={this.onMouseEnter}
-      onMouseLeave={this.onMouseLeave}
-    >
-      {this.renderChildren()}
-      <Port visible={this.state.portVisible} />
-    </ContainerView>)
+    const {
+      id,
+      selected,
+      container: { x, y },
+    } = this.props
+    return (
+      <ContainerView
+        x={x}
+        y={y}
+        id={id}
+        selected={selected}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+      >
+        {this.renderChildren()}
+        <Port visible={this.state.portVisible} />
+      </ContainerView>
+    )
   }
 }
+
+export const ContainerWithRegef = component(NODE)(_Container)
+export default connect(stateToProps)(ContainerWithRegef)

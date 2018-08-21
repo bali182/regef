@@ -1,5 +1,5 @@
 import { SelectionProvider } from '../../src/index'
-import { DIAGRAM } from './constants'
+import { DIAGRAM, NODE } from './constants'
 
 export default class DiagramSelectionProvider extends SelectionProvider {
   constructor(engine, dependencies) {
@@ -12,7 +12,7 @@ export default class DiagramSelectionProvider extends SelectionProvider {
     const store = this.dependencies.store
     const { selection } = store.getState()
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
-    return toolkit.nodes()
+    return toolkit.ofType(NODE)
       .filter(({ props: { id } }) => selection.indexOf(id) >= 0)
   }
 }

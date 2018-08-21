@@ -1,12 +1,14 @@
 import React from 'react'
-import { port } from '../../../src/index'
+import { component } from '../../../src/index'
 
 import PortView from './PortView'
+import { PORT } from '../../diagram/constants'
 
-@port()
-export default class Port extends React.Component {
+export class _Port extends React.Component {
   render() {
     const { visible } = this.props
-    return (<PortView visible={visible} />)
+    return <PortView visible={visible} />
   }
 }
+
+export default component(PORT)(_Port)

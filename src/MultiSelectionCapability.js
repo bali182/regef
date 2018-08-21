@@ -1,19 +1,31 @@
 import { point, rectangle } from 'regef-geometry'
-import { ROOT_TYPE, SELECT, NODE_TYPE } from './constants'
+import { SELECT } from './constants'
 import Capability from './Capability'
-import { eraseFeedback, requestFeedback, perform, getSelection, partMatches, typeMatches, getParts, alwaysTrue, isLeftButton } from './utils'
+import {
+  eraseFeedback,
+  requestFeedback,
+  perform,
+  getSelection,
+  partMatches,
+  typeMatches,
+  getParts,
+  alwaysTrue,
+  isLeftButton,
+} from './utils'
 
 const locationOf = ({ clientX, clientY }) => point(clientX, clientY)
 
+const DEFAULT_CONFIG = {
+  parts: null,
+  selectables: [],
+  intersection: false,
+  containment: true,
+}
+
 export default class MultiSelectionCapability extends Capability {
-  constructor(engine, config = {
-    parts: null,
-    types: [NODE_TYPE],
-    intersection: false,
-    containment: true,
-  }) {
+  constructor(engine, config = {}) {
     super(engine)
-    this.config = config
+    this.config = { ...DEFAULT_CONFIG, ...config }
     this.init()
   }
 
@@ -66,9 +78,9 @@ export default class MultiSelectionCapability extends Capability {
     const currentSelection = getSelection(engine)
     const newSelection = []
 
-    const isRelevant = typeMatches(config.types)
+    const isRelevant = typeMatches(config.selectables)
     const additionalFilter = additional
-      ? (({ userComponent }) => currentSelection.indexOf(userComponent) < 0)
+      ? ({ userComponent }) => currentSelection.indexOf(userComponent) < 0
       : alwaysTrue
     const boundsMatch = config.containment
       ? (itemBounds) => selectionBounds.containsRectangle(itemBounds)
@@ -108,7 +120,7 @@ export default class MultiSelectionCapability extends Capability {
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(e.target, typeMatches(ROOT_TYPE))
+    const target = part.domHelper.findClosest(e.target, typeMatches(this.engine.rootType))
     if (target !== null) {
       this.startLocation = locationOf(e)
       this.progress = true
