@@ -92,7 +92,7 @@ export class DispatchingEditPolicy extends EditPolicy {
   eraseSelectFeedback(intent: SelectionIntent): void
 }
 
-export default class EventManager {
+export class EventManager {
   engine: Engine
   hooked: boolean
   constructor(engine: Engine)
@@ -137,6 +137,8 @@ export interface EngineParams {
   selectionProvider?: SelectionProvider
   capabilities?: Capability<any>[]
   editPolicies?: EditPolicy[]
+  rootType?: Symbol | string
+  types?: ReadonlyArray<Symbol | string>
 }
 
 export class Engine {
@@ -146,6 +148,8 @@ export class Engine {
   editPolicies: EditPolicy[]
   parts: DiagramPartWrapper[]
   eventManager: EventManager
+  rootType: Symbol | string
+  types: ReadonlyArray<Symbol | string>
 
   constructor(initializer: (engine: Engine) => EngineParams)
 
@@ -170,7 +174,9 @@ export function root<P extends RegefComponentProps>(): (
   ConnComponent: ComponentType<P>,
 ) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>
 
-export function component<P extends RegefComponentProps>(type: Symbol | string): (
+export function component<P extends RegefComponentProps>(
+  type: Symbol | string,
+): (
   ConnComponent: ComponentType<P>,
 ) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>
 
