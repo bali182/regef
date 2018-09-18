@@ -1,38 +1,40 @@
-import { rectangle } from 'regef-geometry'
+import { rectangle, Rectangle } from 'regef-geometry'
+import { ComponentRegistry } from './ComponentRegistry';
+import { PartDomHelper } from './PartDomHelper';
 
-const REGISTRY = Symbol('REGISTRY')
-const DOM_HELPER = Symbol('DOM_HELPER')
+export class PartToolkit {
+  private registry: ComponentRegistry
+  private domHelper: PartDomHelper
 
-export default class PartToolkit {
-  constructor(registry, domHelper) {
-    this[REGISTRY] = registry
-    this[DOM_HELPER] = domHelper
+  constructor(registry: ComponentRegistry, domHelper: PartDomHelper) {
+    this.registry = registry
+    this.domHelper = domHelper
   }
 
-  root() {
-    const root = this[REGISTRY].root
+  root(): React.Component {
+    const root = this.registry.root
     if (root === undefined || root === null) {
       throw new Error('No root component!')
     }
-    return this[REGISTRY].root.component.userComponent
+    return this.registry.root.userComponent
   }
 
-  parent(component) {
-    const domHelper = this[DOM_HELPER]
-    const registry = this[REGISTRY]
+  parent(component: React.Component): React.Component {
+    const domHelper = this.domHelper
+    const registry = this.registry
     const wrapper = registry.get(component)
     if (wrapper === undefined || wrapper === null) {
       throw new Error('Given component is not part of the diagram!')
     } else if (wrapper === registry.root) {
       return null
     }
-    const parent = domHelper.findClosest(wrapper.dom.parentNode)
+    const parent = domHelper.findClosest(wrapper.dom.parentNode as Element)
     return parent === null ? null : parent.userComponent
   }
 
-  children(component) {
-    const registry = this[REGISTRY]
-    const domHelper = this[DOM_HELPER]
+  children(component: React.Component): React.Component[] {
+    const registry = this.registry
+    const domHelper = this.domHelper
     const wrapper = registry.get(component)
     if (wrapper === undefined || wrapper === null) {
       throw new Error('Given component is not part of the diagram!')
@@ -48,18 +50,9 @@ export default class PartToolkit {
     return children
   }
 
-  editPolicy(component) {
-    const registry = this[REGISTRY]
-    const wrapper = registry.get(component)
-    if (wrapper === undefined || wrapper === null) {
-      throw new Error('Given component is not part of the diagram!')
-    }
-    return wrapper.component.editPolicy
-  }
-
-  ofType(type) {
-    const all = this[REGISTRY].all()
-    const ofType = []
+  ofType(type: string | Symbol): React.Component[] {
+    const all = this.registry.all()
+    const ofType: React.Component[] = []
     for (let i = 0, length = all.length; i < length; i += 1) {
       const wrapper = all[i]
       if (wrapper.component.type === type) {
@@ -69,8 +62,8 @@ export default class PartToolkit {
     return ofType
   }
 
-  bounds(component) {
-    const registry = this[REGISTRY]
+  bounds(component: React.Component): Rectangle {
+    const registry = this.registry
     const wrapper = registry.get(component)
     if (wrapper === undefined || wrapper === null) {
       throw new Error('Given component is not part of the diagram!')

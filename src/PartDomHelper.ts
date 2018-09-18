@@ -1,11 +1,17 @@
-export default class PartDomHelper {
-  constructor(registry) {
+import { ComponentRegistry } from "./ComponentRegistry";
+import { ComponentWrapper } from "./ComponentWrapper";
+
+type WrapperPredicate = (wrapper: ComponentWrapper) => boolean
+
+export class PartDomHelper {
+  private registry: ComponentRegistry
+  constructor(registry: ComponentRegistry) {
     this.registry = registry
   }
 
-  findClosest(dom, matcher = () => true) {
+  findClosest(dom: Element, matcher: WrapperPredicate = () => true): ComponentWrapper {
     const root = this.registry.root.dom
-    for (let it = dom; it !== null; it = it.parentNode) {
+    for (let it = dom; it !== null; it = it.parentNode as Element) {
       const wrapper = this.registry.get(it)
       if (wrapper !== undefined && wrapper !== null) {
         return matcher(wrapper) ? wrapper : null
@@ -17,9 +23,9 @@ export default class PartDomHelper {
     return null
   }
 
-  findRelevantChildrenIntenal(node, children = []) {
+  findRelevantChildrenIntenal(node: Element, children: Element[] = []): Element[] {
     if (node !== null && node.hasChildNodes()) {
-      const childNodes = node.childNodes
+      const childNodes = node.childNodes as NodeListOf<Element>
       for (let i = 0, len = childNodes.length; i < len; i += 1) {
         const childNode = childNodes[i]
         if (this.registry.has(childNode)) {
@@ -32,18 +38,11 @@ export default class PartDomHelper {
     return children
   }
 
-  findRelevantChildren(element) {
+  findRelevantChildren(element: Element): Element[] {
     return this.findRelevantChildrenIntenal(element, [])
   }
 
-  findClosestParent(element, type = null) {
-    if (element === this.registry.root.dom) {
-      return element
-    }
-    return this.findClosestElement(element.parentNode, type)
-  }
-
-  partContains(element) {
+  partContains(element: Element): boolean {
     return this.registry.root.dom.contains(element)
   }
 }

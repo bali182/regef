@@ -1,6 +1,6 @@
-import { point } from 'regef-geometry'
-import Capability from './Capability'
-import { START_CONNECTION, END_CONNECTION } from './constants'
+import { point, Point } from 'regef-geometry'
+import { Capability } from './Capability'
+import { START_CONNECTION, END_CONNECTION, Id, Intent, StartConnectionIntent, EndConnectionIntent } from './constants'
 import {
   eraseFeedback,
   requestFeedback,
@@ -9,17 +9,31 @@ import {
   typeMatches,
   isLeftButton,
 } from './utils'
+import { Engine } from './Engine';
+import { ComponentWrapper } from './ComponentWrapper';
 
-const DEFAULT_CONFIG = {
+type ConnectCapabilityConfig = {
+  parts?: Id[]
+  sourceTypes?: Id[]
+  targetTypes?: Id[]
+}
+
+const DEFAULT_CONFIG: ConnectCapabilityConfig = {
   parts: null,
   sourceTypes: [],
   targetTypes: [],
 }
 
-export default class ConnectCapability extends Capability {
-  constructor(engine, config = {}) {
-    super(engine)
-    this.config = { ...DEFAULT_CONFIG, ...config }
+type ConnectIntent = StartConnectionIntent | EndConnectionIntent
+
+export default class ConnectCapability extends Capability<ConnectCapabilityConfig> {
+  private source: ComponentWrapper
+  private target: ComponentWrapper
+  private coordinates: Point
+  private lastRequest: ConnectIntent
+
+  constructor(engine: Engine, config: ConnectCapabilityConfig = {}) {
+    super(engine, { ...DEFAULT_CONFIG, ...config })
     this.init()
   }
 
@@ -40,29 +54,29 @@ export default class ConnectCapability extends Capability {
     }
   }
 
-  getStartConnectionRequest() {
+  getStartConnectionRequest(): StartConnectionIntent {
     return {
       type: START_CONNECTION,
-      source: this.source.component.userComponent,
+      source: this.source.userComponent,
       location: point(this.coordinates),
     }
   }
 
-  getEndConnectionRequest() {
+  getEndConnectionRequest(): EndConnectionIntent {
     return {
       type: END_CONNECTION,
-      source: this.source.component.userComponent,
-      target: this.target.component.userComponent,
+      source: this.source.userComponent,
+      target: this.target.userComponent,
       location: point(this.coordinates),
     }
   }
 
-  buildEndConnectRequest(e) {
-    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+  buildEndConnectRequest(e: MouseEvent) {
+    const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return null
     }
-    const target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes))
+    const target = part.domHelper.findClosest(e.target as Element, typeMatches(this.config.targetTypes))
     if (!target) {
       return null
     }
@@ -71,12 +85,12 @@ export default class ConnectCapability extends Capability {
     return this.getEndConnectionRequest()
   }
 
-  buildStartConnectionRequest(e) {
-    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+  buildStartConnectionRequest(e: MouseEvent) {
+    const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return null
     }
-    const source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes))
+    const source = part.domHelper.findClosest(e.target as Element, typeMatches(this.config.sourceTypes))
     if (!source) {
       return null
     }
@@ -85,8 +99,8 @@ export default class ConnectCapability extends Capability {
     return this.getStartConnectionRequest()
   }
 
-  handleFeedback(lastRequest, request) {
-    if (lastRequest !== null && (request === null || request.target !== lastRequest.target)) {
+  handleFeedback(lastRequest: ConnectIntent, request: ConnectIntent) {
+    if (lastRequest !== null && (request === null || (request as EndConnectionIntent).target !== (lastRequest as EndConnectionIntent).target)) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
     if (request !== null) {
@@ -94,7 +108,7 @@ export default class ConnectCapability extends Capability {
     }
   }
 
-  onMouseDown(e) {
+  onMouseDown(e: MouseEvent) {
     if (!isLeftButton(e)) {
       return
     }
@@ -106,7 +120,7 @@ export default class ConnectCapability extends Capability {
     this.lastRequest = request
   }
 
-  onMouseMove(e) {
+  onMouseMove(e: MouseEvent) {
     if (!this.progress) {
       return
     }
@@ -115,7 +129,7 @@ export default class ConnectCapability extends Capability {
     this.lastRequest = request
   }
 
-  onMouseUp(e) {
+  onMouseUp(e: MouseEvent) {
     if (!this.progress) {
       return
     }

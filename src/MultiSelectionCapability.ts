@@ -1,6 +1,7 @@
-import { point, rectangle } from 'regef-geometry'
-import { SELECT } from './constants'
-import Capability from './Capability'
+import React from 'react'
+import { point, rectangle, Point, Rectangle } from 'regef-geometry'
+import { SELECT, Id, SelectionIntent, MoveIntent } from './constants'
+import { Capability } from './Capability'
 import {
   eraseFeedback,
   requestFeedback,
@@ -12,36 +13,50 @@ import {
   alwaysTrue,
   isLeftButton,
 } from './utils'
+import { Engine } from './Engine';
+import { DiagramPartWrapper } from './DiagramPartWrapper';
+import { ComponentWrapper } from './ComponentWrapper';
 
-const locationOf = ({ clientX, clientY }) => point(clientX, clientY)
+const locationOf = ({ clientX, clientY }: MouseEvent) => point(clientX, clientY)
 
-const DEFAULT_CONFIG = {
+type MultiSelectionCapabilityConfig = {
+  parts: Id[]
+  selectables: Id[]
+  intersection: boolean
+  containment: boolean
+}
+
+const DEFAULT_CONFIG: MultiSelectionCapabilityConfig = {
   parts: null,
   selectables: [],
   intersection: false,
   containment: true,
 }
 
-export default class MultiSelectionCapability extends Capability {
-  constructor(engine, config = {}) {
-    super(engine)
-    this.config = { ...DEFAULT_CONFIG, ...config }
+export default class MultiSelectionCapability extends Capability<MultiSelectionCapabilityConfig> {
+  private startLocation: Point
+  private endLocation: Point
+  private lastRequest: SelectionIntent
+  private selectionBounds: Rectangle
+  private selection: React.Component[]
+  private additional: boolean
+
+  constructor(engine: Engine, config: Partial<MultiSelectionCapabilityConfig> = {}) {
+    super(engine, { ...DEFAULT_CONFIG, ...config })
     this.init()
   }
 
-  init() {
+  init(): void {
     this.progress = false
     this.startLocation = null
     this.endLocation = null
     this.lastRequest = null
-    this.startPart = null
-    this.endPart = null
     this.selectionBounds = null
     this.selection = null
     this.additional = false
   }
 
-  createMultiSelectionRequest() {
+  createMultiSelectionRequest(): SelectionIntent {
     const { startLocation, endLocation, selectionBounds, selection } = this
     return {
       type: SELECT,
@@ -52,7 +67,7 @@ export default class MultiSelectionCapability extends Capability {
     }
   }
 
-  buildSelectionBounds() {
+  buildSelectionBounds(): void {
     const { startLocation, endLocation } = this
     if (!startLocation || !endLocation) {
       return
@@ -67,28 +82,30 @@ export default class MultiSelectionCapability extends Capability {
     this.selectionBounds = rectangle(x, y, width, height)
   }
 
-  buildSelection() {
+  buildSelection(): void {
     const { config, engine, selectionBounds, additional } = this
 
     const parts = getParts(engine, config.parts).filter((part) => {
-      const bounds = rectangle(part.registry.root.dom.getBoundingClientRect())
+      const { top, left, width, height } = part.registry.root.dom.getBoundingClientRect()
+      const bounds = rectangle(left, top, width, height)
       return bounds.intersection(selectionBounds) !== null
     })
 
     const currentSelection = getSelection(engine)
-    const newSelection = []
+    const newSelection: React.Component[] = []
 
     const isRelevant = typeMatches(config.selectables)
     const additionalFilter = additional
-      ? ({ userComponent }) => currentSelection.indexOf(userComponent) < 0
+      ? ({ userComponent }: ComponentWrapper) => currentSelection.indexOf(userComponent) < 0
       : alwaysTrue
     const boundsMatch = config.containment
-      ? (itemBounds) => selectionBounds.containsRectangle(itemBounds)
-      : (itemBounds) => selectionBounds.intersection(itemBounds) !== null
+      ? (itemBounds: Rectangle) => selectionBounds.containsRectangle(itemBounds)
+      : (itemBounds: Rectangle) => selectionBounds.intersection(itemBounds) !== null
 
     parts.forEach((part) => {
       part.registry.all().forEach((wrapper) => {
-        const bounds = rectangle(wrapper.dom.getBoundingClientRect())
+        const { top, left, width, height } = wrapper.dom.getBoundingClientRect()
+        const bounds = rectangle(left, top, width, height)
         if (isRelevant(wrapper) && additionalFilter(wrapper) && boundsMatch(bounds)) {
           newSelection.push(wrapper.userComponent)
         }
@@ -98,41 +115,38 @@ export default class MultiSelectionCapability extends Capability {
     this.selection = additional ? currentSelection.concat(newSelection) : newSelection
   }
 
-  cancel() {
+  cancel(): void {
     if (this.progress) {
       if (this.lastRequest !== null) {
         eraseFeedback(this.engine.editPolicies, this.lastRequest)
       }
       this.startLocation = null
       this.endLocation = null
-      this.possibleSingleSelection = false
       this.progress = false
       this.selection = null
       this.selectionBounds = null
     }
   }
 
-  onMouseDown(e) {
+  onMouseDown(e: MouseEvent): void {
     if (!isLeftButton(e)) {
       return
     }
-    const part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
+    const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(e.target, typeMatches(this.engine.rootType))
+    const target = part.domHelper.findClosest(e.target as Element, typeMatches(this.engine.rootType))
     if (target !== null) {
       this.startLocation = locationOf(e)
       this.progress = true
-      this.startPart = part
     }
   }
 
-  onMouseMove(e) {
+  onMouseMove(e: MouseEvent): void {
     if (!this.progress) {
       return
     }
-    this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     this.endLocation = locationOf(e)
     this.additional = Boolean(e.shiftKey)
 
@@ -144,11 +158,10 @@ export default class MultiSelectionCapability extends Capability {
     this.lastRequest = request
   }
 
-  onMouseUp(e) {
+  onMouseUp(e: MouseEvent): void {
     if (!this.progress) {
       return
     }
-    this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts))
     this.endLocation = locationOf(e)
     this.additional = Boolean(e.shiftKey)
 

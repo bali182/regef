@@ -1,17 +1,27 @@
-import ComponentWrapper from './ComponentWrapper'
+import { ComponentWrapper } from './ComponentWrapper'
+import React from 'react'
 
-export default class ComponentRegistry {
+type WrapperField = ComponentWrapper | Element | React.Component
+type RegisterListener = (c: ComponentWrapper) => void
+
+export class ComponentRegistry {
+  private mapping: Map<WrapperField, ComponentWrapper>
+  private wrappers: Set<ComponentWrapper>
+  private registerListeners: RegisterListener[] = []
+  private unregisterListeners: RegisterListener[] = []
+  public root: ComponentWrapper
+
   constructor() {
     this.init()
   }
-  init() {
+  init(): void {
     this.mapping = new Map()
     this.wrappers = new Set()
     this.root = null
     this.registerListeners = []
     this.unregisterListeners = []
   }
-  setRoot(root) {
+  setRoot(root: ComponentWrapper): void {
     if (root && this.root) {
       throw new Error(`Diagram can only contain a single root. ${this.root} is already registered.`)
     }
@@ -21,7 +31,7 @@ export default class ComponentRegistry {
       this.init()
     }
   }
-  register(wrapper) {
+  register(wrapper: ComponentWrapper): void {
     if (!(wrapper instanceof ComponentWrapper)) {
       throw new TypeError(`ComponentWrapper instance expected, got ${wrapper}`)
     }
@@ -32,7 +42,7 @@ export default class ComponentRegistry {
     this.wrappers.add(wrapper)
     this.registerListeners.forEach((listener) => listener(wrapper))
   }
-  unregister(input) {
+  unregister(input: WrapperField) {
     const wrapper = this.get(input)
     if (wrapper !== undefined) {
       this.mapping.delete(wrapper)
@@ -43,25 +53,25 @@ export default class ComponentRegistry {
       this.unregisterListeners.forEach((listener) => listener(wrapper))
     }
   }
-  get(input) {
+  get(input: WrapperField): ComponentWrapper {
     return this.mapping.get(input)
   }
-  all() {
+  all(): ComponentWrapper[] {
     return Array.from(this.wrappers)
   }
-  has(input) {
+  has(input: WrapperField): boolean {
     return this.mapping.has(input)
   }
-  addRegisterListener(listener) {
+  addRegisterListener(listener: RegisterListener): void {
     this.registerListeners.push(listener)
   }
-  addUnregisterListener(listener) {
+  addUnregisterListener(listener: RegisterListener): void {
     this.unregisterListeners.push(listener)
   }
-  removeRegisterListener(listener) {
+  removeRegisterListener(listener: RegisterListener): void {
     this.registerListeners = this.registerListeners.filter((e) => e !== listener)
   }
-  removeUnregisterListener(listener) {
+  removeUnregisterListener(listener: RegisterListener): void {
     this.unregisterListeners = this.unregisterListeners.filter((e) => e !== listener)
   }
 }

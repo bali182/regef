@@ -6,8 +6,8 @@ export const RegefContext = React.createContext({
   engine: null,
 })
 
-export function withRegefContext(Wrapped) {
-  function WithRegefContext(props) {
+export function withRegefContext(Wrapped: React.ComponentClass<any>) {
+  function WithRegefContext(props: any) {
     return (<RegefContext.Consumer>
       {(regef) => <Wrapped {...props} {...{ [REGEF_PROP_KEY]: regef }} />}
     </RegefContext.Consumer>)

@@ -1,41 +1,48 @@
-import Capability from './Capability'
-import { DELETE } from './constants'
+import { Capability } from './Capability'
+import { DELETE, Id, DeleteIntent } from './constants'
 import { perform, partMatches, getSelection } from './utils'
+import { Engine } from './Engine';
 
-const DEFAULT_CONFIG = {
+type DeleteCapabilityConfig = {
+  parts?: Id[]
+  keys?: string[]
+}
+
+const DEFAULT_CONFIG: DeleteCapabilityConfig = {
   parts: null,
   keys: ['Backspace', 'Delete'],
 }
 
 export default class DeleteCapability extends Capability {
-  constructor(engine, config = {}) {
-    super(engine)
-    this.config = { ...DEFAULT_CONFIG, ...config }
+  private currentSelection: any[] = null
+
+  constructor(engine: Engine, config: DeleteCapabilityConfig = {}) {
+    super(engine, { ...DEFAULT_CONFIG, ...config })
     this.init()
   }
 
-  init() {
+  init(): void {
     this.currentSelection = []
     this.progress = false
   }
 
-  getDeleteRequest() {
+  getDeleteRequest(): DeleteIntent {
     return {
       type: DELETE,
       selection: this.currentSelection,
     }
   }
 
-  focusOnTargetedParts(target) {
+  focusOnTargetedParts(target: Element): boolean {
     return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)))
   }
 
-  keyMatches(key) {
+  keyMatches(key: string): boolean {
     return this.config.keys.indexOf(key) >= 0
   }
 
-  onKeyDown({ key, target }) {
-    if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+  onKeyDown({ key, target }: KeyboardEvent): void {
+    if (this.keyMatches(key) && this.focusOnTargetedParts(target as Element)) {
       this.currentSelection = getSelection(this.engine)
       if (this.currentSelection.length > 0) {
         perform(this.engine.editPolicies, this.getDeleteRequest())

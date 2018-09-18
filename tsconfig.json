@@ -2,7 +2,11 @@
   "compilerOptions": {
     "module": "commonjs",
     "jsx": "react",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "target": "es6",
+    "esModuleInterop": true
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

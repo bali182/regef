@@ -1,5 +1,10 @@
-export default class EventManager {
-  constructor(engine) {
+import { Engine } from "./Engine";
+
+export class EventManager {
+  private engine: Engine
+  public hooked: boolean
+
+  constructor(engine: Engine) {
     this.engine = engine
     this.hooked = false
     // binding methods
@@ -10,7 +15,7 @@ export default class EventManager {
     this.onKeyUp = this.onKeyUp.bind(this)
   }
 
-  hookListeners() {
+  hookListeners(): void {
     document.addEventListener('mousedown', this.onMouseDown)
     document.addEventListener('mousemove', this.onMouseMove)
     document.addEventListener('mouseup', this.onMouseUp)
@@ -20,7 +25,7 @@ export default class EventManager {
     this.hooked = true
   }
 
-  unhookListeners() {
+  unhookListeners(): void {
     document.removeEventListener('mousedown', this.onMouseDown)
     document.removeEventListener('mousemove', this.onMouseMove)
     document.removeEventListener('mouseup', this.onMouseUp)
@@ -30,19 +35,19 @@ export default class EventManager {
     this.hooked = false
   }
 
-  onKeyUp(e) {
+  onKeyUp(e: KeyboardEvent): void {
     this.engine.capabilities.forEach((capability) => capability.onKeyUp(e))
   }
-  onKeyDown(e) {
+  onKeyDown(e: KeyboardEvent): void {
     this.engine.capabilities.forEach((capability) => capability.onKeyDown(e))
   }
-  onMouseDown(e) {
+  onMouseDown(e: MouseEvent): void {
     this.engine.capabilities.forEach((capability) => capability.onMouseDown(e))
   }
-  onMouseMove(e) {
+  onMouseMove(e: MouseEvent): void {
     this.engine.capabilities.forEach((capability) => capability.onMouseMove(e))
   }
-  onMouseUp(e) {
+  onMouseUp(e: MouseEvent): void {
     this.engine.capabilities.forEach((capability) => capability.onMouseUp(e))
   }
 }
