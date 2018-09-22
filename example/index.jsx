@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
-import { DiagramPart } from '../src/index'
+import { DiagramPart } from '../index'
 
 import createStore from './state'
 import createEngine from './diagram'

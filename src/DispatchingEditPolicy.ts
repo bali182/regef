@@ -4,7 +4,7 @@ import { ADD, MOVE, START_CONNECTION, END_CONNECTION, SELECT, DELETE, Intent, Ad
 
 type RecognizedIntent = AddIntent | MoveIntent | StartConnectionIntent | EndConnectionIntent | SelectionIntent | DeleteIntent
 
-export default class DispatchingEditPolicy extends EditPolicy {
+export class DispatchingEditPolicy extends EditPolicy {
   perform(intent: RecognizedIntent): void {
     const { type } = intent
     switch (intent.type) {

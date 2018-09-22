@@ -39,7 +39,7 @@ const DEFAULT_CONFIG: DragCapabilityConfig = {
   hosts: [],
 }
 
-export default class DragCapability extends Capability<DragCapabilityConfig> {
+export class DragCapability extends Capability<DragCapabilityConfig> {
   private target: ComponentWrapper
   private lastTargetParent: ComponentWrapper
   private targetParent: ComponentWrapper

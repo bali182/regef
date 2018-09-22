@@ -20,7 +20,7 @@ const DEFAULT_CONFIG: SingleSelectionCapabilityConfig = {
   selectables: [],
 }
 
-export default class SingleSelectionCapability extends Capability<SingleSelectionCapabilityConfig> {
+export class SingleSelectionCapability extends Capability<SingleSelectionCapabilityConfig> {
   private location: Point
   private possibleSingleSelection: boolean
   private additional: boolean

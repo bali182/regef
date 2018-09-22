@@ -1,4 +1,4 @@
-import { DispatchingEditPolicy } from '../../src/index'
+import { DispatchingEditPolicy } from '../../index'
 
 export default class DeleteComponentsEditPolicy extends DispatchingEditPolicy {
   constructor(engine, dependencies) {

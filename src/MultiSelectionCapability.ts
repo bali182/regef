@@ -14,7 +14,6 @@ import {
   isLeftButton,
 } from './utils'
 import { Engine } from './Engine';
-import { DiagramPartWrapper } from './DiagramPartWrapper';
 import { ComponentWrapper } from './ComponentWrapper';
 
 const locationOf = ({ clientX, clientY }: MouseEvent) => point(clientX, clientY)
@@ -33,7 +32,7 @@ const DEFAULT_CONFIG: MultiSelectionCapabilityConfig = {
   containment: true,
 }
 
-export default class MultiSelectionCapability extends Capability<MultiSelectionCapabilityConfig> {
+export class MultiSelectionCapability extends Capability<MultiSelectionCapabilityConfig> {
   private startLocation: Point
   private endLocation: Point
   private lastRequest: SelectionIntent

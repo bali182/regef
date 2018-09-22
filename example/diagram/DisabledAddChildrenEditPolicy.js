@@ -1,4 +1,4 @@
-import { DispatchingEditPolicy } from '../../src/index'
+import { DispatchingEditPolicy } from '../../index'
 import { isRoot, isStep, isNode } from './typeUtils'
 import { DIAGRAM } from './constants'
 

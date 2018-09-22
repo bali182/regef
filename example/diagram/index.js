@@ -1,13 +1,13 @@
 import { bindActionCreators } from 'redux'
 import {
   Engine,
-  DragCapability, // ok
-  ConnectCapability, // ok
-  SingleSelectionCapability, // ok
+  DragCapability,
+  ConnectCapability,
+  SingleSelectionCapability,
   MultiSelectionCapability,
-  CancelCapability, // ok
+  CancelCapability,
   DeleteCapability,
-} from '../../src/index'
+} from '../../index'
 
 import {
   addChildren,

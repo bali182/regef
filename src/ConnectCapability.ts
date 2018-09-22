@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: ConnectCapabilityConfig = {
 
 type ConnectIntent = StartConnectionIntent | EndConnectionIntent
 
-export default class ConnectCapability extends Capability<ConnectCapabilityConfig> {
+export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
   private source: ComponentWrapper
   private target: ComponentWrapper
   private coordinates: Point
@@ -37,7 +37,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     this.init()
   }
 
-  init() {
+  init(): void {
     this.progress = false
     this.source = null
     this.target = null
@@ -45,7 +45,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     this.lastRequest = null
   }
 
-  cancel() {
+  cancel(): void {
     if (this.progress) {
       if (this.lastRequest !== null) {
         eraseFeedback(this.engine.editPolicies, this.lastRequest)
@@ -71,7 +71,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     }
   }
 
-  buildEndConnectRequest(e: MouseEvent) {
+  buildEndConnectRequest(e: MouseEvent): EndConnectionIntent {
     const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return null
@@ -85,7 +85,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     return this.getEndConnectionRequest()
   }
 
-  buildStartConnectionRequest(e: MouseEvent) {
+  buildStartConnectionRequest(e: MouseEvent): StartConnectionIntent {
     const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return null
@@ -99,7 +99,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     return this.getStartConnectionRequest()
   }
 
-  handleFeedback(lastRequest: ConnectIntent, request: ConnectIntent) {
+  handleFeedback(lastRequest: ConnectIntent, request: ConnectIntent): void {
     if (lastRequest !== null && (request === null || (request as EndConnectionIntent).target !== (lastRequest as EndConnectionIntent).target)) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
@@ -108,7 +108,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     }
   }
 
-  onMouseDown(e: MouseEvent) {
+  onMouseDown(e: MouseEvent): void {
     if (!isLeftButton(e)) {
       return
     }
@@ -120,7 +120,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     this.lastRequest = request
   }
 
-  onMouseMove(e: MouseEvent) {
+  onMouseMove(e: MouseEvent): void {
     if (!this.progress) {
       return
     }
@@ -129,7 +129,7 @@ export default class ConnectCapability extends Capability<ConnectCapabilityConfi
     this.lastRequest = request
   }
 
-  onMouseUp(e: MouseEvent) {
+  onMouseUp(e: MouseEvent): void {
     if (!this.progress) {
       return
     }

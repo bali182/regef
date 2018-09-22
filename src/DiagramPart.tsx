@@ -1,5 +1,5 @@
-import React, { Children, PureComponent } from 'react'
-import { instanceOf, string, symbol, oneOfType } from 'prop-types'
+import React from 'react'
+import types from 'prop-types'
 import { RegefContext } from './RegefContext'
 import { Engine } from './Engine'
 import { Id } from './constants';
@@ -9,7 +9,7 @@ type DiagramPartProps = {
   id: Id
 }
 
-export class DiagramPart extends PureComponent<DiagramPartProps> {
+export class DiagramPart extends React.PureComponent<DiagramPartProps> {
   componentDidMount(): void {
     const { engine } = this.props
     if (!engine.eventManager.hooked) {
@@ -31,12 +31,12 @@ export class DiagramPart extends PureComponent<DiagramPartProps> {
   render(): React.ReactNode {
     const { id, engine } = this.props
     return (<RegefContext.Provider value={{ id, engine }}>
-      {Children.only(this.props.children)}
+      {React.Children.only(this.props.children)}
     </RegefContext.Provider>)
   }
 
   static propTypes = {
-    engine: instanceOf(Engine).isRequired,
-    id: oneOfType([string, symbol]).isRequired,
+    engine: types.instanceOf(Engine).isRequired,
+    id: types.oneOfType([types.string, types.symbol]).isRequired,
   }
 }

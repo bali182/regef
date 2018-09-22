@@ -13,7 +13,7 @@ const DEFAULT_CONFIG: DeleteCapabilityConfig = {
   keys: ['Backspace', 'Delete'],
 }
 
-export default class DeleteCapability extends Capability {
+export class DeleteCapability extends Capability {
   private currentSelection: any[] = null
 
   constructor(engine: Engine, config: DeleteCapabilityConfig = {}) {

@@ -1,4 +1,5 @@
-import { findDOMNode } from 'react-dom'
+import ReactDOM from 'react-dom'
+import React from 'react'
 import { HasUserComponent, HasType } from './constants';
 
 type RegefComponent = React.Component & HasType & HasUserComponent
@@ -17,7 +18,7 @@ export class ComponentWrapper {
 
 export function fromComponent(component: RegefComponent): ComponentWrapper {
   return new ComponentWrapper(
-    findDOMNode(component) as Element,
+    ReactDOM.findDOMNode(component) as Element,
     component,
     component.userComponent,
   )

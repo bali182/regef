@@ -28,6 +28,7 @@
     "regef-geometry": "*"
   },
   "devDependencies": {
+    "@types/prop-types": "^15.5.5",
     "@types/react": "^16.4.14",
     "@types/react-dom": "^16.0.7",
     "babel-core": "^6.26.0",
@@ -54,9 +55,9 @@
     "regef-geometry": "latest",
     "rollup": "^0.56.1",
     "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-commonjs": "^8.3.0",
-    "rollup-plugin-node-resolve": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.4.1",
     "rollup-plugin-peer-deps-external": "^2.0.0",
+    "rollup-plugin-typescript2": "^0.17.0",
     "sloc": "^0.2.0",
     "source-map-loader": "^0.2.3",
     "typescript": "^3.0.3",

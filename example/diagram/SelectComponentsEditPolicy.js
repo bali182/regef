@@ -1,4 +1,4 @@
-import { DispatchingEditPolicy } from '../../src/index'
+import { DispatchingEditPolicy } from '../../index'
 import { DIAGRAM } from './constants'
 
 export default class SelectComponentsEditPolicy extends DispatchingEditPolicy {

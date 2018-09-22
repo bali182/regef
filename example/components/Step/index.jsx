@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { component } from '../../../src/index'
+import { component } from '../../../index'
 import StepView from './StepView'
 import { NODE } from '../../diagram/constants'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { component } from '../../../src/index'
+import { component } from '../../../index'
 import { DIAGRAM, NODE, ROOT } from '../../diagram/constants'
 
 import RootView from './RootView'

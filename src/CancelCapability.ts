@@ -13,7 +13,7 @@ const DEFAULT_CONFIG: CancelCapabilityConfig = {
   keys: ['Escape'],
 }
 
-export default class CancelCapability extends Capability<CancelCapabilityConfig> {
+export class CancelCapability extends Capability<CancelCapabilityConfig> {
   constructor(engine: Engine, config: CancelCapabilityConfig = {}) {
     super(engine, { ...DEFAULT_CONFIG, ...config })
   }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { component } from '../../../src/index'
+import { component } from '../../../index'
 
 import PortView from './PortView'
 import { PORT } from '../../diagram/constants'

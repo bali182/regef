@@ -42,7 +42,7 @@ export class ComponentRegistry {
     this.wrappers.add(wrapper)
     this.registerListeners.forEach((listener) => listener(wrapper))
   }
-  unregister(input: WrapperField) {
+  unregister(input: WrapperField): void {
     const wrapper = this.get(input)
     if (wrapper !== undefined) {
       this.mapping.delete(wrapper)

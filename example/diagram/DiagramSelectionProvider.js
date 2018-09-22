@@ -1,4 +1,4 @@
-import { SelectionProvider } from '../../src/index'
+import { SelectionProvider } from '../../index'
 import { DIAGRAM, NODE } from './constants'
 
 export default class DiagramSelectionProvider extends SelectionProvider {

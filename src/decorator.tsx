@@ -1,6 +1,6 @@
 import React from 'react'
 import { withRegefContext } from './RegefContext'
-import { REGEF_PROP_KEY, Id, HasUserComponent, RegefComponent } from './constants'
+import { REGEF_PROP_KEY, Id, RegefComponent } from './constants'
 import { fromComponent } from './ComponentWrapper'
 import { watchRegister } from './watchers'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
@@ -21,46 +21,48 @@ type CachedChildProps = {
   toolkit: () => Promise<Toolkit>
 }
 
-const registryFrom = ({ engine, id }: RegefContext): ComponentRegistry => {
+function registryFrom({ engine, id }: RegefContext): ComponentRegistry {
   if (engine.__partsMap().has(id)) {
     return engine.part(id).registry
   }
   return null
 }
 
-const toolkitFrom = ({ engine, id }: RegefContext): Toolkit => (engine.__partsMap().has(id) ? engine.toolkit : null)
+function toolkitFrom({ engine, id }: RegefContext): Toolkit {
+  return (engine.__partsMap().has(id) ? engine.toolkit : null)
+}
 
-const ensurePartRegistered = ({ engine, id }: RegefContext) => {
+function ensurePartRegistered({ engine, id }: RegefContext): void {
   const parts = engine.__partsMap()
   if (!parts.has(id)) {
     parts.set(id, new DiagramPartWrapper(id, engine))
   }
 }
 
-function toolkitResolver(comp: React.Component, context: RegefContext) {
+function toolkitResolver(comp: React.Component, context: RegefContext): () => Promise<Toolkit> {
   ensurePartRegistered(context)
   return () => watchRegister(registryFrom(context), comp).then(() => toolkitFrom(context))
 }
 
-const defaultActivate = (comp: RegefComponent, context: RegefContext) => {
+function defaultActivate(comp: RegefComponent, context: RegefContext): void {
   ensurePartRegistered(context)
   registryFrom(context).register(fromComponent(comp))
 }
 
-const defaultDecativate = (comp: React.Component, context: RegefContext) => {
+function defaultDecativate(comp: React.Component, context: RegefContext): void {
   const registry = registryFrom(context)
   if (registry) {
     registry.unregister(comp)
   }
 }
 
-const rootActivate = (comp: RegefComponent, context: RegefContext) => {
+function rootActivate(comp: RegefComponent, context: RegefContext): void {
   defaultActivate(comp, context)
   const registry = registryFrom(context)
   registry.setRoot(registry.get(comp))
 }
 
-const rootDeactivate = (comp: React.Component, context: RegefContext) => {
+function rootDeactivate(comp: React.Component, context: RegefContext): void {
   defaultDecativate(comp, context)
   const registry = registryFrom(context)
   if (registry) {
@@ -68,9 +70,11 @@ const rootDeactivate = (comp: React.Component, context: RegefContext) => {
   }
 }
 
-const getEngine = (comp: React.Component<RegefProps>) => comp.props[REGEF_PROP_KEY].engine
+function getEngine(comp: React.Component<RegefProps>): Engine {
+  return comp.props[REGEF_PROP_KEY].engine
+}
 
-export default function component(type: Id) {
+export function component(type: Id) {
   return function componentDecorator(Wrapped: React.ComponentClass<any>) {
     class DecoratedComponent extends React.PureComponent<RegefProps> {
       public userComponent: React.Component
