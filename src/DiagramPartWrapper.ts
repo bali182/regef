@@ -2,7 +2,7 @@ import { ComponentRegistry } from './ComponentRegistry'
 import { PartToolkit } from './PartToolkit'
 import { PartDomHelper } from './PartDomHelper'
 import { Engine } from './Engine'
-import { Id } from './constants';
+import { Id } from './constants'
 
 export class DiagramPartWrapper {
   public readonly id: Id

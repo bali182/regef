@@ -1,7 +1,7 @@
 import { Capability } from './Capability'
 import { partMatches } from './utils'
 import { Engine } from './Engine'
-import { Id } from './constants';
+import { Id } from './constants'
 
 interface CancelCapabilityConfig {
   parts?: Id[]

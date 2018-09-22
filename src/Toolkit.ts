@@ -1,5 +1,5 @@
-import { Engine } from "./Engine";
-import { PartToolkit } from "./PartToolkit";
+import { Engine } from './Engine'
+import { PartToolkit } from './PartToolkit'
 
 export class Toolkit {
   private engine: Engine

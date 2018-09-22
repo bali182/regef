@@ -1,10 +1,10 @@
 import { Component } from 'react'
 import { SelectionProvider } from './SelectionProvider'
-import { ComponentWrapper } from './ComponentWrapper';
-import { DiagramPartWrapper } from './DiagramPartWrapper';
-import { Engine } from './Engine';
-import { EditPolicy } from './EditPolicy';
-import { Intent, Id } from './constants';
+import { ComponentWrapper } from './ComponentWrapper'
+import { DiagramPartWrapper } from './DiagramPartWrapper'
+import { Engine } from './Engine'
+import { EditPolicy } from './EditPolicy'
+import { Intent, Id } from './constants'
 
 export function matchesSingleType(type: Id): (wrapper: ComponentWrapper) => boolean {
   return ({ component }: ComponentWrapper) => component.type === type
@@ -51,7 +51,9 @@ export function partMatches(ids: Id[]): (part: DiagramPartWrapper) => boolean {
   return matchesSinglePart(ids)
 }
 
-function onEachPolicy(callback: (e: EditPolicy, i: Intent) => void): (policies: EditPolicy[], intent: Intent) => void {
+function onEachPolicy(
+  callback: (e: EditPolicy, i: Intent) => void,
+): (policies: EditPolicy[], intent: Intent) => void {
   return (policies: EditPolicy[], intent: Intent): void => {
     if (Array.isArray(policies) && intent && intent.type) {
       for (let i = 0; i < policies.length; i += 1) {

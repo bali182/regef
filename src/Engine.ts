@@ -1,18 +1,18 @@
 import { EventManager } from './EventManager'
 import { Toolkit } from './Toolkit'
 import { DomHelper } from './DomHelper'
-import { Capability } from './Capability';
-import { EditPolicy } from './EditPolicy';
-import { SelectionProvider } from './SelectionProvider';
-import { DiagramPartWrapper } from './DiagramPartWrapper';
-import { Id } from './constants';
+import { Capability } from './Capability'
+import { EditPolicy } from './EditPolicy'
+import { SelectionProvider } from './SelectionProvider'
+import { DiagramPartWrapper } from './DiagramPartWrapper'
+import { Id } from './constants'
 
 type EngineConfig = {
-  capabilities: Capability<any>[],
-  editPolicies: EditPolicy[],
-  selectionProvider: SelectionProvider,
-  rootType: Id,
-  types: Id[],
+  capabilities: Capability<any>[]
+  editPolicies: EditPolicy[]
+  selectionProvider: SelectionProvider
+  rootType: Id
+  types: Id[]
 }
 
 type EngineConfigProvider = (engine: Engine) => EngineConfig

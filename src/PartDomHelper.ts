@@ -1,5 +1,5 @@
-import { ComponentRegistry } from "./ComponentRegistry";
-import { ComponentWrapper } from "./ComponentWrapper";
+import { ComponentRegistry } from './ComponentRegistry'
+import { ComponentWrapper } from './ComponentWrapper'
 
 type WrapperPredicate = (wrapper: ComponentWrapper) => boolean
 

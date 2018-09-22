@@ -1,6 +1,12 @@
 import { point, Point } from 'regef-geometry'
 import { Capability } from './Capability'
-import { START_CONNECTION, END_CONNECTION, Id, Intent, StartConnectionIntent, EndConnectionIntent } from './constants'
+import {
+  START_CONNECTION,
+  END_CONNECTION,
+  Id,
+  StartConnectionIntent,
+  EndConnectionIntent,
+} from './constants'
 import {
   eraseFeedback,
   requestFeedback,
@@ -9,8 +15,8 @@ import {
   typeMatches,
   isLeftButton,
 } from './utils'
-import { Engine } from './Engine';
-import { ComponentWrapper } from './ComponentWrapper';
+import { Engine } from './Engine'
+import { ComponentWrapper } from './ComponentWrapper'
 
 type ConnectCapabilityConfig = {
   parts?: Id[]
@@ -76,7 +82,10 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     if (!part) {
       return null
     }
-    const target = part.domHelper.findClosest(e.target as Element, typeMatches(this.config.targetTypes))
+    const target = part.domHelper.findClosest(
+      e.target as Element,
+      typeMatches(this.config.targetTypes),
+    )
     if (!target) {
       return null
     }
@@ -90,7 +99,10 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     if (!part) {
       return null
     }
-    const source = part.domHelper.findClosest(e.target as Element, typeMatches(this.config.sourceTypes))
+    const source = part.domHelper.findClosest(
+      e.target as Element,
+      typeMatches(this.config.sourceTypes),
+    )
     if (!source) {
       return null
     }
@@ -100,7 +112,11 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
   }
 
   handleFeedback(lastRequest: ConnectIntent, request: ConnectIntent): void {
-    if (lastRequest !== null && (request === null || (request as EndConnectionIntent).target !== (lastRequest as EndConnectionIntent).target)) {
+    if (
+      lastRequest !== null &&
+      (request === null ||
+        (request as EndConnectionIntent).target !== (lastRequest as EndConnectionIntent).target)
+    ) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
     }
     if (request !== null) {

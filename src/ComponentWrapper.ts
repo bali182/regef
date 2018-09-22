@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
-import { HasUserComponent, HasType } from './constants';
+import { HasUserComponent, HasType } from './constants'
 
 type RegefComponent = React.Component & HasType & HasUserComponent
 

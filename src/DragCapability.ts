@@ -10,9 +10,9 @@ import {
   getSelection,
   isLeftButton,
 } from './utils'
-import { Engine } from './Engine';
-import { ComponentWrapper } from './ComponentWrapper';
-import { DiagramPartWrapper } from './DiagramPartWrapper';
+import { Engine } from './Engine'
+import { ComponentWrapper } from './ComponentWrapper'
+import { DiagramPartWrapper } from './DiagramPartWrapper'
 
 function buildOffset({ clientX, clientY }: MouseEvent, element: Element): Point {
   const { left, top } = element.getBoundingClientRect()
@@ -29,7 +29,7 @@ type DragIntent = MoveIntent | AddIntent | SelectionIntent
 
 type DragCapabilityConfig = {
   parts?: Id[]
-  draggables?: Id[],
+  draggables?: Id[]
   hosts?: Id[]
 }
 
@@ -215,7 +215,10 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     if (!part) {
       return
     }
-    this.target = part.domHelper.findClosest(e.target as Element, typeMatches(this.config.draggables))
+    this.target = part.domHelper.findClosest(
+      e.target as Element,
+      typeMatches(this.config.draggables),
+    )
     if (this.target !== null) {
       const parent = part.domHelper.findClosest(
         this.target.dom.parentNode as Element,

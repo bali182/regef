@@ -1,6 +1,6 @@
 import { rectangle, Rectangle } from 'regef-geometry'
-import { ComponentRegistry } from './ComponentRegistry';
-import { PartDomHelper } from './PartDomHelper';
+import { ComponentRegistry } from './ComponentRegistry'
+import { PartDomHelper } from './PartDomHelper'
 
 export class PartToolkit {
   private registry: ComponentRegistry
@@ -69,11 +69,6 @@ export class PartToolkit {
       throw new Error('Given component is not part of the diagram!')
     }
     const { left, top, width, height } = wrapper.dom.getBoundingClientRect()
-    return rectangle(
-      left,
-      top,
-      width,
-      height,
-    )
+    return rectangle(left, top, width, height)
   }
 }

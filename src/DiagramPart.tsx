@@ -2,7 +2,7 @@ import React from 'react'
 import types from 'prop-types'
 import { RegefContext } from './RegefContext'
 import { Engine } from './Engine'
-import { Id } from './constants';
+import { Id } from './constants'
 
 type DiagramPartProps = {
   engine: Engine
@@ -30,9 +30,11 @@ export class DiagramPart extends React.PureComponent<DiagramPartProps> {
   }
   render(): React.ReactNode {
     const { id, engine } = this.props
-    return (<RegefContext.Provider value={{ id, engine }}>
-      {React.Children.only(this.props.children)}
-    </RegefContext.Provider>)
+    return (
+      <RegefContext.Provider value={{ id, engine }}>
+        {React.Children.only(this.props.children)}
+      </RegefContext.Provider>
+    )
   }
 
   static propTypes = {

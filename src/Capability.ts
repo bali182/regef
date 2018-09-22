@@ -1,4 +1,4 @@
-import { Engine } from "./Engine";
+import { Engine } from './Engine'
 
 export class Capability<Config = any> {
   protected progress: boolean

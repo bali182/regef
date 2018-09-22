@@ -8,9 +8,11 @@ export const RegefContext = React.createContext({
 
 export function withRegefContext(Wrapped: React.ComponentClass<any>) {
   function WithRegefContext(props: any) {
-    return (<RegefContext.Consumer>
-      {(regef) => <Wrapped {...props} {...{ [REGEF_PROP_KEY]: regef }} />}
-    </RegefContext.Consumer>)
+    return (
+      <RegefContext.Consumer>
+        {(regef) => <Wrapped {...props} {...{ [REGEF_PROP_KEY]: regef }} />}
+      </RegefContext.Consumer>
+    )
   }
   return WithRegefContext
 }

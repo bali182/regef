@@ -1,5 +1,5 @@
-import { Engine } from "./Engine";
-import { DiagramPartWrapper } from "./DiagramPartWrapper";
+import { Engine } from './Engine'
+import { DiagramPartWrapper } from './DiagramPartWrapper'
 
 type PartPredicate = (part: DiagramPartWrapper) => boolean
 

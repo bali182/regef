@@ -1,5 +1,5 @@
-import { Rectangle, Point } from "regef-geometry";
-import { Component } from "react";
+import { Rectangle, Point } from 'regef-geometry'
+import { Component } from 'react'
 
 export const REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay'
 
@@ -22,7 +22,13 @@ export const DELETE = 'delete'
 export const START_CONNECTION = 'start-connection'
 export const END_CONNECTION = 'end-connection'
 
-export type IntentType = typeof ADD | typeof MOVE | typeof SELECT | typeof DELETE | typeof START_CONNECTION | typeof END_CONNECTION
+export type IntentType =
+  | typeof ADD
+  | typeof MOVE
+  | typeof SELECT
+  | typeof DELETE
+  | typeof START_CONNECTION
+  | typeof END_CONNECTION
 
 export type Intent = {
   type: IntentType

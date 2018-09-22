@@ -4,9 +4,9 @@ import { REGEF_PROP_KEY, Id, RegefComponent } from './constants'
 import { fromComponent } from './ComponentWrapper'
 import { watchRegister } from './watchers'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
-import { Engine } from './Engine';
-import { ComponentRegistry } from './ComponentRegistry';
-import { Toolkit } from './Toolkit';
+import { Engine } from './Engine'
+import { ComponentRegistry } from './ComponentRegistry'
+import { Toolkit } from './Toolkit'
 
 type RegefProps = {
   [REGEF_PROP_KEY]: RegefContext
@@ -29,7 +29,7 @@ function registryFrom({ engine, id }: RegefContext): ComponentRegistry {
 }
 
 function toolkitFrom({ engine, id }: RegefContext): Toolkit {
-  return (engine.__partsMap().has(id) ? engine.toolkit : null)
+  return engine.__partsMap().has(id) ? engine.toolkit : null
 }
 
 function ensurePartRegistered({ engine, id }: RegefContext): void {
@@ -121,7 +121,7 @@ export function component(type: Id) {
       render() {
         const { children, ...rest } = this.props
         return (
-          <Wrapped {...rest} ref={this.setUserComponent} regef={this.childProps} >
+          <Wrapped {...rest} ref={this.setUserComponent} regef={this.childProps}>
             {children}
           </Wrapped>
         )

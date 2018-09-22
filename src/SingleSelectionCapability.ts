@@ -3,7 +3,7 @@ import { point, rectangle, dimension, Point } from 'regef-geometry'
 import { SELECT, Id, SelectionIntent } from './constants'
 import { Capability } from './Capability'
 import { typeMatches, partMatches, perform, getSelection, isLeftButton } from './utils'
-import { Engine } from './Engine';
+import { Engine } from './Engine'
 
 const locationOf = ({ clientX, clientY }: MouseEvent, rootDom: Element) => {
   const { top, left } = rootDom.getBoundingClientRect()
@@ -46,7 +46,7 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
       bounds: rectangle(location, dimension(0, 0)),
       selection: additional ? getSelection(this.engine).concat(selection) : selection,
       startLocation: location,
-      endLocation: location
+      endLocation: location,
     }
   }
 
@@ -64,7 +64,10 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(e.target as Element, typeMatches(this.config.selectables))
+    const target = part.domHelper.findClosest(
+      e.target as Element,
+      typeMatches(this.config.selectables),
+    )
     if (!target) {
       return
     }

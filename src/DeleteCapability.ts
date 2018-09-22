@@ -1,7 +1,7 @@
 import { Capability } from './Capability'
 import { DELETE, Id, DeleteIntent } from './constants'
 import { perform, partMatches, getSelection } from './utils'
-import { Engine } from './Engine';
+import { Engine } from './Engine'
 
 type DeleteCapabilityConfig = {
   parts?: Id[]

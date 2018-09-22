@@ -252,33 +252,52 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
     DispatchingEditPolicy.prototype.perform = function (intent) {
         var type = intent.type;
         switch (intent.type) {
-            case ADD: return this.add(intent);
-            case MOVE: return this.move(intent);
-            case START_CONNECTION: return this.startConnection(intent);
-            case END_CONNECTION: return this.endConnection(intent);
-            case SELECT: return this.select(intent);
-            case DELETE: return this.delete(intent);
-            default: throw new Error("Unknown intent type " + type);
+            case ADD:
+                return this.add(intent);
+            case MOVE:
+                return this.move(intent);
+            case START_CONNECTION:
+                return this.startConnection(intent);
+            case END_CONNECTION:
+                return this.endConnection(intent);
+            case SELECT:
+                return this.select(intent);
+            case DELETE:
+                return this.delete(intent);
+            default:
+                throw new Error("Unknown intent type " + type);
         }
     };
     DispatchingEditPolicy.prototype.intentFeedback = function (intent) {
         switch (intent.type) {
-            case ADD: return this.intentAddFeedback(intent);
-            case MOVE: return this.intentMoveFeedback(intent);
-            case START_CONNECTION: return this.intentStartConnectionFeedback(intent);
-            case END_CONNECTION: return this.intentEndConnectionFeedback(intent);
-            case SELECT: return this.intentSelectFeedback(intent);
-            default: throw new Error("Unknown intent type " + intent.type);
+            case ADD:
+                return this.intentAddFeedback(intent);
+            case MOVE:
+                return this.intentMoveFeedback(intent);
+            case START_CONNECTION:
+                return this.intentStartConnectionFeedback(intent);
+            case END_CONNECTION:
+                return this.intentEndConnectionFeedback(intent);
+            case SELECT:
+                return this.intentSelectFeedback(intent);
+            default:
+                throw new Error("Unknown intent type " + intent.type);
         }
     };
     DispatchingEditPolicy.prototype.eraseFeedback = function (intent) {
         switch (intent.type) {
-            case ADD: return this.eraseAddFeedback(intent);
-            case MOVE: return this.eraseMoveFeedback(intent);
-            case START_CONNECTION: return this.eraseStartConnectionFeedback(intent);
-            case END_CONNECTION: return this.eraseEndConnectionFeedback(intent);
-            case SELECT: return this.eraseSelectFeedback(intent);
-            default: throw new Error("Unknown intent type " + intent.type);
+            case ADD:
+                return this.eraseAddFeedback(intent);
+            case MOVE:
+                return this.eraseMoveFeedback(intent);
+            case START_CONNECTION:
+                return this.eraseStartConnectionFeedback(intent);
+            case END_CONNECTION:
+                return this.eraseEndConnectionFeedback(intent);
+            case SELECT:
+                return this.eraseSelectFeedback(intent);
+            default:
+                throw new Error("Unknown intent type " + intent.type);
         }
     };
     DispatchingEditPolicy.prototype.add = function (intent) { };
@@ -350,35 +369,34 @@ function fromComponent(component) {
 
 var matches = function (target, wrapper) {
     var userComponent = wrapper.userComponent, dom = wrapper.dom, component = wrapper.component;
-    return wrapper === target
-        || userComponent === target
-        || dom === target
-        || component === target;
+    return wrapper === target || userComponent === target || dom === target || component === target;
 };
-var watchRegister = function (registry, target) { return new Promise(function (resolve, reject) {
-    if (!registry || !target) {
-        reject(new Error('registry or target was falsy value'));
-        return;
-    }
-    if (registry.has(target)) {
-        resolve();
-        return;
-    }
-    var listener = function (wrapper) {
-        if (wrapper && matches(target, wrapper)) {
-            try {
-                resolve();
-            }
-            catch (e) {
-                reject(e);
-            }
-            finally {
-                registry.removeRegisterListener(listener);
-            }
+var watchRegister = function (registry, target) {
+    return new Promise(function (resolve, reject) {
+        if (!registry || !target) {
+            reject(new Error('registry or target was falsy value'));
+            return;
         }
-    };
-    registry.addRegisterListener(listener);
-}); };
+        if (registry.has(target)) {
+            resolve();
+            return;
+        }
+        var listener = function (wrapper) {
+            if (wrapper && matches(target, wrapper)) {
+                try {
+                    resolve();
+                }
+                catch (e) {
+                    reject(e);
+                }
+                finally {
+                    registry.removeRegisterListener(listener);
+                }
+            }
+        };
+        registry.addRegisterListener(listener);
+    });
+};
 
 var ComponentRegistry = /** @class */ (function () {
     function ComponentRegistry() {
@@ -578,7 +596,7 @@ function registryFrom(_a) {
 }
 function toolkitFrom(_a) {
     var engine = _a.engine, id = _a.id;
-    return (engine.__partsMap().has(id) ? engine.toolkit : null);
+    return engine.__partsMap().has(id) ? engine.toolkit : null;
 }
 function ensurePartRegistered(_a) {
     var engine = _a.engine, id = _a.id;
@@ -1007,7 +1025,9 @@ var ConnectCapability = /** @class */ (function (_super) {
         return this.getStartConnectionRequest();
     };
     ConnectCapability.prototype.handleFeedback = function (lastRequest, request) {
-        if (lastRequest !== null && (request === null || request.target !== lastRequest.target)) {
+        if (lastRequest !== null &&
+            (request === null ||
+                request.target !== lastRequest.target)) {
             eraseFeedback(this.engine.editPolicies, lastRequest);
         }
         if (request !== null) {
@@ -1080,7 +1100,7 @@ var SingleSelectionCapability = /** @class */ (function (_super) {
             bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
             selection: additional ? getSelection(this.engine).concat(selection) : selection,
             startLocation: location,
-            endLocation: location
+            endLocation: location,
         };
     };
     SingleSelectionCapability.prototype.cancel = function () {

@@ -13,8 +13,8 @@ import {
   alwaysTrue,
   isLeftButton,
 } from './utils'
-import { Engine } from './Engine';
-import { ComponentWrapper } from './ComponentWrapper';
+import { Engine } from './Engine'
+import { ComponentWrapper } from './ComponentWrapper'
 
 const locationOf = ({ clientX, clientY }: MouseEvent) => point(clientX, clientY)
 
@@ -135,7 +135,10 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(e.target as Element, typeMatches(this.engine.rootType))
+    const target = part.domHelper.findClosest(
+      e.target as Element,
+      typeMatches(this.engine.rootType),
+    )
     if (target !== null) {
       this.startLocation = locationOf(e)
       this.progress = true
