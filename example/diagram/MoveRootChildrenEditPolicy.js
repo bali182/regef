@@ -14,9 +14,14 @@ export default class MoveRootChildrenEditPolicy extends DispatchingEditPolicy {
       return
     }
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
-    const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
+    const containerOffset = toolkit
+      .bounds(toolkit.root())
+      .topLeft()
+      .negated()
     components.forEach((component) => {
-      const { x, y } = toolkit.bounds(component).location()
+      const { x, y } = toolkit
+        .bounds(component)
+        .location()
         .translate(delta)
         .translate(containerOffset)
       this.dependencies.setPosition({
@@ -32,12 +37,17 @@ export default class MoveRootChildrenEditPolicy extends DispatchingEditPolicy {
       return
     }
     const toolkit = this.engine.toolkit.forPart(DIAGRAM)
-    const containerOffset = toolkit.bounds(toolkit.root()).topLeft().negated()
-    container.setState({
-      moveFeedback: components.map((c) => toolkit.bounds(c)
+    const containerOffset = toolkit
+      .bounds(toolkit.root())
+      .topLeft()
+      .negated()
+    const moveFeedback = components.map((c) =>
+      toolkit
+        .bounds(c)
         .translate(delta)
-        .translate(containerOffset)),
-    })
+        .translate(containerOffset),
+    )
+    container.setState({ moveFeedback })
   }
 
   eraseMoveFeedback({ container }) {

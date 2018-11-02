@@ -27,6 +27,7 @@ import SelectComponentsEditPolicy from './SelectComponentsEditPolicy'
 import MoveRootChildrenEditPolicy from './MoveRootChildrenEditPolicy'
 import DeleteComponentsEditPolicy from './DeleteComponentsEditPolicy'
 import DisabledAddChildrenEditPolicy from './DisabledAddChildrenEditPolicy'
+// import LoggerEditPolicy from './LoggerEditPolicy'
 import { NODE, PORT, ROOT } from './constants'
 
 const createEngine = (store) => {

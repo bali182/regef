@@ -1,4 +1,4 @@
-import { EditPolicy } from '../../src/index'
+import { EditPolicy } from '../../index'
 
 export default class LoggerEditPolicy extends EditPolicy {
   requestFeedback(intent) {

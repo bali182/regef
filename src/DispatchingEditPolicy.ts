@@ -44,18 +44,18 @@ export class DispatchingEditPolicy extends EditPolicy {
     }
   }
 
-  intentFeedback(intent: RecognizedIntent): void {
+  requestFeedback(intent: RecognizedIntent): void {
     switch (intent.type) {
       case ADD:
-        return this.intentAddFeedback(intent)
+        return this.requestAddFeedback(intent)
       case MOVE:
-        return this.intentMoveFeedback(intent)
+        return this.requestMoveFeedback(intent)
       case START_CONNECTION:
-        return this.intentStartConnectionFeedback(intent)
+        return this.requestStartConnectionFeedback(intent)
       case END_CONNECTION:
-        return this.intentEndConnectionFeedback(intent)
+        return this.requestEndConnectionFeedback(intent)
       case SELECT:
-        return this.intentSelectFeedback(intent)
+        return this.requestSelectFeedback(intent)
       default:
         throw new Error(`Unknown intent type ${intent.type}`)
     }
@@ -85,11 +85,11 @@ export class DispatchingEditPolicy extends EditPolicy {
   select(intent: SelectionIntent): void {}
   delete(intent: DeleteIntent): void {}
 
-  intentAddFeedback(intent: AddIntent) {}
-  intentMoveFeedback(intent: MoveIntent) {}
-  intentStartConnectionFeedback(intent: StartConnectionIntent) {}
-  intentEndConnectionFeedback(intent: EndConnectionIntent) {}
-  intentSelectFeedback(intent: SelectionIntent) {}
+  requestAddFeedback(intent: AddIntent) {}
+  requestMoveFeedback(intent: MoveIntent) {}
+  requestStartConnectionFeedback(intent: StartConnectionIntent) {}
+  requestEndConnectionFeedback(intent: EndConnectionIntent) {}
+  requestSelectFeedback(intent: SelectionIntent) {}
 
   eraseAddFeedback(intent: AddIntent) {}
   eraseMoveFeedback(intent: MoveIntent) {}

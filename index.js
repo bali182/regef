@@ -268,18 +268,18 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
                 throw new Error("Unknown intent type " + type);
         }
     };
-    DispatchingEditPolicy.prototype.intentFeedback = function (intent) {
+    DispatchingEditPolicy.prototype.requestFeedback = function (intent) {
         switch (intent.type) {
             case ADD:
-                return this.intentAddFeedback(intent);
+                return this.requestAddFeedback(intent);
             case MOVE:
-                return this.intentMoveFeedback(intent);
+                return this.requestMoveFeedback(intent);
             case START_CONNECTION:
-                return this.intentStartConnectionFeedback(intent);
+                return this.requestStartConnectionFeedback(intent);
             case END_CONNECTION:
-                return this.intentEndConnectionFeedback(intent);
+                return this.requestEndConnectionFeedback(intent);
             case SELECT:
-                return this.intentSelectFeedback(intent);
+                return this.requestSelectFeedback(intent);
             default:
                 throw new Error("Unknown intent type " + intent.type);
         }
@@ -306,11 +306,11 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
     DispatchingEditPolicy.prototype.endConnection = function (intent) { };
     DispatchingEditPolicy.prototype.select = function (intent) { };
     DispatchingEditPolicy.prototype.delete = function (intent) { };
-    DispatchingEditPolicy.prototype.intentAddFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.intentMoveFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.intentStartConnectionFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.intentEndConnectionFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.intentSelectFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestAddFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestMoveFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestStartConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestEndConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestSelectFeedback = function (intent) { };
     DispatchingEditPolicy.prototype.eraseAddFeedback = function (intent) { };
     DispatchingEditPolicy.prototype.eraseMoveFeedback = function (intent) { };
     DispatchingEditPolicy.prototype.eraseStartConnectionFeedback = function (intent) { };
