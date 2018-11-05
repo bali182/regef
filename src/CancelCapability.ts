@@ -1,12 +1,7 @@
 import { Capability } from './Capability'
 import { partMatches } from './utils'
 import { Engine } from './Engine'
-import { Id } from './typings'
-
-interface CancelCapabilityConfig {
-  parts?: Id[]
-  keys?: string[]
-}
+import { CancelCapabilityConfig } from './typings'
 
 const DEFAULT_CONFIG: CancelCapabilityConfig = {
   parts: null,

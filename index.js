@@ -60,12 +60,14 @@ function __rest(s, e) {
 }
 
 var REGEF_PROP_KEY = '@@regef-internal-context@@';
-var ADD = 'add';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
+(function (IntentType) {
+    IntentType["ADD"] = "add";
+    IntentType["MOVE"] = "move";
+    IntentType["SELECT"] = "select";
+    IntentType["DELETE"] = "delete";
+    IntentType["START_CONNECTION"] = "start-connection";
+    IntentType["END_CONNECTION"] = "end-connection";
+})(exports.IntentType || (exports.IntentType = {}));
 
 var RegefContext = React.createContext({
     id: null,
@@ -261,17 +263,17 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
     DispatchingEditPolicy.prototype.perform = function (intent) {
         var type = intent.type;
         switch (intent.type) {
-            case ADD:
+            case exports.IntentType.ADD:
                 return this.add(intent);
-            case MOVE:
+            case exports.IntentType.MOVE:
                 return this.move(intent);
-            case START_CONNECTION:
+            case exports.IntentType.START_CONNECTION:
                 return this.startConnection(intent);
-            case END_CONNECTION:
+            case exports.IntentType.END_CONNECTION:
                 return this.endConnection(intent);
-            case SELECT:
+            case exports.IntentType.SELECT:
                 return this.select(intent);
-            case DELETE:
+            case exports.IntentType.DELETE:
                 return this.delete(intent);
             default:
                 throw new Error("Unknown intent type " + type);
@@ -279,15 +281,15 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
     };
     DispatchingEditPolicy.prototype.requestFeedback = function (intent) {
         switch (intent.type) {
-            case ADD:
+            case exports.IntentType.ADD:
                 return this.requestAddFeedback(intent);
-            case MOVE:
+            case exports.IntentType.MOVE:
                 return this.requestMoveFeedback(intent);
-            case START_CONNECTION:
+            case exports.IntentType.START_CONNECTION:
                 return this.requestStartConnectionFeedback(intent);
-            case END_CONNECTION:
+            case exports.IntentType.END_CONNECTION:
                 return this.requestEndConnectionFeedback(intent);
-            case SELECT:
+            case exports.IntentType.SELECT:
                 return this.requestSelectFeedback(intent);
             default:
                 throw new Error("Unknown intent type " + intent.type);
@@ -295,15 +297,15 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
     };
     DispatchingEditPolicy.prototype.eraseFeedback = function (intent) {
         switch (intent.type) {
-            case ADD:
+            case exports.IntentType.ADD:
                 return this.eraseAddFeedback(intent);
-            case MOVE:
+            case exports.IntentType.MOVE:
                 return this.eraseMoveFeedback(intent);
-            case START_CONNECTION:
+            case exports.IntentType.START_CONNECTION:
                 return this.eraseStartConnectionFeedback(intent);
-            case END_CONNECTION:
+            case exports.IntentType.END_CONNECTION:
                 return this.eraseEndConnectionFeedback(intent);
-            case SELECT:
+            case exports.IntentType.SELECT:
                 return this.eraseSelectFeedback(intent);
             default:
                 throw new Error("Unknown intent type " + intent.type);
@@ -868,16 +870,16 @@ var DragCapability = /** @class */ (function (_super) {
         return [target];
     };
     DragCapability.prototype.getMoveChildRequest = function () {
-        return __assign({ type: MOVE, components: this.getMovedComponents(), container: this.currentParent.component.userComponent }, this.coordinates);
+        return __assign({ type: exports.IntentType.MOVE, components: this.getMovedComponents(), container: this.currentParent.component.userComponent }, this.coordinates);
     };
     DragCapability.prototype.getAddChildRequest = function () {
         var _a = this, targetParent = _a.targetParent, currentParent = _a.currentParent;
-        return __assign({ type: ADD, components: this.getMovedComponents(), targetContainer: targetParent === null ? null : targetParent.component.userComponent, container: currentParent.component.userComponent }, this.coordinates);
+        return __assign({ type: exports.IntentType.ADD, components: this.getMovedComponents(), targetContainer: targetParent === null ? null : targetParent.component.userComponent, container: currentParent.component.userComponent }, this.coordinates);
     };
     DragCapability.prototype.getSelectionRequest = function () {
         var _a = this, startLocation = _a.startLocation, target = _a.target;
         return {
-            type: SELECT,
+            type: exports.IntentType.SELECT,
             bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
             startLocation: startLocation,
             endLocation: startLocation,
@@ -993,14 +995,14 @@ var ConnectCapability = /** @class */ (function (_super) {
     };
     ConnectCapability.prototype.getStartConnectionRequest = function () {
         return {
-            type: START_CONNECTION,
+            type: exports.IntentType.START_CONNECTION,
             source: this.source.userComponent,
             location: regefGeometry.point(this.coordinates),
         };
     };
     ConnectCapability.prototype.getEndConnectionRequest = function () {
         return {
-            type: END_CONNECTION,
+            type: exports.IntentType.END_CONNECTION,
             source: this.source.userComponent,
             target: this.target.userComponent,
             location: regefGeometry.point(this.coordinates),
@@ -1104,7 +1106,7 @@ var SingleSelectionCapability = /** @class */ (function (_super) {
     SingleSelectionCapability.prototype.createSingleSelectionRequest = function () {
         var _a = this, location = _a.location, selection = _a.selection, additional = _a.additional;
         return {
-            type: SELECT,
+            type: exports.IntentType.SELECT,
             bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
             selection: additional ? getSelection(this.engine).concat(selection) : selection,
             startLocation: location,
@@ -1181,7 +1183,7 @@ var MultiSelectionCapability = /** @class */ (function (_super) {
     MultiSelectionCapability.prototype.createMultiSelectionRequest = function () {
         var _a = this, startLocation = _a.startLocation, endLocation = _a.endLocation, selectionBounds = _a.selectionBounds, selection = _a.selection;
         return {
-            type: SELECT,
+            type: exports.IntentType.SELECT,
             bounds: selectionBounds,
             selection: selection || [],
             startLocation: startLocation,
@@ -1332,7 +1334,7 @@ var DeleteCapability = /** @class */ (function (_super) {
     };
     DeleteCapability.prototype.getDeleteRequest = function () {
         return {
-            type: DELETE,
+            type: exports.IntentType.DELETE,
             selection: this.currentSelection,
         };
     };
@@ -1369,10 +1371,4 @@ exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
 exports.REGEF_PROP_KEY = REGEF_PROP_KEY;
-exports.ADD = ADD;
-exports.MOVE = MOVE;
-exports.SELECT = SELECT;
-exports.DELETE = DELETE;
-exports.START_CONNECTION = START_CONNECTION;
-exports.END_CONNECTION = END_CONNECTION;
 //# sourceMappingURL=index.js.map

@@ -1,6 +1,6 @@
 import React from 'react'
 import { point, rectangle, Point, Rectangle } from 'regef-geometry'
-import { SELECT, Id, SelectionIntent, MoveIntent } from './typings'
+import { SelectionIntent, IntentType, MultiSelectionCapabilityConfig } from './typings'
 import { Capability } from './Capability'
 import {
   eraseFeedback,
@@ -17,13 +17,6 @@ import { Engine } from './Engine'
 import { ComponentWrapper } from './ComponentWrapper'
 
 const locationOf = ({ clientX, clientY }: MouseEvent) => point(clientX, clientY)
-
-type MultiSelectionCapabilityConfig = {
-  parts: Id[]
-  selectables: Id[]
-  intersection: boolean
-  containment: boolean
-}
 
 const DEFAULT_CONFIG: MultiSelectionCapabilityConfig = {
   parts: null,
@@ -58,7 +51,7 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
   createMultiSelectionRequest(): SelectionIntent {
     const { startLocation, endLocation, selectionBounds, selection } = this
     return {
-      type: SELECT,
+      type: IntentType.SELECT,
       bounds: selectionBounds,
       selection: selection || [],
       startLocation,

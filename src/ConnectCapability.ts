@@ -1,11 +1,10 @@
 import { point, Point } from 'regef-geometry'
 import { Capability } from './Capability'
 import {
-  START_CONNECTION,
-  END_CONNECTION,
-  Id,
+  IntentType,
   StartConnectionIntent,
   EndConnectionIntent,
+  ConnectCapabilityConfig,
 } from './typings'
 import {
   eraseFeedback,
@@ -17,12 +16,6 @@ import {
 } from './utils'
 import { Engine } from './Engine'
 import { ComponentWrapper } from './ComponentWrapper'
-
-type ConnectCapabilityConfig = {
-  parts?: Id[]
-  sourceTypes?: Id[]
-  targetTypes?: Id[]
-}
 
 const DEFAULT_CONFIG: ConnectCapabilityConfig = {
   parts: null,
@@ -62,7 +55,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
 
   getStartConnectionRequest(): StartConnectionIntent {
     return {
-      type: START_CONNECTION,
+      type: IntentType.START_CONNECTION,
       source: this.source.userComponent,
       location: point(this.coordinates),
     }
@@ -70,7 +63,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
 
   getEndConnectionRequest(): EndConnectionIntent {
     return {
-      type: END_CONNECTION,
+      type: IntentType.END_CONNECTION,
       source: this.source.userComponent,
       target: this.target.userComponent,
       location: point(this.coordinates),

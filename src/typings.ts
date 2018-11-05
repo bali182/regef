@@ -17,27 +17,21 @@ export type HasType = {
 
 export type RegefComponent = React.Component & HasUserComponent & HasType
 
-export const ADD = 'add'
-export const MOVE = 'move'
-export const SELECT = 'select'
-export const DELETE = 'delete'
-export const START_CONNECTION = 'start-connection'
-export const END_CONNECTION = 'end-connection'
-
-export type IntentType =
-  | typeof ADD
-  | typeof MOVE
-  | typeof SELECT
-  | typeof DELETE
-  | typeof START_CONNECTION
-  | typeof END_CONNECTION
+export enum IntentType {
+  ADD = 'add',
+  MOVE = 'move',
+  SELECT = 'select',
+  DELETE = 'delete',
+  START_CONNECTION = 'start-connection',
+  END_CONNECTION = 'end-connection',
+}
 
 export type Intent = {
   type: IntentType
 }
 
 export type SelectionIntent = {
-  type: typeof SELECT
+  type: IntentType.SELECT
   bounds: Rectangle
   startLocation: Point
   endLocation: Point
@@ -45,7 +39,7 @@ export type SelectionIntent = {
 }
 
 export type MoveIntent = {
-  type: typeof MOVE
+  type: IntentType.MOVE
   components: Component[]
   container: Component
   location: Point
@@ -54,12 +48,12 @@ export type MoveIntent = {
 }
 
 export type DeleteIntent = {
-  type: typeof DELETE
+  type: IntentType.DELETE
   selection: Component[]
 }
 
 export type AddIntent = {
-  type: typeof ADD
+  type: IntentType.ADD
   components: Component[]
   targetContainer: Component
   container: Component
@@ -69,13 +63,13 @@ export type AddIntent = {
 }
 
 export type StartConnectionIntent = {
-  type: typeof START_CONNECTION
+  type: IntentType.START_CONNECTION
   source: Component
   location: Point
 }
 
 export type EndConnectionIntent = {
-  type: typeof END_CONNECTION
+  type: IntentType.END_CONNECTION
   source: Component
   target: Component
   location: Point
@@ -98,4 +92,38 @@ export type RegefInternalProps = {
 
 export type RegefProps = {
   [REGEF_PROP_KEY]: RegefInternalProps
+}
+
+export interface CancelCapabilityConfig {
+  parts?: Id[]
+  keys?: string[]
+}
+
+export interface ConnectCapabilityConfig {
+  parts?: Id[]
+  sourceTypes?: Id[]
+  targetTypes?: Id[]
+}
+
+export interface DeleteCapabilityConfig {
+  parts?: Id[]
+  keys?: string[]
+}
+
+export interface DragCapabilityConfig {
+  parts?: Id[]
+  draggables?: Id[]
+  hosts?: Id[]
+}
+
+export interface MultiSelectionCapabilityConfig {
+  parts: Id[]
+  selectables: Id[]
+  intersection: boolean
+  containment: boolean
+}
+
+export interface SingleSelectionCapabilityConfig {
+  parts: Id[]
+  selectables: Id[]
 }

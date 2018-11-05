@@ -1,12 +1,7 @@
 import { Capability } from './Capability'
-import { DELETE, Id, DeleteIntent } from './typings'
+import { IntentType, DeleteIntent, DeleteCapabilityConfig } from './typings'
 import { perform, partMatches, getSelection } from './utils'
 import { Engine } from './Engine'
-
-type DeleteCapabilityConfig = {
-  parts?: Id[]
-  keys?: string[]
-}
 
 const DEFAULT_CONFIG: DeleteCapabilityConfig = {
   parts: null,
@@ -28,7 +23,7 @@ export class DeleteCapability extends Capability {
 
   getDeleteRequest(): DeleteIntent {
     return {
-      type: DELETE,
+      type: IntentType.DELETE,
       selection: this.currentSelection,
     }
   }

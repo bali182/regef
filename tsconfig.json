@@ -17,7 +17,8 @@
     "emitDecoratorMetadata": true,
     "declarationDir": "types",
     "outDir": "dist/lib",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noUnusedLocals": true
   },
   "include": [
     "src"

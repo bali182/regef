@@ -11,25 +11,26 @@ export declare type HasType = {
     type: Id;
 };
 export declare type RegefComponent = React.Component & HasUserComponent & HasType;
-export declare const ADD = "add";
-export declare const MOVE = "move";
-export declare const SELECT = "select";
-export declare const DELETE = "delete";
-export declare const START_CONNECTION = "start-connection";
-export declare const END_CONNECTION = "end-connection";
-export declare type IntentType = typeof ADD | typeof MOVE | typeof SELECT | typeof DELETE | typeof START_CONNECTION | typeof END_CONNECTION;
+export declare enum IntentType {
+    ADD = "add",
+    MOVE = "move",
+    SELECT = "select",
+    DELETE = "delete",
+    START_CONNECTION = "start-connection",
+    END_CONNECTION = "end-connection"
+}
 export declare type Intent = {
     type: IntentType;
 };
 export declare type SelectionIntent = {
-    type: typeof SELECT;
+    type: IntentType.SELECT;
     bounds: Rectangle;
     startLocation: Point;
     endLocation: Point;
     selection: Component[];
 };
 export declare type MoveIntent = {
-    type: typeof MOVE;
+    type: IntentType.MOVE;
     components: Component[];
     container: Component;
     location: Point;
@@ -37,11 +38,11 @@ export declare type MoveIntent = {
     delta: Point;
 };
 export declare type DeleteIntent = {
-    type: typeof DELETE;
+    type: IntentType.DELETE;
     selection: Component[];
 };
 export declare type AddIntent = {
-    type: typeof ADD;
+    type: IntentType.ADD;
     components: Component[];
     targetContainer: Component;
     container: Component;
@@ -50,12 +51,12 @@ export declare type AddIntent = {
     delta: Point;
 };
 export declare type StartConnectionIntent = {
-    type: typeof START_CONNECTION;
+    type: IntentType.START_CONNECTION;
     source: Component;
     location: Point;
 };
 export declare type EndConnectionIntent = {
-    type: typeof END_CONNECTION;
+    type: IntentType.END_CONNECTION;
     source: Component;
     target: Component;
     location: Point;

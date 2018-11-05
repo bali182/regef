@@ -1,6 +1,6 @@
 import React from 'react'
 import { point, rectangle, dimension, Point } from 'regef-geometry'
-import { SELECT, Id, SelectionIntent } from './typings'
+import { IntentType, SelectionIntent, SingleSelectionCapabilityConfig } from './typings'
 import { Capability } from './Capability'
 import { typeMatches, partMatches, perform, getSelection, isLeftButton } from './utils'
 import { Engine } from './Engine'
@@ -8,11 +8,6 @@ import { Engine } from './Engine'
 const locationOf = ({ clientX, clientY }: MouseEvent, rootDom: Element) => {
   const { top, left } = rootDom.getBoundingClientRect()
   return point(clientX - left, clientY - top)
-}
-
-type SingleSelectionCapabilityConfig = {
-  parts: Id[]
-  selectables: Id[]
 }
 
 const DEFAULT_CONFIG: SingleSelectionCapabilityConfig = {
@@ -42,7 +37,7 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
   createSingleSelectionRequest(): SelectionIntent {
     const { location, selection, additional } = this
     return {
-      type: SELECT,
+      type: IntentType.SELECT,
       bounds: rectangle(location, dimension(0, 0)),
       selection: additional ? getSelection(this.engine).concat(selection) : selection,
       startLocation: location,

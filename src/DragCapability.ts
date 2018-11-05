@@ -1,5 +1,5 @@
 import { point, rectangle, dimension, Point } from 'regef-geometry'
-import { MOVE, ADD, SELECT, Id, MoveIntent, AddIntent, SelectionIntent } from './typings'
+import { IntentType, MoveIntent, AddIntent, SelectionIntent, DragCapabilityConfig } from './typings'
 import { Capability } from './Capability'
 import {
   typeMatches,
@@ -26,12 +26,6 @@ type Coordinates = {
 }
 
 type DragIntent = MoveIntent | AddIntent | SelectionIntent
-
-type DragCapabilityConfig = {
-  parts?: Id[]
-  draggables?: Id[]
-  hosts?: Id[]
-}
 
 const DEFAULT_CONFIG: DragCapabilityConfig = {
   parts: null,
@@ -143,7 +137,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
 
   getMoveChildRequest(): MoveIntent {
     return {
-      type: MOVE,
+      type: IntentType.MOVE,
       components: this.getMovedComponents(),
       container: this.currentParent.component.userComponent,
       ...this.coordinates,
@@ -153,7 +147,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
   getAddChildRequest(): AddIntent {
     const { targetParent, currentParent } = this
     return {
-      type: ADD,
+      type: IntentType.ADD,
       components: this.getMovedComponents(),
       targetContainer: targetParent === null ? null : targetParent.component.userComponent,
       container: currentParent.component.userComponent,
@@ -164,7 +158,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
   getSelectionRequest(): SelectionIntent {
     const { startLocation, target } = this
     return {
-      type: SELECT,
+      type: IntentType.SELECT,
       bounds: rectangle(startLocation, dimension(0, 0)),
       startLocation,
       endLocation: startLocation,

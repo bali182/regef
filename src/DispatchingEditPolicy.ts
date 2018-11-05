@@ -1,18 +1,13 @@
 import { EditPolicy } from './EditPolicy'
 
 import {
-  ADD,
-  MOVE,
-  START_CONNECTION,
-  END_CONNECTION,
-  SELECT,
-  DELETE,
   AddIntent,
   MoveIntent,
   StartConnectionIntent,
   EndConnectionIntent,
   SelectionIntent,
   DeleteIntent,
+  IntentType,
 } from './typings'
 
 type RecognizedIntent =
@@ -27,17 +22,17 @@ export class DispatchingEditPolicy extends EditPolicy {
   perform(intent: RecognizedIntent): void {
     const { type } = intent
     switch (intent.type) {
-      case ADD:
+      case IntentType.ADD:
         return this.add(intent)
-      case MOVE:
+      case IntentType.MOVE:
         return this.move(intent)
-      case START_CONNECTION:
+      case IntentType.START_CONNECTION:
         return this.startConnection(intent)
-      case END_CONNECTION:
+      case IntentType.END_CONNECTION:
         return this.endConnection(intent)
-      case SELECT:
+      case IntentType.SELECT:
         return this.select(intent)
-      case DELETE:
+      case IntentType.DELETE:
         return this.delete(intent)
       default:
         throw new Error(`Unknown intent type ${type}`)
@@ -46,15 +41,15 @@ export class DispatchingEditPolicy extends EditPolicy {
 
   requestFeedback(intent: RecognizedIntent): void {
     switch (intent.type) {
-      case ADD:
+      case IntentType.ADD:
         return this.requestAddFeedback(intent)
-      case MOVE:
+      case IntentType.MOVE:
         return this.requestMoveFeedback(intent)
-      case START_CONNECTION:
+      case IntentType.START_CONNECTION:
         return this.requestStartConnectionFeedback(intent)
-      case END_CONNECTION:
+      case IntentType.END_CONNECTION:
         return this.requestEndConnectionFeedback(intent)
-      case SELECT:
+      case IntentType.SELECT:
         return this.requestSelectFeedback(intent)
       default:
         throw new Error(`Unknown intent type ${intent.type}`)
@@ -63,15 +58,15 @@ export class DispatchingEditPolicy extends EditPolicy {
 
   eraseFeedback(intent: RecognizedIntent): void {
     switch (intent.type) {
-      case ADD:
+      case IntentType.ADD:
         return this.eraseAddFeedback(intent)
-      case MOVE:
+      case IntentType.MOVE:
         return this.eraseMoveFeedback(intent)
-      case START_CONNECTION:
+      case IntentType.START_CONNECTION:
         return this.eraseStartConnectionFeedback(intent)
-      case END_CONNECTION:
+      case IntentType.END_CONNECTION:
         return this.eraseEndConnectionFeedback(intent)
-      case SELECT:
+      case IntentType.SELECT:
         return this.eraseSelectFeedback(intent)
       default:
         throw new Error(`Unknown intent type ${intent.type}`)
