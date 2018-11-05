@@ -1,11 +1,6 @@
 import { Capability } from './Capability';
-import { Id, StartConnectionIntent, EndConnectionIntent } from './typings';
+import { StartConnectionIntent, EndConnectionIntent, ConnectCapabilityConfig } from './typings';
 import { Engine } from './Engine';
-declare type ConnectCapabilityConfig = {
-    parts?: Id[];
-    sourceTypes?: Id[];
-    targetTypes?: Id[];
-};
 declare type ConnectIntent = StartConnectionIntent | EndConnectionIntent;
 export declare class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     private source;

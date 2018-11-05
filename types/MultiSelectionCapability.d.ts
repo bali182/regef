@@ -1,12 +1,6 @@
-import { Id, SelectionIntent } from './typings';
+import { SelectionIntent, MultiSelectionCapabilityConfig } from './typings';
 import { Capability } from './Capability';
 import { Engine } from './Engine';
-declare type MultiSelectionCapabilityConfig = {
-    parts: Id[];
-    selectables: Id[];
-    intersection: boolean;
-    containment: boolean;
-};
 export declare class MultiSelectionCapability extends Capability<MultiSelectionCapabilityConfig> {
     private startLocation;
     private endLocation;
@@ -24,4 +18,3 @@ export declare class MultiSelectionCapability extends Capability<MultiSelectionC
     onMouseMove(e: MouseEvent): void;
     onMouseUp(e: MouseEvent): void;
 }
-export {};

@@ -1,16 +1,11 @@
 /// <reference types="react" />
 import { Point } from 'regef-geometry';
-import { Id, MoveIntent, AddIntent, SelectionIntent } from './typings';
+import { MoveIntent, AddIntent, SelectionIntent, DragCapabilityConfig } from './typings';
 import { Capability } from './Capability';
 import { Engine } from './Engine';
 import { ComponentWrapper } from './ComponentWrapper';
 import { DiagramPartWrapper } from './DiagramPartWrapper';
 declare type DragIntent = MoveIntent | AddIntent | SelectionIntent;
-declare type DragCapabilityConfig = {
-    parts?: Id[];
-    draggables?: Id[];
-    hosts?: Id[];
-};
 export declare class DragCapability extends Capability<DragCapabilityConfig> {
     private target;
     private lastTargetParent;

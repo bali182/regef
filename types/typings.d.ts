@@ -75,3 +75,31 @@ export declare type RegefInternalProps = {
 export declare type RegefProps = {
     [REGEF_PROP_KEY]: RegefInternalProps;
 };
+export interface CancelCapabilityConfig {
+    parts?: Id[];
+    keys?: string[];
+}
+export interface ConnectCapabilityConfig {
+    parts?: Id[];
+    sourceTypes?: Id[];
+    targetTypes?: Id[];
+}
+export interface DeleteCapabilityConfig {
+    parts?: Id[];
+    keys?: string[];
+}
+export interface DragCapabilityConfig {
+    parts?: Id[];
+    draggables?: Id[];
+    hosts?: Id[];
+}
+export interface MultiSelectionCapabilityConfig {
+    parts: Id[];
+    selectables: Id[];
+    intersection: boolean;
+    containment: boolean;
+}
+export interface SingleSelectionCapabilityConfig {
+    parts: Id[];
+    selectables: Id[];
+}

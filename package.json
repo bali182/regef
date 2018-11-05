@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "precommit": "npm run build && git add index.js",
+    "precommit": "npm run build && git add index.js types",
     "start": "webpack-dev-server",
     "build": "rollup -c",
     "stats": "sloc src"

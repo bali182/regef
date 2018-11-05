@@ -1,10 +1,6 @@
-import { Id, SelectionIntent } from './typings';
+import { SelectionIntent, SingleSelectionCapabilityConfig } from './typings';
 import { Capability } from './Capability';
 import { Engine } from './Engine';
-declare type SingleSelectionCapabilityConfig = {
-    parts: Id[];
-    selectables: Id[];
-};
 export declare class SingleSelectionCapability extends Capability<SingleSelectionCapabilityConfig> {
     private location;
     private possibleSingleSelection;
@@ -18,4 +14,3 @@ export declare class SingleSelectionCapability extends Capability<SingleSelectio
     onMouseMove(): void;
     onMouseUp({ ctrlKey, metaKey }: MouseEvent): void;
 }
-export {};

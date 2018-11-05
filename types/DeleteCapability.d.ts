@@ -1,10 +1,6 @@
 import { Capability } from './Capability';
-import { Id, DeleteIntent } from './typings';
+import { DeleteIntent, DeleteCapabilityConfig } from './typings';
 import { Engine } from './Engine';
-declare type DeleteCapabilityConfig = {
-    parts?: Id[];
-    keys?: string[];
-};
 export declare class DeleteCapability extends Capability {
     private currentSelection;
     constructor(engine: Engine, config?: DeleteCapabilityConfig);
@@ -14,4 +10,3 @@ export declare class DeleteCapability extends Capability {
     keyMatches(key: string): boolean;
     onKeyDown({ key, target }: KeyboardEvent): void;
 }
-export {};
