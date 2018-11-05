@@ -120,7 +120,7 @@ declare class PartToolkit {
   parent(component: Component): Component
   children(component: Component): Component[]
   editPolicy(component: Component): EditPolicy
-  ofType(type: string): Component[]
+  ofType(type: string | Symbol): Component[]
   nodes(): Component[]
   ports(): Component[]
   connections(): Component[]
@@ -170,11 +170,11 @@ export interface RegefComponentProps {
   regef: { toolkit: () => Promise<Toolkit> }
 }
 
-export function root<P extends RegefComponentProps>(): (
+export function root<P extends Partial<RegefComponentProps>>(): (
   ConnComponent: ComponentType<P>,
 ) => ComponentType<Pick<P, Exclude<keyof P, keyof RegefComponentProps>>>
 
-export function component<P extends RegefComponentProps>(
+export function component<P extends Partial<RegefComponentProps>>(
   type: Symbol | string,
 ): (
   ConnComponent: ComponentType<P>,

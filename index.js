@@ -59,7 +59,7 @@ function __rest(s, e) {
     return t;
 }
 
-var REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay';
+var REGEF_PROP_KEY = '@@regef-internal-context@@';
 var ADD = 'add';
 var MOVE = 'move';
 var SELECT = 'select';
@@ -72,12 +72,21 @@ var RegefContext = React.createContext({
     engine: null,
 });
 function withRegefContext(Wrapped) {
-    function WithRegefContext(props) {
-        return (React.createElement(RegefContext.Consumer, null, function (regef) {
-            var _a;
-            return React.createElement(Wrapped, __assign({}, props, (_a = {}, _a[REGEF_PROP_KEY] = regef, _a)));
-        }));
-    }
+    var WithRegefContext = /** @class */ (function (_super) {
+        __extends(WithRegefContext, _super);
+        function WithRegefContext() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        WithRegefContext.prototype.render = function () {
+            var _this = this;
+            return (React.createElement(RegefContext.Consumer, null, function (context) {
+                var _a;
+                var allProps = __assign({}, _this.props, (_a = {}, _a[REGEF_PROP_KEY] = context, _a));
+                return React.createElement(Wrapped, __assign({}, allProps));
+            }));
+        };
+        return WithRegefContext;
+    }(React.Component));
     return WithRegefContext;
 }
 
@@ -640,41 +649,40 @@ function component(type) {
             __extends(DecoratedComponent, _super);
             function DecoratedComponent(props) {
                 var _this = _super.call(this, props) || this;
-                var regef = props[REGEF_PROP_KEY];
+                _this.setUserComponent = function (ref) {
+                    _this.userComponent = ref;
+                };
+                var context = _this.getRegefContext();
                 _this.userComponent = null;
                 _this.type = type;
-                _this.childProps = { toolkit: toolkitResolver(_this, regef) };
-                // binding methods
-                _this.setUserComponent = _this.setUserComponent.bind(_this);
-                var types$$1 = regef.engine.types;
+                _this.childProps = { toolkit: toolkitResolver(_this, context) };
+                var types$$1 = context.engine.types;
                 if (types$$1.indexOf(type) < 0) {
                     var typesStr = types$$1.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
                     throw new TypeError("Not a valid component type \"" + type + "\". Please select one from " + typesStr + ", or add \"" + type + "\" to the engine's \"types\" array.");
                 }
                 return _this;
             }
-            DecoratedComponent.prototype.setUserComponent = function (ref) {
-                this.userComponent = ref;
-            };
             DecoratedComponent.prototype.componentDidMount = function () {
                 var engine = getEngine(this);
-                var context = this.props[REGEF_PROP_KEY];
                 if (this.type === engine.rootType) {
-                    rootActivate(this, context);
+                    rootActivate(this, this.getRegefContext());
                 }
                 else {
-                    defaultActivate(this, context);
+                    defaultActivate(this, this.getRegefContext());
                 }
             };
             DecoratedComponent.prototype.componentWillUnmount = function () {
                 var engine = getEngine(this);
-                var context = this.props[REGEF_PROP_KEY];
                 if (this.type === engine.rootType) {
-                    rootDeactivate(this, context);
+                    rootDeactivate(this, this.getRegefContext());
                 }
                 else {
-                    defaultDecativate(this, context);
+                    defaultDecativate(this, this.getRegefContext());
                 }
+            };
+            DecoratedComponent.prototype.getRegefContext = function () {
+                return this.props[REGEF_PROP_KEY];
             };
             DecoratedComponent.prototype.render = function () {
                 var _a = this.props, children = _a.children, rest = __rest(_a, ["children"]);

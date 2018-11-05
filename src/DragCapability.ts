@@ -1,5 +1,5 @@
 import { point, rectangle, dimension, Point } from 'regef-geometry'
-import { MOVE, ADD, SELECT, Id, MoveIntent, AddIntent, SelectionIntent } from './constants'
+import { MOVE, ADD, SELECT, Id, MoveIntent, AddIntent, SelectionIntent } from './typings'
 import { Capability } from './Capability'
 import {
   typeMatches,

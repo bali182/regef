@@ -6,7 +6,7 @@ import {
   Id,
   StartConnectionIntent,
   EndConnectionIntent,
-} from './constants'
+} from './typings'
 import {
   eraseFeedback,
   requestFeedback,

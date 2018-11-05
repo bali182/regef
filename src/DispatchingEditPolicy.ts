@@ -13,7 +13,7 @@ import {
   EndConnectionIntent,
   SelectionIntent,
   DeleteIntent,
-} from './constants'
+} from './typings'
 
 type RecognizedIntent =
   | AddIntent

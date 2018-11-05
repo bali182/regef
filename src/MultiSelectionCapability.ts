@@ -1,6 +1,6 @@
 import React from 'react'
 import { point, rectangle, Point, Rectangle } from 'regef-geometry'
-import { SELECT, Id, SelectionIntent, MoveIntent } from './constants'
+import { SELECT, Id, SelectionIntent, MoveIntent } from './typings'
 import { Capability } from './Capability'
 import {
   eraseFeedback,

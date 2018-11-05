@@ -2,7 +2,7 @@ import React from 'react'
 import types from 'prop-types'
 import { RegefContext } from './RegefContext'
 import { Engine } from './Engine'
-import { Id } from './constants'
+import { Id } from './typings'
 
 type DiagramPartProps = {
   engine: Engine

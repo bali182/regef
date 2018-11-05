@@ -5,7 +5,7 @@ import { Capability } from './Capability'
 import { EditPolicy } from './EditPolicy'
 import { SelectionProvider } from './SelectionProvider'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
-import { Id } from './constants'
+import { Id } from './typings'
 
 type EngineConfig = {
   capabilities: Capability<any>[]

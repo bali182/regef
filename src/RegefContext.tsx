@@ -1,20 +1,28 @@
 import React from 'react'
-import { REGEF_PROP_KEY } from './constants'
+import { REGEF_PROP_KEY, RegefInternalProps } from './typings'
 
-export const RegefContext = React.createContext({
+export const RegefContext = React.createContext<RegefInternalProps>({
   id: null,
   engine: null,
 })
 
 export function withRegefContext(Wrapped: React.ComponentClass<any>) {
-  function WithRegefContext(props: any) {
-    return (
-      <RegefContext.Consumer>
-        {(regef) => <Wrapped {...props} {...{ [REGEF_PROP_KEY]: regef }} />}
-      </RegefContext.Consumer>
-    )
+  class WithRegefContext extends React.Component<any> {
+    render() {
+      return (
+        <RegefContext.Consumer>
+          {(context: RegefInternalProps) => {
+            const allProps: any = {
+              ...this.props,
+              [REGEF_PROP_KEY]: context,
+            }
+            return <Wrapped {...allProps} />
+          }}
+        </RegefContext.Consumer>
+      )
+    }
   }
-  return WithRegefContext
+  return WithRegefContext as any
 }
 
-export default RegefContext
+export default RegefInternalProps

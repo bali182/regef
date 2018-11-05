@@ -1,4 +1,4 @@
-import { IntentType } from './constants'
+import { IntentType } from './typings'
 
 type Intent = {
   type: IntentType

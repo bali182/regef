@@ -4,7 +4,7 @@ import { ComponentWrapper } from './ComponentWrapper'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
 import { Engine } from './Engine'
 import { EditPolicy } from './EditPolicy'
-import { Intent, Id } from './constants'
+import { Intent, Id } from './typings'
 
 export function matchesSingleType(type: Id): (wrapper: ComponentWrapper) => boolean {
   return ({ component }: ComponentWrapper) => component.type === type

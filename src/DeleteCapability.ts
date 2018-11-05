@@ -1,5 +1,5 @@
 import { Capability } from './Capability'
-import { DELETE, Id, DeleteIntent } from './constants'
+import { DELETE, Id, DeleteIntent } from './typings'
 import { perform, partMatches, getSelection } from './utils'
 import { Engine } from './Engine'
 

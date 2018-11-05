@@ -1,6 +1,6 @@
 import React from 'react'
 import { point, rectangle, dimension, Point } from 'regef-geometry'
-import { SELECT, Id, SelectionIntent } from './constants'
+import { SELECT, Id, SelectionIntent } from './typings'
 import { Capability } from './Capability'
 import { typeMatches, partMatches, perform, getSelection, isLeftButton } from './utils'
 import { Engine } from './Engine'

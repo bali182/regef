@@ -14,4 +14,4 @@ export { MultiSelectionCapability } from './MultiSelectionCapability'
 export { CancelCapability } from './CancelCapability'
 export { DeleteCapability } from './DeleteCapability'
 
-export * from './constants'
+export * from './typings'
