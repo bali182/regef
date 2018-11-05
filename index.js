@@ -200,6 +200,7 @@ var Engine = /** @class */ (function () {
         this.types = types$$1;
         this.rootType = rootType;
     }
+    /** @internal */
     Engine.prototype.__partsMap = function () {
         return this._parts;
     };
@@ -382,6 +383,7 @@ var matches = function (target, wrapper) {
     var userComponent = wrapper.userComponent, dom = wrapper.dom, component = wrapper.component;
     return wrapper === target || userComponent === target || dom === target || component === target;
 };
+/** @internal */
 var watchRegister = function (registry, target) {
     return new Promise(function (resolve, reject) {
         if (!registry || !target) {
@@ -598,6 +600,7 @@ var DiagramPartWrapper = /** @class */ (function () {
     return DiagramPartWrapper;
 }());
 
+/** @internal */
 function registryFrom(_a) {
     var engine = _a.engine, id = _a.id;
     if (engine.__partsMap().has(id)) {
@@ -605,10 +608,12 @@ function registryFrom(_a) {
     }
     return null;
 }
+/** @internal */
 function toolkitFrom(_a) {
     var engine = _a.engine, id = _a.id;
     return engine.__partsMap().has(id) ? engine.toolkit : null;
 }
+/** @internal */
 function ensurePartRegistered(_a) {
     var engine = _a.engine, id = _a.id;
     var parts = engine.__partsMap();
@@ -616,25 +621,30 @@ function ensurePartRegistered(_a) {
         parts.set(id, new DiagramPartWrapper(id, engine));
     }
 }
+/** @internal */
 function toolkitResolver(comp, context) {
     ensurePartRegistered(context);
     return function () { return watchRegister(registryFrom(context), comp).then(function () { return toolkitFrom(context); }); };
 }
+/** @internal */
 function defaultActivate(comp, context) {
     ensurePartRegistered(context);
     registryFrom(context).register(fromComponent(comp));
 }
+/** @internal */
 function defaultDecativate(comp, context) {
     var registry = registryFrom(context);
     if (registry) {
         registry.unregister(comp);
     }
 }
+/** @internal */
 function rootActivate(comp, context) {
     defaultActivate(comp, context);
     var registry = registryFrom(context);
     registry.setRoot(registry.get(comp));
 }
+/** @internal */
 function rootDeactivate(comp, context) {
     defaultDecativate(comp, context);
     var registry = registryFrom(context);
@@ -642,6 +652,7 @@ function rootDeactivate(comp, context) {
         registry.setRoot(null);
     }
 }
+/** @internal */
 function getEngine(comp) {
     return comp.props[REGEF_PROP_KEY].engine;
 }
@@ -831,10 +842,6 @@ var DragCapability = /** @class */ (function (_super) {
     DragCapability.prototype.deltaCoordinates = function (_a) {
         var clientX = _a.clientX, clientY = _a.clientY;
         return regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
-    };
-    DragCapability.prototype.screenCoordinates = function (_a) {
-        var clientX = _a.clientX, clientY = _a.clientY;
-        return regefGeometry.point(clientX, clientY);
     };
     DragCapability.prototype.offsetCoordinates = function () {
         return this.offset;

@@ -49,7 +49,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     this.init()
   }
 
-  init() {
+  private init() {
     this.progress = false
     this.target = null
     this.lastTargetParent = null
@@ -62,7 +62,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     this.startLocation = null
   }
 
-  findTargetedParent(eventTarget: Element, part: DiagramPartWrapper) {
+  private findTargetedParent(eventTarget: Element, part: DiagramPartWrapper) {
     const { target, currentParent } = this
     if (!part) {
       return null
@@ -91,23 +91,19 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     return newTarget
   }
 
-  deltaCoordinates({ clientX, clientY }: MouseEvent): Point {
+  private deltaCoordinates({ clientX, clientY }: MouseEvent): Point {
     return point(clientX - this.startLocation.x, clientY - this.startLocation.y)
   }
 
-  screenCoordinates({ clientX, clientY }: MouseEvent): Point {
-    return point(clientX, clientY)
-  }
-
-  offsetCoordinates(): Point {
+  private offsetCoordinates(): Point {
     return this.offset
   }
 
-  locationCoordinates({ clientX, clientY }: MouseEvent): Point {
+  private locationCoordinates({ clientX, clientY }: MouseEvent): Point {
     return point(clientX, clientY)
   }
 
-  updateCoordinates(e: MouseEvent): void {
+  private updateCoordinates(e: MouseEvent): void {
     this.coordinates = {
       offset: this.offsetCoordinates(),
       delta: this.deltaCoordinates(e),
@@ -115,7 +111,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     }
   }
 
-  updateParents(e: MouseEvent, part: DiagramPartWrapper) {
+  private updateParents(e: MouseEvent, part: DiagramPartWrapper) {
     const newTargetParent = this.findTargetedParent(e.target as Element, part)
     const targetParent = this.targetParent
     if (targetParent !== newTargetParent) {
@@ -126,7 +122,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     }
   }
 
-  getMovedComponents() {
+  private getMovedComponents() {
     const target = this.target.userComponent
     const selection = getSelection(this.engine)
     if (selection.indexOf(target) >= 0) {
@@ -135,7 +131,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     return [target]
   }
 
-  getMoveChildRequest(): MoveIntent {
+  private getMoveChildRequest(): MoveIntent {
     return {
       type: IntentType.MOVE,
       components: this.getMovedComponents(),
@@ -144,7 +140,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     }
   }
 
-  getAddChildRequest(): AddIntent {
+  private getAddChildRequest(): AddIntent {
     const { targetParent, currentParent } = this
     return {
       type: IntentType.ADD,
@@ -155,7 +151,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     }
   }
 
-  getSelectionRequest(): SelectionIntent {
+  private getSelectionRequest(): SelectionIntent {
     const { startLocation, target } = this
     return {
       type: IntentType.SELECT,
@@ -166,7 +162,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     }
   }
 
-  handleFeedback(lastRequest: DragIntent, request: DragIntent): void {
+  private handleFeedback(lastRequest: DragIntent, request: DragIntent): void {
     const { lastTargetParent, targetParent } = this
     if (lastRequest !== null && lastTargetParent !== targetParent) {
       eraseFeedback(this.engine.editPolicies, lastRequest)
@@ -176,7 +172,7 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
     }
   }
 
-  buildDragRequest(e: MouseEvent): DragIntent {
+  private buildDragRequest(e: MouseEvent): DragIntent {
     const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
 
     this.updateParents(e, part)

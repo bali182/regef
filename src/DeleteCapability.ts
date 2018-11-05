@@ -16,23 +16,23 @@ export class DeleteCapability extends Capability {
     this.init()
   }
 
-  init(): void {
+  private init(): void {
     this.currentSelection = []
     this.progress = false
   }
 
-  getDeleteRequest(): DeleteIntent {
+  private getDeleteRequest(): DeleteIntent {
     return {
       type: IntentType.DELETE,
       selection: this.currentSelection,
     }
   }
 
-  focusOnTargetedParts(target: Element): boolean {
+  private focusOnTargetedParts(target: Element): boolean {
     return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)))
   }
 
-  keyMatches(key: string): boolean {
+  private keyMatches(key: string): boolean {
     return this.config.keys.indexOf(key) >= 0
   }
 

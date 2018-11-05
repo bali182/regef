@@ -2,6 +2,9 @@ import { Rectangle, Point } from 'regef-geometry';
 import { Component } from 'react';
 import { Toolkit } from './Toolkit';
 import { Engine } from './Engine';
+import { Capability } from './Capability';
+import { EditPolicy } from './EditPolicy';
+import { SelectionProvider } from './SelectionProvider';
 export declare const REGEF_PROP_KEY = "@@regef-internal-context@@";
 export declare type Id = string | Symbol;
 export declare type HasUserComponent = {
@@ -103,3 +106,11 @@ export interface SingleSelectionCapabilityConfig {
     parts: Id[];
     selectables: Id[];
 }
+export interface EngineConfig {
+    capabilities: Capability<any>[];
+    editPolicies: EditPolicy[];
+    selectionProvider: SelectionProvider;
+    rootType: Id;
+    types: Id[];
+}
+export declare type EngineConfigProvider = (engine: Engine) => EngineConfig;

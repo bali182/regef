@@ -1,4 +1,4 @@
-import { SelectionIntent, SingleSelectionCapabilityConfig } from './typings';
+import { SingleSelectionCapabilityConfig } from './typings';
 import { Capability } from './Capability';
 import { Engine } from './Engine';
 export declare class SingleSelectionCapability extends Capability<SingleSelectionCapabilityConfig> {
@@ -7,8 +7,8 @@ export declare class SingleSelectionCapability extends Capability<SingleSelectio
     private additional;
     private selection;
     constructor(engine: Engine, config?: Partial<SingleSelectionCapabilityConfig>);
-    init(): void;
-    createSingleSelectionRequest(): SelectionIntent;
+    private init;
+    private createSingleSelectionRequest;
     cancel(): void;
     onMouseDown(e: MouseEvent): void;
     onMouseMove(): void;

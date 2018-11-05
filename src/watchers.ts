@@ -6,6 +6,7 @@ const matches = (target: any, wrapper: ComponentWrapper) => {
   return wrapper === target || userComponent === target || dom === target || component === target
 }
 
+/** @internal */
 export const watchRegister = (registry: ComponentRegistry, target: any) =>
   new Promise((resolve, reject) => {
     if (!registry || !target) {

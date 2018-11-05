@@ -36,7 +36,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     this.init()
   }
 
-  init(): void {
+  private init(): void {
     this.progress = false
     this.source = null
     this.target = null
@@ -53,7 +53,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     }
   }
 
-  getStartConnectionRequest(): StartConnectionIntent {
+  private getStartConnectionRequest(): StartConnectionIntent {
     return {
       type: IntentType.START_CONNECTION,
       source: this.source.userComponent,
@@ -61,7 +61,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     }
   }
 
-  getEndConnectionRequest(): EndConnectionIntent {
+  private getEndConnectionRequest(): EndConnectionIntent {
     return {
       type: IntentType.END_CONNECTION,
       source: this.source.userComponent,
@@ -70,7 +70,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     }
   }
 
-  buildEndConnectRequest(e: MouseEvent): EndConnectionIntent {
+  private buildEndConnectRequest(e: MouseEvent): EndConnectionIntent {
     const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return null
@@ -87,7 +87,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     return this.getEndConnectionRequest()
   }
 
-  buildStartConnectionRequest(e: MouseEvent): StartConnectionIntent {
+  private buildStartConnectionRequest(e: MouseEvent): StartConnectionIntent {
     const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
     if (!part) {
       return null
@@ -104,7 +104,7 @@ export class ConnectCapability extends Capability<ConnectCapabilityConfig> {
     return this.getStartConnectionRequest()
   }
 
-  handleFeedback(lastRequest: ConnectIntent, request: ConnectIntent): void {
+  private handleFeedback(lastRequest: ConnectIntent, request: ConnectIntent): void {
     if (
       lastRequest !== null &&
       (request === null ||

@@ -5,15 +5,7 @@ import { Capability } from './Capability';
 import { EditPolicy } from './EditPolicy';
 import { SelectionProvider } from './SelectionProvider';
 import { DiagramPartWrapper } from './DiagramPartWrapper';
-import { Id } from './typings';
-declare type EngineConfig = {
-    capabilities: Capability<any>[];
-    editPolicies: EditPolicy[];
-    selectionProvider: SelectionProvider;
-    rootType: Id;
-    types: Id[];
-};
-declare type EngineConfigProvider = (engine: Engine) => EngineConfig;
+import { Id, EngineConfigProvider } from './typings';
 export declare class Engine {
     readonly toolkit: Toolkit;
     readonly eventManager: EventManager;
@@ -23,10 +15,7 @@ export declare class Engine {
     readonly selectionProvider: SelectionProvider;
     readonly types: Id[];
     readonly rootType: Id;
-    private _parts;
     constructor(config?: EngineConfigProvider);
-    __partsMap(): Map<Id, DiagramPartWrapper>;
     part(id: Id): DiagramPartWrapper;
     allParts(): DiagramPartWrapper[];
 }
-export {};

@@ -18,7 +18,8 @@
     "declarationDir": "types",
     "outDir": "dist/lib",
     "resolveJsonModule": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "stripInternal": true
   },
   "include": [
     "src"

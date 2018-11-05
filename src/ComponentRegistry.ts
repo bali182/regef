@@ -14,7 +14,7 @@ export class ComponentRegistry {
   constructor() {
     this.init()
   }
-  init(): void {
+  private init(): void {
     this.mapping = new Map()
     this.wrappers = new Set()
     this.root = null

@@ -26,7 +26,7 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
     this.init()
   }
 
-  init(): void {
+  private init(): void {
     this.progress = false
     this.location = null
     this.possibleSingleSelection = false
@@ -34,7 +34,7 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
     this.selection = []
   }
 
-  createSingleSelectionRequest(): SelectionIntent {
+  private createSingleSelectionRequest(): SelectionIntent {
     const { location, selection, additional } = this
     return {
       type: IntentType.SELECT,

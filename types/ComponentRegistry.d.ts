@@ -9,7 +9,7 @@ export declare class ComponentRegistry {
     private unregisterListeners;
     root: ComponentWrapper;
     constructor();
-    init(): void;
+    private init;
     setRoot(root: ComponentWrapper): void;
     register(wrapper: ComponentWrapper): void;
     unregister(input: WrapperField): void;

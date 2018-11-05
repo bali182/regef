@@ -5,17 +5,7 @@ import { Capability } from './Capability'
 import { EditPolicy } from './EditPolicy'
 import { SelectionProvider } from './SelectionProvider'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
-import { Id } from './typings'
-
-type EngineConfig = {
-  capabilities: Capability<any>[]
-  editPolicies: EditPolicy[]
-  selectionProvider: SelectionProvider
-  rootType: Id
-  types: Id[]
-}
-
-type EngineConfigProvider = (engine: Engine) => EngineConfig
+import { Id, EngineConfig, EngineConfigProvider } from './typings'
 
 const DefaultEngineConfig: EngineConfig = {
   capabilities: [],
@@ -35,6 +25,7 @@ export class Engine {
   public readonly types: Id[]
   public readonly rootType: Id
 
+  /** @internal */
   private _parts: Map<Id, DiagramPartWrapper>
 
   constructor(config: EngineConfigProvider = () => DefaultEngineConfig) {
@@ -51,6 +42,7 @@ export class Engine {
     this.types = types
     this.rootType = rootType
   }
+  /** @internal */
   __partsMap(): Map<Id, DiagramPartWrapper> {
     return this._parts
   }

@@ -38,7 +38,7 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     this.init()
   }
 
-  init(): void {
+  private init(): void {
     this.progress = false
     this.startLocation = null
     this.endLocation = null
@@ -48,7 +48,7 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     this.additional = false
   }
 
-  createMultiSelectionRequest(): SelectionIntent {
+  private createMultiSelectionRequest(): SelectionIntent {
     const { startLocation, endLocation, selectionBounds, selection } = this
     return {
       type: IntentType.SELECT,
@@ -59,7 +59,7 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     }
   }
 
-  buildSelectionBounds(): void {
+  private buildSelectionBounds(): void {
     const { startLocation, endLocation } = this
     if (!startLocation || !endLocation) {
       return
@@ -74,7 +74,7 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     this.selectionBounds = rectangle(x, y, width, height)
   }
 
-  buildSelection(): void {
+  private buildSelection(): void {
     const { config, engine, selectionBounds, additional } = this
 
     const parts = getParts(engine, config.parts).filter((part) => {
