@@ -1,31 +1,28 @@
-
 const HtmlPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  entry: './example/index.jsx',
+  mode: 'development',
+  // devtool: 'inline-source-map',
+  entry: './example/index.tsx',
   output: {
     filename: 'bundle.js',
     path: `${__dirname}/dist`,
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ['.js', '.jsx', '.json'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          plugins: ['transform-decorators-legacy'],
-          presets: ['es2015', 'react', 'stage-0'],
-          babelrc: false,
-        },
+        loader: 'ts-loader',
       },
     ],
   },
-  plugins: [
-    new HtmlPlugin({ template: 'example/index.html' }),
-  ],
+  plugins: [new HtmlPlugin({ template: 'example/index.html' })],
+  devServer: {
+    stats: 'errors-only',
+  },
 }

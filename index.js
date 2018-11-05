@@ -4,2043 +4,1366 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var React = require('react');
-var React__default = _interopDefault(React);
-var propTypes = require('prop-types');
-var reactDom = require('react-dom');
+var React = _interopDefault(require('react'));
+var types = _interopDefault(require('prop-types'));
+var ReactDOM = _interopDefault(require('react-dom'));
 var regefGeometry = require('regef-geometry');
 
-var REGEF_PROP_KEY = '@@superSecretPropForTransferingContextInAVeryAwkwardWay';
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
 
-// Request types
-var ADD = 'add';
-var MOVE = 'move';
-var SELECT = 'select';
-var DELETE = 'delete';
-var START_CONNECTION = 'start-connection';
-var END_CONNECTION = 'end-connection';
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
 
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return extendStatics(d, b);
 };
 
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
+function __extends(d, b) {
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
 
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-var defineProperty = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
+            t[p[i]] = s[p[i]];
+    return t;
+}
 
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
+/** @internal */
+var REGEF_PROP_KEY = '@@regef-internal-context@@';
+(function (IntentType) {
+    IntentType["ADD"] = "add";
+    IntentType["MOVE"] = "move";
+    IntentType["SELECT"] = "select";
+    IntentType["DELETE"] = "delete";
+    IntentType["START_CONNECTION"] = "start-connection";
+    IntentType["END_CONNECTION"] = "end-connection";
+})(exports.IntentType || (exports.IntentType = {}));
 
-  return target;
-};
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-var objectWithoutProperties = function (obj, keys) {
-  var target = {};
-
-  for (var i in obj) {
-    if (keys.indexOf(i) >= 0) continue;
-    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-    target[i] = obj[i];
-  }
-
-  return target;
-};
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-var RegefContext = React__default.createContext({
-  id: null,
-  engine: null
+var RegefContext = React.createContext({
+    id: null,
+    engine: null,
 });
-
 function withRegefContext(Wrapped) {
-  function WithRegefContext(props) {
-    return React__default.createElement(
-      RegefContext.Consumer,
-      null,
-      function (regef) {
-        return React__default.createElement(Wrapped, _extends({}, props, defineProperty({}, REGEF_PROP_KEY, regef)));
-      }
-    );
-  }
-  return WithRegefContext;
+    var WithRegefContext = /** @class */ (function (_super) {
+        __extends(WithRegefContext, _super);
+        function WithRegefContext() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        WithRegefContext.prototype.render = function () {
+            var _this = this;
+            return (React.createElement(RegefContext.Consumer, null, function (context) {
+                var _a;
+                var allProps = __assign({}, _this.props, (_a = {}, _a[REGEF_PROP_KEY] = context, _a));
+                return React.createElement(Wrapped, __assign({}, allProps));
+            }));
+        };
+        return WithRegefContext;
+    }(React.Component));
+    return WithRegefContext;
 }
 
-var EventManager = function () {
-  function EventManager(engine) {
-    classCallCheck(this, EventManager);
-
-    this.engine = engine;
-    this.hooked = false;
-    // binding methods
-    this.onMouseDown = this.onMouseDown.bind(this);
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onKeyUp = this.onKeyUp.bind(this);
-  }
-
-  createClass(EventManager, [{
-    key: 'hookListeners',
-    value: function hookListeners() {
-      document.addEventListener('mousedown', this.onMouseDown);
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
-      document.addEventListener('keydown', this.onKeyDown);
-      document.addEventListener('keyup', this.onKeyUp);
-
-      this.hooked = true;
+var EventManager = /** @class */ (function () {
+    function EventManager(engine) {
+        this.engine = engine;
+        this.hooked = false;
+        // binding methods
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
     }
-  }, {
-    key: 'unhookListeners',
-    value: function unhookListeners() {
-      document.removeEventListener('mousedown', this.onMouseDown);
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
-      document.removeEventListener('keydown', this.onKeyDown);
-      document.removeEventListener('keyup', this.onKeyUp);
-
-      this.hooked = false;
-    }
-  }, {
-    key: 'onKeyUp',
-    value: function onKeyUp(e) {
-      this.engine.capabilities.forEach(function (capability) {
-        return capability.onKeyUp(e);
-      });
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(e) {
-      this.engine.capabilities.forEach(function (capability) {
-        return capability.onKeyDown(e);
-      });
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      this.engine.capabilities.forEach(function (capability) {
-        return capability.onMouseDown(e);
-      });
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      this.engine.capabilities.forEach(function (capability) {
-        return capability.onMouseMove(e);
-      });
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      this.engine.capabilities.forEach(function (capability) {
-        return capability.onMouseUp(e);
-      });
-    }
-  }]);
-  return EventManager;
-}();
-
-var Toolkit = function () {
-  function Toolkit(engine) {
-    classCallCheck(this, Toolkit);
-
-    this.engine = engine;
-  }
-
-  createClass(Toolkit, [{
-    key: "forPart",
-    value: function forPart(id) {
-      var part = this.engine.part(id);
-      if (part === null) {
-        throw new Error("DiagramPart " + id + " hasn't been registered.");
-      }
-      return part ? part.toolkit : null;
-    }
-  }, {
-    key: "forComponent",
-    value: function forComponent(component) {
-      var parts = this.engine.parts;
-      for (var i = 0, length = parts.length; i < length; i += 1) {
-        var part = parts[i];
-        if (part.registry.has(component)) {
-          return part;
-        }
-      }
-      throw new Error("Component " + component + " is not registered in any DiagramParts.");
-    }
-  }]);
-  return Toolkit;
-}();
-
-var DomHelper = function () {
-  function DomHelper(engine) {
-    classCallCheck(this, DomHelper);
-
-    this.engine = engine;
-  }
-
-  createClass(DomHelper, [{
-    key: "findPart",
-    value: function findPart(dom) {
-      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
-        return true;
-      };
-
-      var parts = this.engine.parts;
-      for (var i = 0; i < parts.length; i += 1) {
-        var part = parts[i];
-        if (part.domHelper.partContains(dom)) {
-          return matcher(part) ? part : null;
-        }
-      }
-      return null;
-    }
-  }]);
-  return DomHelper;
-}();
-
-var SELECTION_PROVIDER = Symbol('SELECTION_PROVIDER');
-var CAPABILITIES = Symbol('CAPABILITIES');
-var DOM_HELPER = Symbol('DOM_HELPER');
-var TOOLKIT = Symbol('TOOLKIT');
-var EVENT_MANAGER = Symbol('EVENT_MANAGER');
-var EDIT_POLICIES = Symbol('EDIT_POLICIES');
-var PARTS = Symbol('PARTS');
-var TYPES = Symbol('TYPES');
-var ROOT_TYPE = Symbol('ROOT_TYPE');
-
-var Engine = function () {
-  function Engine() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {
-      return {
-        capabilities: [],
-        editPolicies: [],
-        selectionProvider: null,
-        rootType: null,
-        types: []
-      };
+    EventManager.prototype.hookListeners = function () {
+        document.addEventListener('mousedown', this.onMouseDown);
+        document.addEventListener('mousemove', this.onMouseMove);
+        document.addEventListener('mouseup', this.onMouseUp);
+        document.addEventListener('keydown', this.onKeyDown);
+        document.addEventListener('keyup', this.onKeyUp);
+        this.hooked = true;
     };
-    classCallCheck(this, Engine);
-
-    this[TOOLKIT] = new Toolkit(this);
-    this[EVENT_MANAGER] = new EventManager(this);
-    this[DOM_HELPER] = new DomHelper(this);
-    this[PARTS] = new Map();
-
-    var _config = config(this),
-        capabilities = _config.capabilities,
-        editPolicies = _config.editPolicies,
-        selectionProvider = _config.selectionProvider,
-        rootType = _config.rootType,
-        types = _config.types;
-
-    this[CAPABILITIES] = capabilities;
-    this[EDIT_POLICIES] = editPolicies;
-    this[SELECTION_PROVIDER] = selectionProvider;
-    this[TYPES] = types;
-    this[ROOT_TYPE] = rootType;
-  }
-
-  createClass(Engine, [{
-    key: '__partsMap',
-    value: function __partsMap() {
-      return this[PARTS];
-    }
-  }, {
-    key: 'part',
-    value: function part(id) {
-      return this[PARTS].get(id);
-    }
-  }, {
-    key: 'domHelper',
-    get: function get$$1() {
-      return this[DOM_HELPER];
-    }
-  }, {
-    key: 'parts',
-    get: function get$$1() {
-      return Array.from(this[PARTS].values());
-    }
-  }, {
-    key: 'eventManager',
-    get: function get$$1() {
-      return this[EVENT_MANAGER];
-    }
-  }, {
-    key: 'toolkit',
-    get: function get$$1() {
-      return this[TOOLKIT];
-    }
-  }, {
-    key: 'capabilities',
-    get: function get$$1() {
-      return this[CAPABILITIES];
-    }
-  }, {
-    key: 'selectionProvider',
-    get: function get$$1() {
-      return this[SELECTION_PROVIDER];
-    }
-  }, {
-    key: 'editPolicies',
-    get: function get$$1() {
-      return this[EDIT_POLICIES];
-    }
-  }, {
-    key: 'rootType',
-    get: function get$$1() {
-      return this[ROOT_TYPE];
-    }
-  }, {
-    key: 'types',
-    get: function get$$1() {
-      return this[TYPES];
-    }
-  }]);
-  return Engine;
-}();
-
-var DiagramPart = function (_PureComponent) {
-  inherits(DiagramPart, _PureComponent);
-
-  function DiagramPart() {
-    classCallCheck(this, DiagramPart);
-    return possibleConstructorReturn(this, (DiagramPart.__proto__ || Object.getPrototypeOf(DiagramPart)).apply(this, arguments));
-  }
-
-  createClass(DiagramPart, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var engine = this.props.engine;
-
-      if (!engine.eventManager.hooked) {
-        engine.eventManager.hookListeners();
-      }
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      var _props = this.props,
-          id = _props.id,
-          engine = _props.engine;
-
-      var parts = engine.__partsMap();
-      var part = parts.get(id);
-      if (part && part.registry) {
-        part.registry.setRoot(null);
-      }
-      parts.delete(id);
-      if (parts.size === 0) {
-        engine.eventManager.unhookListeners();
-      }
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _props2 = this.props,
-          id = _props2.id,
-          engine = _props2.engine;
-
-      return React__default.createElement(
-        RegefContext.Provider,
-        { value: { id: id, engine: engine } },
-        React.Children.only(this.props.children)
-      );
-    }
-  }]);
-  return DiagramPart;
-}(React.PureComponent);
-
-
-DiagramPart.propTypes = {
-  engine: propTypes.instanceOf(Engine).isRequired,
-  id: propTypes.oneOfType([propTypes.string, propTypes.symbol]).isRequired
-};
-
-var EditPolicy = function () {
-  function EditPolicy() {
-    classCallCheck(this, EditPolicy);
-  }
-
-  createClass(EditPolicy, [{
-    key: "perform",
-    value: function perform() /* intent */{}
-  }, {
-    key: "requestFeedback",
-    value: function requestFeedback() /* intent */{}
-  }, {
-    key: "eraseFeedback",
-    value: function eraseFeedback() /* intent */{}
-  }]);
-  return EditPolicy;
-}();
-
-var DispatchingEditPolicy = function (_EditPolicy) {
-  inherits(DispatchingEditPolicy, _EditPolicy);
-
-  function DispatchingEditPolicy() {
-    classCallCheck(this, DispatchingEditPolicy);
-    return possibleConstructorReturn(this, (DispatchingEditPolicy.__proto__ || Object.getPrototypeOf(DispatchingEditPolicy)).apply(this, arguments));
-  }
-
-  createClass(DispatchingEditPolicy, [{
-    key: 'perform',
-    value: function perform(request) {
-      switch (request.type) {
-        case ADD:
-          return this.add(request);
-        case MOVE:
-          return this.move(request);
-        case START_CONNECTION:
-          return this.startConnection(request);
-        case END_CONNECTION:
-          return this.endConnection(request);
-        case SELECT:
-          return this.select(request);
-        case DELETE:
-          return this.delete(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'requestFeedback',
-    value: function requestFeedback(request) {
-      switch (request.type) {
-        case ADD:
-          return this.requestAddFeedback(request);
-        case MOVE:
-          return this.requestMoveFeedback(request);
-        case START_CONNECTION:
-          return this.requestStartConnectionFeedback(request);
-        case END_CONNECTION:
-          return this.requestEndConnectionFeedback(request);
-        case SELECT:
-          return this.requestSelectFeedback(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'eraseFeedback',
-    value: function eraseFeedback(request) {
-      switch (request.type) {
-        case ADD:
-          return this.eraseAddFeedback(request);
-        case MOVE:
-          return this.eraseMoveFeedback(request);
-        case START_CONNECTION:
-          return this.eraseStartConnectionFeedback(request);
-        case END_CONNECTION:
-          return this.eraseEndConnectionFeedback(request);
-        case SELECT:
-          return this.eraseSelectFeedback(request);
-        default:
-          throw new Error('Unknown request type ' + request.type);
-      }
-    }
-  }, {
-    key: 'add',
-    value: function add() /* request */{}
-  }, {
-    key: 'move',
-    value: function move() /* request */{}
-  }, {
-    key: 'startConnection',
-    value: function startConnection() /* request */{}
-  }, {
-    key: 'endConnection',
-    value: function endConnection() /* request */{}
-  }, {
-    key: 'select',
-    value: function select() /* request */{}
-  }, {
-    key: 'delete',
-    value: function _delete() /* request */{}
-  }, {
-    key: 'requestAddFeedback',
-    value: function requestAddFeedback() /* request */{}
-  }, {
-    key: 'requestMoveFeedback',
-    value: function requestMoveFeedback() /* request */{}
-  }, {
-    key: 'requestStartConnectionFeedback',
-    value: function requestStartConnectionFeedback() /* request */{}
-  }, {
-    key: 'requestEndConnectionFeedback',
-    value: function requestEndConnectionFeedback() /* request */{}
-  }, {
-    key: 'requestSelectFeedback',
-    value: function requestSelectFeedback() /* request */{}
-  }, {
-    key: 'eraseAddFeedback',
-    value: function eraseAddFeedback() /* request */{}
-  }, {
-    key: 'eraseMoveFeedback',
-    value: function eraseMoveFeedback() /* request */{}
-  }, {
-    key: 'eraseStartConnectionFeedback',
-    value: function eraseStartConnectionFeedback() /* request */{}
-  }, {
-    key: 'eraseEndConnectionFeedback',
-    value: function eraseEndConnectionFeedback() /* request */{}
-  }, {
-    key: 'eraseSelectFeedback',
-    value: function eraseSelectFeedback() /* request */{}
-  }]);
-  return DispatchingEditPolicy;
-}(EditPolicy);
-
-var Capability = function () {
-  function Capability(engine) {
-    classCallCheck(this, Capability);
-
-    this.progress = false;
-    this.engine = engine;
-  }
-
-  createClass(Capability, [{
-    key: "onKeyDown",
-    value: function onKeyDown() {
-      // emtpy
-    }
-  }, {
-    key: "onKeyUp",
-    value: function onKeyUp() {
-      // empty
-    }
-  }, {
-    key: "onMouseDown",
-    value: function onMouseDown() {
-      // empty
-    }
-  }, {
-    key: "onMouseMove",
-    value: function onMouseMove() {
-      // empty
-    }
-  }, {
-    key: "onMouseUp",
-    value: function onMouseUp() {
-      // empty
-    }
-  }, {
-    key: "cancel",
-    value: function cancel() {
-      // empty
-    }
-  }]);
-  return Capability;
-}();
-
-var SelectionProvider = function () {
-  function SelectionProvider() {
-    classCallCheck(this, SelectionProvider);
-  }
-
-  createClass(SelectionProvider, [{
-    key: "selection",
-    value: function selection() {
-      return [];
-    }
-  }]);
-  return SelectionProvider;
-}();
-
-var DOM = Symbol('DOM');
-var COMPONENT = Symbol('COMPONENT');
-var USER_COMPONENT = Symbol('USER_COMPONENT');
-
-var ComponentWrapper = function () {
-  function ComponentWrapper(dom, component, userComponent) {
-    classCallCheck(this, ComponentWrapper);
-
-    this[DOM] = dom;
-    this[COMPONENT] = component;
-    this[USER_COMPONENT] = userComponent;
-  }
-
-  createClass(ComponentWrapper, [{
-    key: 'dom',
-    get: function get$$1() {
-      return this[DOM];
-    }
-  }, {
-    key: 'component',
-    get: function get$$1() {
-      return this[COMPONENT];
-    }
-  }, {
-    key: 'userComponent',
-    get: function get$$1() {
-      return this[USER_COMPONENT];
-    }
-  }]);
-  return ComponentWrapper;
-}();
-
-
-var fromComponent = function fromComponent(component) {
-  return new ComponentWrapper(reactDom.findDOMNode(component), component, component.userComponent);
-};
-
-var matches = function matches(target, wrapper) {
-  var userComponent = wrapper.userComponent,
-      dom = wrapper.dom,
-      component = wrapper.component;
-
-  return wrapper === target || userComponent === target || dom === target || component === target;
-};
-
-var watchRegister = function watchRegister(registry, target) {
-  return new Promise(function (resolve, reject) {
-    if (!registry || !target) {
-      reject(new Error('registry or target was falsy value'));
-      return;
-    }
-    if (registry.has(target)) {
-      resolve();
-      return;
-    }
-    var listener = function listener(wrapper) {
-      if (wrapper && matches(target, wrapper)) {
-        try {
-          resolve();
-        } catch (e) {
-          reject(e);
-        } finally {
-          registry.removeRegisterListener(listener);
-        }
-      }
+    EventManager.prototype.unhookListeners = function () {
+        document.removeEventListener('mousedown', this.onMouseDown);
+        document.removeEventListener('mousemove', this.onMouseMove);
+        document.removeEventListener('mouseup', this.onMouseUp);
+        document.removeEventListener('keydown', this.onKeyDown);
+        document.removeEventListener('keyup', this.onKeyUp);
+        this.hooked = false;
     };
-    registry.addRegisterListener(listener);
-  });
-};
+    EventManager.prototype.onKeyUp = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onKeyUp(e); });
+    };
+    EventManager.prototype.onKeyDown = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onKeyDown(e); });
+    };
+    EventManager.prototype.onMouseDown = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onMouseDown(e); });
+    };
+    EventManager.prototype.onMouseMove = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onMouseMove(e); });
+    };
+    EventManager.prototype.onMouseUp = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onMouseUp(e); });
+    };
+    return EventManager;
+}());
 
-var ComponentRegistry = function () {
-  function ComponentRegistry() {
-    classCallCheck(this, ComponentRegistry);
+var Toolkit = /** @class */ (function () {
+    function Toolkit(engine) {
+        this.engine = engine;
+    }
+    Toolkit.prototype.forPart = function (id) {
+        var part = this.engine.part(id);
+        if (part === null) {
+            throw new Error("DiagramPart " + id + " hasn't been registered.");
+        }
+        return part ? part.toolkit : null;
+    };
+    Toolkit.prototype.forComponent = function (component) {
+        var parts = this.engine.allParts();
+        for (var i = 0, length_1 = parts.length; i < length_1; i += 1) {
+            var part = parts[i];
+            if (part && part.registry.has(component)) {
+                return part.toolkit;
+            }
+        }
+        throw new Error("Component " + component + " is not registered in any DiagramParts.");
+    };
+    return Toolkit;
+}());
 
-    this.init();
-  }
-
-  createClass(ComponentRegistry, [{
-    key: 'init',
-    value: function init() {
-      this.mapping = new Map();
-      this.wrappers = new Set();
-      this.root = null;
-      this.registerListeners = [];
-      this.unregisterListeners = [];
+var DomHelper = /** @class */ (function () {
+    function DomHelper(engine) {
+        this.engine = engine;
     }
-  }, {
-    key: 'setRoot',
-    value: function setRoot(root) {
-      if (root && this.root) {
-        throw new Error('Diagram can only contain a single root. ' + this.root + ' is already registered.');
-      }
-      if (root) {
-        this.root = root;
-      } else {
-        this.init();
-      }
-    }
-  }, {
-    key: 'register',
-    value: function register(wrapper) {
-      if (!(wrapper instanceof ComponentWrapper)) {
-        throw new TypeError('ComponentWrapper instance expected, got ' + wrapper);
-      }
-      this.mapping.set(wrapper, wrapper);
-      this.mapping.set(wrapper.dom, wrapper);
-      this.mapping.set(wrapper.component, wrapper);
-      this.mapping.set(wrapper.userComponent, wrapper);
-      this.wrappers.add(wrapper);
-      this.registerListeners.forEach(function (listener) {
-        return listener(wrapper);
-      });
-    }
-  }, {
-    key: 'unregister',
-    value: function unregister(input) {
-      var wrapper = this.get(input);
-      if (wrapper !== undefined) {
-        this.mapping.delete(wrapper);
-        this.mapping.delete(wrapper.dom);
-        this.mapping.delete(wrapper.component);
-        this.mapping.delete(wrapper.userComponent);
-        this.wrappers.delete(wrapper);
-        this.unregisterListeners.forEach(function (listener) {
-          return listener(wrapper);
-        });
-      }
-    }
-  }, {
-    key: 'get',
-    value: function get$$1(input) {
-      return this.mapping.get(input);
-    }
-  }, {
-    key: 'all',
-    value: function all() {
-      return Array.from(this.wrappers);
-    }
-  }, {
-    key: 'has',
-    value: function has(input) {
-      return this.mapping.has(input);
-    }
-  }, {
-    key: 'addRegisterListener',
-    value: function addRegisterListener(listener) {
-      this.registerListeners.push(listener);
-    }
-  }, {
-    key: 'addUnregisterListener',
-    value: function addUnregisterListener(listener) {
-      this.unregisterListeners.push(listener);
-    }
-  }, {
-    key: 'removeRegisterListener',
-    value: function removeRegisterListener(listener) {
-      this.registerListeners = this.registerListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }, {
-    key: 'removeUnregisterListener',
-    value: function removeUnregisterListener(listener) {
-      this.unregisterListeners = this.unregisterListeners.filter(function (e) {
-        return e !== listener;
-      });
-    }
-  }]);
-  return ComponentRegistry;
-}();
-
-var REGISTRY = Symbol('REGISTRY');
-var DOM_HELPER$1 = Symbol('DOM_HELPER');
-
-var PartToolkit = function () {
-  function PartToolkit(registry, domHelper) {
-    classCallCheck(this, PartToolkit);
-
-    this[REGISTRY] = registry;
-    this[DOM_HELPER$1] = domHelper;
-  }
-
-  createClass(PartToolkit, [{
-    key: 'root',
-    value: function root() {
-      var root = this[REGISTRY].root;
-      if (root === undefined || root === null) {
-        throw new Error('No root component!');
-      }
-      return this[REGISTRY].root.component.userComponent;
-    }
-  }, {
-    key: 'parent',
-    value: function parent(component) {
-      var domHelper = this[DOM_HELPER$1];
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      } else if (wrapper === registry.root) {
+    DomHelper.prototype.findPart = function (dom, matcher) {
+        if (matcher === void 0) { matcher = function () { return true; }; }
+        var parts = this.engine.allParts();
+        for (var i = 0; i < parts.length; i += 1) {
+            var part = parts[i];
+            if (part.domHelper.partContains(dom)) {
+                return matcher(part) ? part : null;
+            }
+        }
         return null;
-      }
-      var parent = domHelper.findClosest(wrapper.dom.parentNode);
-      return parent === null ? null : parent.userComponent;
-    }
-  }, {
-    key: 'children',
-    value: function children(component) {
-      var registry = this[REGISTRY];
-      var domHelper = this[DOM_HELPER$1];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-      var domChildren = domHelper.findRelevantChildren(wrapper.dom);
-      var children = [];
-      for (var i = 0, length = domChildren.length; i < length; i += 1) {
-        var child = registry.get(domChildren[i]);
-        if (child !== undefined && child !== null) {
-          children.push(child.userComponent);
-        }
-      }
-      return children;
-    }
-  }, {
-    key: 'editPolicy',
-    value: function editPolicy(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
-      return wrapper.component.editPolicy;
-    }
-  }, {
-    key: 'ofType',
-    value: function ofType(type) {
-      var all = this[REGISTRY].all();
-      var ofType = [];
-      for (var i = 0, length = all.length; i < length; i += 1) {
-        var wrapper = all[i];
-        if (wrapper.component.type === type) {
-          ofType.push(wrapper.userComponent);
-        }
-      }
-      return ofType;
-    }
-  }, {
-    key: 'bounds',
-    value: function bounds(component) {
-      var registry = this[REGISTRY];
-      var wrapper = registry.get(component);
-      if (wrapper === undefined || wrapper === null) {
-        throw new Error('Given component is not part of the diagram!');
-      }
+    };
+    return DomHelper;
+}());
 
-      var _wrapper$dom$getBound = wrapper.dom.getBoundingClientRect(),
-          left = _wrapper$dom$getBound.left,
-          top = _wrapper$dom$getBound.top,
-          width = _wrapper$dom$getBound.width,
-          height = _wrapper$dom$getBound.height;
-
-      return regefGeometry.rectangle(left, top, width, height);
-    }
-  }]);
-  return PartToolkit;
-}();
-
-var PartDomHelper = function () {
-  function PartDomHelper(registry) {
-    classCallCheck(this, PartDomHelper);
-
-    this.registry = registry;
-  }
-
-  createClass(PartDomHelper, [{
-    key: "findClosest",
-    value: function findClosest(dom) {
-      var matcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
-        return true;
-      };
-
-      var root = this.registry.root.dom;
-      for (var it = dom; it !== null; it = it.parentNode) {
-        var wrapper = this.registry.get(it);
-        if (wrapper !== undefined && wrapper !== null) {
-          return matcher(wrapper) ? wrapper : null;
-        }
-        if (it === root) {
-          return null;
-        }
-      }
-      return null;
-    }
-  }, {
-    key: "findRelevantChildrenIntenal",
-    value: function findRelevantChildrenIntenal(node) {
-      var children = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      if (node !== null && node.hasChildNodes()) {
-        var childNodes = node.childNodes;
-        for (var i = 0, len = childNodes.length; i < len; i += 1) {
-          var childNode = childNodes[i];
-          if (this.registry.has(childNode)) {
-            children.push(childNode);
-          } else {
-            this.findRelevantChildrenIntenal(childNode, children);
-          }
-        }
-      }
-      return children;
-    }
-  }, {
-    key: "findRelevantChildren",
-    value: function findRelevantChildren(element) {
-      return this.findRelevantChildrenIntenal(element, []);
-    }
-  }, {
-    key: "findClosestParent",
-    value: function findClosestParent(element) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (element === this.registry.root.dom) {
-        return element;
-      }
-      return this.findClosestElement(element.parentNode, type);
-    }
-  }, {
-    key: "partContains",
-    value: function partContains(element) {
-      return this.registry.root.dom.contains(element);
-    }
-  }]);
-  return PartDomHelper;
-}();
-
-var ID = Symbol('id');
-var ENGINE = Symbol('ENGINE');
-var REGISTRY$1 = Symbol('REGISTRY');
-var TOOLKIT$1 = Symbol('TOOLKIT');
-var DOM_HELPER$2 = Symbol('DOM_HELPER');
-
-var DiagramPartWrapper = function () {
-  function DiagramPartWrapper(id, engine) {
-    classCallCheck(this, DiagramPartWrapper);
-
-    this[ID] = id;
-    this[ENGINE] = engine;
-
-    this[REGISTRY$1] = new ComponentRegistry();
-    this[DOM_HELPER$2] = new PartDomHelper(this.registry);
-    this[TOOLKIT$1] = new PartToolkit(this.registry, this[DOM_HELPER$2]);
-  }
-
-  createClass(DiagramPartWrapper, [{
-    key: 'id',
-    get: function get$$1() {
-      return this[ID];
-    }
-  }, {
-    key: 'registry',
-    get: function get$$1() {
-      return this[REGISTRY$1];
-    }
-  }, {
-    key: 'toolkit',
-    get: function get$$1() {
-      return this[TOOLKIT$1];
-    }
-  }, {
-    key: 'engine',
-    get: function get$$1() {
-      return this[ENGINE];
-    }
-  }, {
-    key: 'domHelper',
-    get: function get$$1() {
-      return this[DOM_HELPER$2];
-    }
-  }]);
-  return DiagramPartWrapper;
-}();
-
-var registryFrom = function registryFrom(_ref) {
-  var engine = _ref.engine,
-      id = _ref.id;
-
-  if (engine.__partsMap().has(id)) {
-    return engine.part(id).registry;
-  }
-  return null;
+var DefaultEngineConfig = {
+    capabilities: [],
+    editPolicies: [],
+    selectionProvider: null,
+    rootType: null,
+    types: [],
 };
+var Engine = /** @class */ (function () {
+    function Engine(config) {
+        if (config === void 0) { config = function () { return DefaultEngineConfig; }; }
+        this.toolkit = new Toolkit(this);
+        this.eventManager = new EventManager(this);
+        this.domHelper = new DomHelper(this);
+        this._parts = new Map();
+        var _a = config(this), capabilities = _a.capabilities, editPolicies = _a.editPolicies, selectionProvider = _a.selectionProvider, rootType = _a.rootType, types$$1 = _a.types;
+        this.capabilities = capabilities;
+        this.editPolicies = editPolicies;
+        this.selectionProvider = selectionProvider;
+        this.types = types$$1;
+        this.rootType = rootType;
+    }
+    /** @internal */
+    Engine.prototype.__partsMap = function () {
+        return this._parts;
+    };
+    Engine.prototype.part = function (id) {
+        return this._parts.get(id);
+    };
+    Engine.prototype.allParts = function () {
+        return Array.from(this._parts.values());
+    };
+    return Engine;
+}());
 
-var toolkitFrom = function toolkitFrom(_ref2) {
-  var engine = _ref2.engine,
-      id = _ref2.id;
-  return engine.__partsMap().has(id) ? engine.toolkit : null;
+var DiagramPart = /** @class */ (function (_super) {
+    __extends(DiagramPart, _super);
+    function DiagramPart() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DiagramPart.prototype.componentDidMount = function () {
+        var engine = this.props.engine;
+        if (!engine.eventManager.hooked) {
+            engine.eventManager.hookListeners();
+        }
+    };
+    DiagramPart.prototype.componentWillUnmount = function () {
+        var _a = this.props, id = _a.id, engine = _a.engine;
+        var parts = engine.__partsMap();
+        var part = parts.get(id);
+        if (part && part.registry) {
+            part.registry.setRoot(null);
+        }
+        parts.delete(id);
+        if (parts.size === 0) {
+            engine.eventManager.unhookListeners();
+        }
+    };
+    DiagramPart.prototype.render = function () {
+        var _a = this.props, id = _a.id, engine = _a.engine;
+        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, React.Children.only(this.props.children)));
+    };
+    DiagramPart.propTypes = {
+        engine: types.instanceOf(Engine).isRequired,
+        id: types.oneOfType([types.string, types.symbol]).isRequired,
+    };
+    return DiagramPart;
+}(React.PureComponent));
+
+var EditPolicy = /** @class */ (function () {
+    function EditPolicy() {
+    }
+    EditPolicy.prototype.perform = function (intent) { };
+    EditPolicy.prototype.requestFeedback = function (intent) { };
+    EditPolicy.prototype.eraseFeedback = function (intent) { };
+    return EditPolicy;
+}());
+
+var DispatchingEditPolicy = /** @class */ (function (_super) {
+    __extends(DispatchingEditPolicy, _super);
+    function DispatchingEditPolicy() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DispatchingEditPolicy.prototype.perform = function (intent) {
+        var type = intent.type;
+        switch (intent.type) {
+            case exports.IntentType.ADD:
+                return this.add(intent);
+            case exports.IntentType.MOVE:
+                return this.move(intent);
+            case exports.IntentType.START_CONNECTION:
+                return this.startConnection(intent);
+            case exports.IntentType.END_CONNECTION:
+                return this.endConnection(intent);
+            case exports.IntentType.SELECT:
+                return this.select(intent);
+            case exports.IntentType.DELETE:
+                return this.delete(intent);
+            default:
+                throw new Error("Unknown intent type " + type);
+        }
+    };
+    DispatchingEditPolicy.prototype.requestFeedback = function (intent) {
+        switch (intent.type) {
+            case exports.IntentType.ADD:
+                return this.requestAddFeedback(intent);
+            case exports.IntentType.MOVE:
+                return this.requestMoveFeedback(intent);
+            case exports.IntentType.START_CONNECTION:
+                return this.requestStartConnectionFeedback(intent);
+            case exports.IntentType.END_CONNECTION:
+                return this.requestEndConnectionFeedback(intent);
+            case exports.IntentType.SELECT:
+                return this.requestSelectFeedback(intent);
+            default:
+                throw new Error("Unknown intent type " + intent.type);
+        }
+    };
+    DispatchingEditPolicy.prototype.eraseFeedback = function (intent) {
+        switch (intent.type) {
+            case exports.IntentType.ADD:
+                return this.eraseAddFeedback(intent);
+            case exports.IntentType.MOVE:
+                return this.eraseMoveFeedback(intent);
+            case exports.IntentType.START_CONNECTION:
+                return this.eraseStartConnectionFeedback(intent);
+            case exports.IntentType.END_CONNECTION:
+                return this.eraseEndConnectionFeedback(intent);
+            case exports.IntentType.SELECT:
+                return this.eraseSelectFeedback(intent);
+            default:
+                throw new Error("Unknown intent type " + intent.type);
+        }
+    };
+    DispatchingEditPolicy.prototype.add = function (intent) { };
+    DispatchingEditPolicy.prototype.move = function (intent) { };
+    DispatchingEditPolicy.prototype.startConnection = function (intent) { };
+    DispatchingEditPolicy.prototype.endConnection = function (intent) { };
+    DispatchingEditPolicy.prototype.select = function (intent) { };
+    DispatchingEditPolicy.prototype.delete = function (intent) { };
+    DispatchingEditPolicy.prototype.requestAddFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestMoveFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestStartConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestEndConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestSelectFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseAddFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseMoveFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseStartConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseEndConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseSelectFeedback = function (intent) { };
+    return DispatchingEditPolicy;
+}(EditPolicy));
+
+var Capability = /** @class */ (function () {
+    function Capability(engine, config) {
+        this.progress = false;
+        this.engine = engine;
+        this.config = config;
+    }
+    Capability.prototype.onKeyDown = function (e) {
+        // emtpy
+    };
+    Capability.prototype.onKeyUp = function (e) {
+        // empty
+    };
+    Capability.prototype.onMouseDown = function (e) {
+        // empty
+    };
+    Capability.prototype.onMouseMove = function (e) {
+        // empty
+    };
+    Capability.prototype.onMouseUp = function (e) {
+        // empty
+    };
+    Capability.prototype.cancel = function () {
+        // empty
+    };
+    return Capability;
+}());
+
+var SelectionProvider = /** @class */ (function () {
+    function SelectionProvider() {
+    }
+    SelectionProvider.prototype.selection = function () {
+        return [];
+    };
+    return SelectionProvider;
+}());
+
+var ComponentWrapper = /** @class */ (function () {
+    function ComponentWrapper(dom, component, userComponent) {
+        this.dom = dom;
+        this.component = component;
+        this.userComponent = userComponent;
+    }
+    return ComponentWrapper;
+}());
+function fromComponent(component) {
+    return new ComponentWrapper(ReactDOM.findDOMNode(component), component, component.userComponent);
+}
+
+var matches = function (target, wrapper) {
+    var userComponent = wrapper.userComponent, dom = wrapper.dom, component = wrapper.component;
+    return wrapper === target || userComponent === target || dom === target || component === target;
 };
-
-var ensurePartRegistered = function ensurePartRegistered(_ref3) {
-  var engine = _ref3.engine,
-      id = _ref3.id;
-
-  var parts = engine.__partsMap();
-  if (!parts.has(id)) {
-    parts.set(id, new DiagramPartWrapper(id, engine));
-  }
-};
-
-function toolkitResolver(comp, context) {
-  ensurePartRegistered(context);
-  return function () {
-    return watchRegister(registryFrom(context), comp).then(function () {
-      return toolkitFrom(context);
+/** @internal */
+var watchRegister = function (registry, target) {
+    return new Promise(function (resolve, reject) {
+        if (!registry || !target) {
+            reject(new Error('registry or target was falsy value'));
+            return;
+        }
+        if (registry.has(target)) {
+            resolve();
+            return;
+        }
+        var listener = function (wrapper) {
+            if (wrapper && matches(target, wrapper)) {
+                try {
+                    resolve();
+                }
+                catch (e) {
+                    reject(e);
+                }
+                finally {
+                    registry.removeRegisterListener(listener);
+                }
+            }
+        };
+        registry.addRegisterListener(listener);
     });
-  };
-}
-
-var defaultActivate = function defaultActivate(comp, context) {
-  ensurePartRegistered(context);
-  registryFrom(context).register(fromComponent(comp));
 };
 
-var defaultDecativate = function defaultDecativate(comp, context) {
-  var registry = registryFrom(context);
-  if (registry) {
-    registry.unregister(comp);
-  }
-};
-
-var rootActivate = function rootActivate(comp, context) {
-  defaultActivate(comp, context);
-  var registry = registryFrom(context);
-  registry.setRoot(registry.get(comp));
-};
-
-var rootDeactivate = function rootDeactivate(comp, context) {
-  defaultDecativate(comp, context);
-  var registry = registryFrom(context);
-  if (registry) {
-    registry.setRoot(null);
-  }
-};
-
-var getEngine = function getEngine(comp) {
-  return comp.props[REGEF_PROP_KEY].engine;
-};
-
-function component(type) {
-  return function DecoratedDiagramComponent(Wrapped) {
-    var DecoratedComponent = function (_PureComponent) {
-      inherits(DecoratedComponent, _PureComponent);
-
-      function DecoratedComponent(props) {
-        classCallCheck(this, DecoratedComponent);
-
-        var _this = possibleConstructorReturn(this, (DecoratedComponent.__proto__ || Object.getPrototypeOf(DecoratedComponent)).call(this, props));
-
-        var regef = props[REGEF_PROP_KEY];
-        _this.userComponent = null;
-        _this.type = type;
-        _this.childProps = { toolkit: toolkitResolver(_this, regef)
-          // binding methods
-        };_this.setUserComponent = _this.setUserComponent.bind(_this);
-        var types = regef.engine.types;
-        if (types.indexOf(type) < 0) {
-          var typesStr = types.map(function (tpe) {
-            return '"' + tpe + '"';
-          }).join(',');
-          throw new TypeError('Not a valid component type "' + type + '". Please select one from ' + typesStr + ', or add "' + type + '" to the engine\'s "types" array.');
-        }
-        return _this;
-      }
-
-      createClass(DecoratedComponent, [{
-        key: 'setUserComponent',
-        value: function setUserComponent(ref) {
-          this.userComponent = ref;
-        }
-      }, {
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-          var engine = getEngine(this);
-          var context = this.props[REGEF_PROP_KEY];
-          if (this.type === engine.rootType) {
-            rootActivate(this, context);
-          } else {
-            defaultActivate(this, context);
-          }
-        }
-      }, {
-        key: 'componentWillUnmount',
-        value: function componentWillUnmount() {
-          var engine = getEngine(this);
-          var context = this.props[REGEF_PROP_KEY];
-          if (this.type === engine.rootType) {
-            rootDeactivate(this, context);
-          } else {
-            defaultDecativate(this, context);
-          }
-        }
-      }, {
-        key: 'render',
-        value: function render() {
-          var _props = this.props,
-              children = _props.children,
-              rest = objectWithoutProperties(_props, ['children']);
-
-          return React__default.createElement(
-            Wrapped,
-            _extends({}, rest, { ref: this.setUserComponent, regef: this.childProps }),
-            children
-          );
-        }
-      }]);
-      return DecoratedComponent;
-    }(React.PureComponent);
-
-    return withRegefContext(DecoratedComponent);
-  };
-}
-
-var matchesSingleType = function matchesSingleType(type) {
-  return function (_ref) {
-    var component = _ref.component;
-    return component.type === type;
-  };
-};
-
-var matchesMultiTypes = function matchesMultiTypes(types) {
-  return function (_ref2) {
-    var component = _ref2.component;
-    return types.indexOf(component.type) >= 0;
-  };
-};
-
-var matchesSinglePart = function matchesSinglePart(partId) {
-  return function (part) {
-    return part.id === partId;
-  };
-};
-
-var matchesMultiParts = function matchesMultiParts(partIds) {
-  return function (part) {
-    return partIds.indexOf(part.id) >= 0;
-  };
-};
-
-var alwaysTrue = function alwaysTrue() {
-  return true;
-};
-
-var getSelection = function getSelection(engine) {
-  if (engine && engine.selectionProvider instanceof SelectionProvider) {
-    return engine.selectionProvider.selection();
-  }
-  return [];
-};
-
-var typeMatches = function typeMatches(types) {
-  if (types === null || types === undefined) {
-    return alwaysTrue;
-  } else if (Array.isArray(types)) {
-    return matchesMultiTypes(types);
-  }
-  return matchesSingleType(types);
-};
-
-var partMatches = function partMatches(ids) {
-  if (ids === null || ids === undefined) {
-    return alwaysTrue;
-  } else if (Array.isArray(ids)) {
-    return matchesMultiParts(ids);
-  }
-  return matchesSinglePart(ids);
-};
-
-var onEachPolicy = function onEachPolicy(callback) {
-  return function (policies, intent) {
-    if (Array.isArray(policies) && intent && intent.type) {
-      for (var i = 0; i < policies.length; i += 1) {
-        callback(policies[i], intent);
-      }
+var ComponentRegistry = /** @class */ (function () {
+    function ComponentRegistry() {
+        this.registerListeners = [];
+        this.unregisterListeners = [];
+        this.init();
     }
-  };
-};
+    ComponentRegistry.prototype.init = function () {
+        this.mapping = new Map();
+        this.wrappers = new Set();
+        this.root = null;
+        this.registerListeners = [];
+        this.unregisterListeners = [];
+    };
+    ComponentRegistry.prototype.setRoot = function (root) {
+        if (root && this.root) {
+            throw new Error("Diagram can only contain a single root. " + this.root + " is already registered.");
+        }
+        if (root) {
+            this.root = root;
+        }
+        else {
+            this.init();
+        }
+    };
+    ComponentRegistry.prototype.register = function (wrapper) {
+        if (!(wrapper instanceof ComponentWrapper)) {
+            throw new TypeError("ComponentWrapper instance expected, got " + wrapper);
+        }
+        this.mapping.set(wrapper, wrapper);
+        this.mapping.set(wrapper.dom, wrapper);
+        this.mapping.set(wrapper.component, wrapper);
+        this.mapping.set(wrapper.userComponent, wrapper);
+        this.wrappers.add(wrapper);
+        this.registerListeners.forEach(function (listener) { return listener(wrapper); });
+    };
+    ComponentRegistry.prototype.unregister = function (input) {
+        var wrapper = this.get(input);
+        if (wrapper !== undefined) {
+            this.mapping.delete(wrapper);
+            this.mapping.delete(wrapper.dom);
+            this.mapping.delete(wrapper.component);
+            this.mapping.delete(wrapper.userComponent);
+            this.wrappers.delete(wrapper);
+            this.unregisterListeners.forEach(function (listener) { return listener(wrapper); });
+        }
+    };
+    ComponentRegistry.prototype.get = function (input) {
+        return this.mapping.get(input);
+    };
+    ComponentRegistry.prototype.all = function () {
+        return Array.from(this.wrappers);
+    };
+    ComponentRegistry.prototype.has = function (input) {
+        return this.mapping.has(input);
+    };
+    ComponentRegistry.prototype.addRegisterListener = function (listener) {
+        this.registerListeners.push(listener);
+    };
+    ComponentRegistry.prototype.addUnregisterListener = function (listener) {
+        this.unregisterListeners.push(listener);
+    };
+    ComponentRegistry.prototype.removeRegisterListener = function (listener) {
+        this.registerListeners = this.registerListeners.filter(function (e) { return e !== listener; });
+    };
+    ComponentRegistry.prototype.removeUnregisterListener = function (listener) {
+        this.unregisterListeners = this.unregisterListeners.filter(function (e) { return e !== listener; });
+    };
+    return ComponentRegistry;
+}());
 
-var perform = onEachPolicy(function (policy, intent) {
-  return policy.perform(intent);
-});
-var requestFeedback = onEachPolicy(function (policy, intent) {
-  return policy.requestFeedback(intent);
-});
-var eraseFeedback = onEachPolicy(function (policy, intent) {
-  return policy.eraseFeedback(intent);
-});
-
-var getParts = function getParts(engine) {
-  var ids = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-  if (ids === null || ids === undefined) {
-    return engine.parts;
-  }
-  return ids.map(function (id) {
-    return engine.part(id);
-  });
-};
-
-// https://stackoverflow.com/a/12737882/1126273
-var isLeftButton = function isLeftButton(e) {
-  if ('buttons' in e) {
-    return e.buttons === 1;
-  } else if ('which' in e) {
-    return e.which === 1;
-  }
-  return e.button === 1;
-};
-
-var buildOffset = function buildOffset(_ref, element) {
-  var clientX = _ref.clientX,
-      clientY = _ref.clientY;
-
-  var _element$getBoundingC = element.getBoundingClientRect(),
-      x = _element$getBoundingC.x,
-      y = _element$getBoundingC.y;
-
-  return regefGeometry.point(clientX - x, clientY - y);
-};
-
-var DEFAULT_CONFIG = {
-  parts: null,
-  draggables: [],
-  hosts: []
-};
-
-var DragCapability = function (_Capability) {
-  inherits(DragCapability, _Capability);
-
-  function DragCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, DragCapability);
-
-    var _this = possibleConstructorReturn(this, (DragCapability.__proto__ || Object.getPrototypeOf(DragCapability)).call(this, engine));
-
-    _this.config = _extends({}, DEFAULT_CONFIG, config);
-    _this.init();
-    return _this;
-  }
-
-  createClass(DragCapability, [{
-    key: 'init',
-    value: function init() {
-      this.progress = false;
-      this.target = null;
-      this.lastTargetParent = null;
-      this.targetParent = null;
-      this.currentParent = null;
-      this.coordinates = null;
-      this.offset = null;
-      this.lastRequest = null;
-      this.mouseMoved = false;
-      this.startLocation = null;
+var PartToolkit = /** @class */ (function () {
+    function PartToolkit(registry, domHelper) {
+        this.registry = registry;
+        this.domHelper = domHelper;
     }
-  }, {
-    key: 'findTargetedParent',
-    value: function findTargetedParent(eventTarget, part) {
-      var _this2 = this;
+    PartToolkit.prototype.root = function () {
+        var root = this.registry.root;
+        if (root === undefined || root === null) {
+            throw new Error('No root component!');
+        }
+        return this.registry.root.userComponent;
+    };
+    PartToolkit.prototype.parent = function (component) {
+        var domHelper = this.domHelper;
+        var registry = this.registry;
+        var wrapper = registry.get(component);
+        if (wrapper === undefined || wrapper === null) {
+            throw new Error('Given component is not part of the diagram!');
+        }
+        else if (wrapper === registry.root) {
+            return null;
+        }
+        var parent = domHelper.findClosest(wrapper.dom.parentNode);
+        return parent === null ? null : parent.userComponent;
+    };
+    PartToolkit.prototype.children = function (component) {
+        var registry = this.registry;
+        var domHelper = this.domHelper;
+        var wrapper = registry.get(component);
+        if (wrapper === undefined || wrapper === null) {
+            throw new Error('Given component is not part of the diagram!');
+        }
+        var domChildren = domHelper.findRelevantChildren(wrapper.dom);
+        var children = [];
+        for (var i = 0, length_1 = domChildren.length; i < length_1; i += 1) {
+            var child = registry.get(domChildren[i]);
+            if (child !== undefined && child !== null) {
+                children.push(child.userComponent);
+            }
+        }
+        return children;
+    };
+    PartToolkit.prototype.ofType = function (type) {
+        var all = this.registry.all();
+        var ofType = [];
+        for (var i = 0, length_2 = all.length; i < length_2; i += 1) {
+            var wrapper = all[i];
+            if (wrapper.component.type === type) {
+                ofType.push(wrapper.userComponent);
+            }
+        }
+        return ofType;
+    };
+    PartToolkit.prototype.bounds = function (component) {
+        var registry = this.registry;
+        var wrapper = registry.get(component);
+        if (wrapper === undefined || wrapper === null) {
+            throw new Error('Given component is not part of the diagram!');
+        }
+        var _a = wrapper.dom.getBoundingClientRect(), left = _a.left, top = _a.top, width = _a.width, height = _a.height;
+        return regefGeometry.rectangle(left, top, width, height);
+    };
+    return PartToolkit;
+}());
 
-      var target = this.target,
-          currentParent = this.currentParent;
-
-      if (!part) {
+var PartDomHelper = /** @class */ (function () {
+    function PartDomHelper(registry) {
+        this.registry = registry;
+    }
+    PartDomHelper.prototype.findClosest = function (dom, matcher) {
+        if (matcher === void 0) { matcher = function () { return true; }; }
+        var root = this.registry.root.dom;
+        for (var it = dom; it !== null; it = it.parentNode) {
+            var wrapper = this.registry.get(it);
+            if (wrapper !== undefined && wrapper !== null) {
+                return matcher(wrapper) ? wrapper : null;
+            }
+            if (it === root) {
+                return null;
+            }
+        }
         return null;
-      }
-      var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(this.config.hosts));
-      if (newTarget === null || newTarget === target || target !== null && target.dom.contains(newTarget.dom)) {
-        return currentParent;
-      }
-      var selection = getSelection(this.engine);
-      var affectedParts = selection.map(function (comp) {
-        return _this2.engine.toolkit.forComponent(comp);
-      });
-      if (new Set(affectedParts).size !== 1) {
+    };
+    PartDomHelper.prototype.findRelevantChildrenIntenal = function (node, children) {
+        if (children === void 0) { children = []; }
+        if (node !== null && node.hasChildNodes()) {
+            var childNodes = node.childNodes;
+            for (var i = 0, len = childNodes.length; i < len; i += 1) {
+                var childNode = childNodes[i];
+                if (this.registry.has(childNode)) {
+                    children.push(childNode);
+                }
+                else {
+                    this.findRelevantChildrenIntenal(childNode, children);
+                }
+            }
+        }
+        return children;
+    };
+    PartDomHelper.prototype.findRelevantChildren = function (element) {
+        return this.findRelevantChildrenIntenal(element, []);
+    };
+    PartDomHelper.prototype.partContains = function (element) {
+        return this.registry.root.dom.contains(element);
+    };
+    return PartDomHelper;
+}());
+
+var DiagramPartWrapper = /** @class */ (function () {
+    function DiagramPartWrapper(id, engine) {
+        this.id = id;
+        this.engine = engine;
+        this.registry = new ComponentRegistry();
+        this.domHelper = new PartDomHelper(this.registry);
+        this.toolkit = new PartToolkit(this.registry, this.domHelper);
+    }
+    return DiagramPartWrapper;
+}());
+
+/** @internal */
+function registryFrom(_a) {
+    var engine = _a.engine, id = _a.id;
+    if (engine.__partsMap().has(id)) {
+        return engine.part(id).registry;
+    }
+    return null;
+}
+/** @internal */
+function toolkitFrom(_a) {
+    var engine = _a.engine, id = _a.id;
+    return engine.__partsMap().has(id) ? engine.toolkit : null;
+}
+/** @internal */
+function ensurePartRegistered(_a) {
+    var engine = _a.engine, id = _a.id;
+    var parts = engine.__partsMap();
+    if (!parts.has(id)) {
+        parts.set(id, new DiagramPartWrapper(id, engine));
+    }
+}
+/** @internal */
+function toolkitResolver(comp, context) {
+    ensurePartRegistered(context);
+    return function () { return watchRegister(registryFrom(context), comp).then(function () { return toolkitFrom(context); }); };
+}
+/** @internal */
+function defaultActivate(comp, context) {
+    ensurePartRegistered(context);
+    registryFrom(context).register(fromComponent(comp));
+}
+/** @internal */
+function defaultDecativate(comp, context) {
+    var registry = registryFrom(context);
+    if (registry) {
+        registry.unregister(comp);
+    }
+}
+/** @internal */
+function rootActivate(comp, context) {
+    defaultActivate(comp, context);
+    var registry = registryFrom(context);
+    registry.setRoot(registry.get(comp));
+}
+/** @internal */
+function rootDeactivate(comp, context) {
+    defaultDecativate(comp, context);
+    var registry = registryFrom(context);
+    if (registry) {
+        registry.setRoot(null);
+    }
+}
+/** @internal */
+function getEngine(comp) {
+    return comp.props[REGEF_PROP_KEY].engine;
+}
+function component(type) {
+    return function componentDecorator(Wrapped) {
+        var DecoratedComponent = /** @class */ (function (_super) {
+            __extends(DecoratedComponent, _super);
+            function DecoratedComponent(props) {
+                var _this = _super.call(this, props) || this;
+                _this.setUserComponent = function (ref) {
+                    _this.userComponent = ref;
+                };
+                var context = _this.getRegefContext();
+                _this.userComponent = null;
+                _this.type = type;
+                _this.childProps = { toolkit: toolkitResolver(_this, context) };
+                var types$$1 = context.engine.types;
+                if (types$$1.indexOf(type) < 0) {
+                    var typesStr = types$$1.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
+                    throw new TypeError("Not a valid component type \"" + type + "\". Please select one from " + typesStr + ", or add \"" + type + "\" to the engine's \"types\" array.");
+                }
+                return _this;
+            }
+            DecoratedComponent.prototype.componentDidMount = function () {
+                var engine = getEngine(this);
+                if (this.type === engine.rootType) {
+                    rootActivate(this, this.getRegefContext());
+                }
+                else {
+                    defaultActivate(this, this.getRegefContext());
+                }
+            };
+            DecoratedComponent.prototype.componentWillUnmount = function () {
+                var engine = getEngine(this);
+                if (this.type === engine.rootType) {
+                    rootDeactivate(this, this.getRegefContext());
+                }
+                else {
+                    defaultDecativate(this, this.getRegefContext());
+                }
+            };
+            DecoratedComponent.prototype.getRegefContext = function () {
+                return this.props[REGEF_PROP_KEY];
+            };
+            DecoratedComponent.prototype.render = function () {
+                var _a = this.props, children = _a.children, rest = __rest(_a, ["children"]);
+                return (React.createElement(Wrapped, __assign({}, rest, { ref: this.setUserComponent, regef: this.childProps }), children));
+            };
+            return DecoratedComponent;
+        }(React.PureComponent));
+        return withRegefContext(DecoratedComponent);
+    };
+}
+
+function matchesSingleType(type) {
+    return function (_a) {
+        var component = _a.component;
+        return component.type === type;
+    };
+}
+function matchesMultiTypes(types$$1) {
+    return function (_a) {
+        var component = _a.component;
+        return types$$1.indexOf(component.type) >= 0;
+    };
+}
+function matchesSinglePart(partId) {
+    return function (part) { return part.id === partId; };
+}
+function matchesMultiParts(partIds) {
+    return function (part) { return partIds.indexOf(part.id) >= 0; };
+}
+function alwaysTrue() {
+    return true;
+}
+function getSelection(engine) {
+    if (engine && engine.selectionProvider instanceof SelectionProvider) {
+        return engine.selectionProvider.selection();
+    }
+    return [];
+}
+function typeMatches(types$$1) {
+    if (types$$1 === null || types$$1 === undefined) {
+        return alwaysTrue;
+    }
+    else if (Array.isArray(types$$1)) {
+        return matchesMultiTypes(types$$1);
+    }
+    return matchesSingleType(types$$1);
+}
+function partMatches(ids) {
+    if (ids === null || ids === undefined) {
+        return alwaysTrue;
+    }
+    else if (Array.isArray(ids)) {
+        return matchesMultiParts(ids);
+    }
+    return matchesSinglePart(ids);
+}
+function onEachPolicy(callback) {
+    return function (policies, intent) {
+        if (Array.isArray(policies) && intent && intent.type) {
+            for (var i = 0; i < policies.length; i += 1) {
+                callback(policies[i], intent);
+            }
+        }
+    };
+}
+var perform = onEachPolicy(function (policy, intent) { return policy.perform(intent); });
+var requestFeedback = onEachPolicy(function (policy, intent) { return policy.requestFeedback(intent); });
+var eraseFeedback = onEachPolicy(function (policy, intent) { return policy.eraseFeedback(intent); });
+function getParts(engine, ids) {
+    if (ids === void 0) { ids = null; }
+    if (ids === null || ids === undefined) {
+        return engine.allParts();
+    }
+    return ids.map(function (id) { return engine.part(id); });
+}
+// https://stackoverflow.com/a/12737882/1126273
+function isLeftButton(e) {
+    if ('buttons' in e) {
+        return e.buttons === 1;
+    }
+    else if ('which' in e) {
+        return e.which === 1;
+    }
+    return e.button === 1;
+}
+
+function buildOffset(_a, element) {
+    var clientX = _a.clientX, clientY = _a.clientY;
+    var _b = element.getBoundingClientRect(), left = _b.left, top = _b.top;
+    return regefGeometry.point(clientX - left, clientY - top);
+}
+var DEFAULT_CONFIG = {
+    parts: null,
+    draggables: [],
+    hosts: [],
+};
+var DragCapability = /** @class */ (function (_super) {
+    __extends(DragCapability, _super);
+    function DragCapability(engine, config) {
+        if (config === void 0) { config = {}; }
+        var _this = _super.call(this, engine, __assign({}, DEFAULT_CONFIG, config)) || this;
+        _this.init();
+        return _this;
+    }
+    DragCapability.prototype.init = function () {
+        this.progress = false;
+        this.target = null;
+        this.lastTargetParent = null;
+        this.targetParent = null;
+        this.currentParent = null;
+        this.coordinates = null;
+        this.offset = null;
+        this.lastRequest = null;
+        this.mouseMoved = false;
+        this.startLocation = null;
+    };
+    DragCapability.prototype.findTargetedParent = function (eventTarget, part) {
+        var _this = this;
+        var _a = this, target = _a.target, currentParent = _a.currentParent;
+        if (!part) {
+            return null;
+        }
+        var newTarget = part.domHelper.findClosest(eventTarget, typeMatches(this.config.hosts));
+        if (newTarget === null ||
+            newTarget === target ||
+            (target !== null && target.dom.contains(newTarget.dom))) {
+            return currentParent;
+        }
+        var selection = getSelection(this.engine);
+        var affectedParts = selection.map(function (comp) { return _this.engine.toolkit.forComponent(comp); });
+        if (new Set(affectedParts).size !== 1) {
+            return newTarget;
+        }
+        var affectedParents = selection.map(function (comp, i) { return affectedParts[i].parent(comp); });
+        if (new Set(affectedParents).size !== 1) {
+            return newTarget;
+        }
+        var targets = [newTarget.userComponent, target.userComponent];
+        if (targets.every(function (userComponent) { return selection.indexOf(userComponent) >= 0; })) {
+            return currentParent;
+        }
         return newTarget;
-      }
-      var affectedParents = selection.map(function (comp, i) {
-        return affectedParts[i].toolkit.parent(comp);
-      });
-      if (new Set(affectedParents).size !== 1) {
-        return newTarget;
-      }
-      var targets = [newTarget.userComponent, target.userComponent];
-      if (targets.every(function (userComponent) {
-        return selection.indexOf(userComponent) >= 0;
-      })) {
-        return currentParent;
-      }
-      return newTarget;
-    }
-  }, {
-    key: 'deltaCoordinates',
-    value: function deltaCoordinates(_ref2) {
-      var clientX = _ref2.clientX,
-          clientY = _ref2.clientY;
-
-      return regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
-    }
-  }, {
-    key: 'screenCoordinates',
-    value: function screenCoordinates(_ref3) {
-      var clientX = _ref3.clientX,
-          clientY = _ref3.clientY;
-
-      return regefGeometry.point(clientX, clientY);
-    }
-  }, {
-    key: 'offsetCoordinates',
-    value: function offsetCoordinates() {
-      return this.offset;
-    }
-  }, {
-    key: 'locationCoordinates',
-    value: function locationCoordinates(_ref4) {
-      var clientX = _ref4.clientX,
-          clientY = _ref4.clientY;
-
-      return regefGeometry.point(clientX, clientY);
-    }
-  }, {
-    key: 'updateCoordinates',
-    value: function updateCoordinates(e, part) {
-      this.coordinates = {
-        offset: this.offsetCoordinates(),
-        delta: this.deltaCoordinates(e),
-        location: this.locationCoordinates(e, part)
-      };
-    }
-  }, {
-    key: 'updateParents',
-    value: function updateParents(e, part) {
-      var newTargetParent = this.findTargetedParent(e.target, part);
-      var targetParent = this.targetParent;
-      if (targetParent !== newTargetParent) {
-        this.lastTargetParent = targetParent;
-        this.targetParent = newTargetParent;
-      } else {
-        this.lastTargetParent = targetParent;
-      }
-    }
-  }, {
-    key: 'getMovedComponents',
-    value: function getMovedComponents() {
-      var target = this.target.userComponent;
-      var selection = getSelection(this.engine);
-      if (selection.indexOf(target) >= 0) {
-        return selection;
-      }
-      return [target];
-    }
-  }, {
-    key: 'getMoveChildRequest',
-    value: function getMoveChildRequest() {
-      return _extends({
-        type: MOVE,
-        components: this.getMovedComponents(),
-        container: this.currentParent.component.userComponent
-      }, this.coordinates);
-    }
-  }, {
-    key: 'getAddChildRequest',
-    value: function getAddChildRequest() {
-      var targetParent = this.targetParent,
-          currentParent = this.currentParent;
-
-      return _extends({
-        type: ADD,
-        components: this.getMovedComponents(),
-        targetContainer: targetParent === null ? null : targetParent.component.userComponent,
-        container: currentParent.component.userComponent
-      }, this.coordinates);
-    }
-  }, {
-    key: 'getSelectionRequest',
-    value: function getSelectionRequest() {
-      var startLocation = this.startLocation,
-          target = this.target;
-
-      return {
-        type: SELECT,
-        bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
-        startLocation: startLocation,
-        endLocation: startLocation,
-        selection: [target.userComponent]
-      };
-    }
-  }, {
-    key: 'handleFeedback',
-    value: function handleFeedback(lastRequest, request) {
-      var lastTargetParent = this.lastTargetParent,
-          targetParent = this.targetParent;
-
-      if (lastRequest !== null && lastTargetParent !== targetParent) {
-        eraseFeedback(this.engine.editPolicies, lastRequest);
-      }
-      if (request !== null) {
-        requestFeedback(this.engine.editPolicies, request);
-      }
-    }
-  }, {
-    key: 'buildDragRequest',
-    value: function buildDragRequest(e) {
-      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-
-      this.updateParents(e, part);
-      this.updateCoordinates(e, part);
-
-      var currentParent = this.currentParent,
-          targetParent = this.targetParent;
-
-
-      if (currentParent === targetParent) {
-        return this.getMoveChildRequest();
-      } else if (currentParent !== targetParent) {
-        return this.getAddChildRequest();
-      }
-      return null;
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      if (this.progress) {
-        if (this.lastRequest !== null && this.targetParent !== null) {
-          eraseFeedback(this.engine.editPolicies, this.lastRequest);
+    };
+    DragCapability.prototype.deltaCoordinates = function (_a) {
+        var clientX = _a.clientX, clientY = _a.clientY;
+        return regefGeometry.point(clientX - this.startLocation.x, clientY - this.startLocation.y);
+    };
+    DragCapability.prototype.offsetCoordinates = function () {
+        return this.offset;
+    };
+    DragCapability.prototype.locationCoordinates = function (_a) {
+        var clientX = _a.clientX, clientY = _a.clientY;
+        return regefGeometry.point(clientX, clientY);
+    };
+    DragCapability.prototype.updateCoordinates = function (e) {
+        this.coordinates = {
+            offset: this.offsetCoordinates(),
+            delta: this.deltaCoordinates(e),
+            location: this.locationCoordinates(e),
+        };
+    };
+    DragCapability.prototype.updateParents = function (e, part) {
+        var newTargetParent = this.findTargetedParent(e.target, part);
+        var targetParent = this.targetParent;
+        if (targetParent !== newTargetParent) {
+            this.lastTargetParent = targetParent;
+            this.targetParent = newTargetParent;
+        }
+        else {
+            this.lastTargetParent = targetParent;
+        }
+    };
+    DragCapability.prototype.getMovedComponents = function () {
+        var target = this.target.userComponent;
+        var selection = getSelection(this.engine);
+        if (selection.indexOf(target) >= 0) {
+            return selection;
+        }
+        return [target];
+    };
+    DragCapability.prototype.getMoveChildRequest = function () {
+        return __assign({ type: exports.IntentType.MOVE, components: this.getMovedComponents(), container: this.currentParent.component.userComponent }, this.coordinates);
+    };
+    DragCapability.prototype.getAddChildRequest = function () {
+        var _a = this, targetParent = _a.targetParent, currentParent = _a.currentParent;
+        return __assign({ type: exports.IntentType.ADD, components: this.getMovedComponents(), targetContainer: targetParent === null ? null : targetParent.component.userComponent, container: currentParent.component.userComponent }, this.coordinates);
+    };
+    DragCapability.prototype.getSelectionRequest = function () {
+        var _a = this, startLocation = _a.startLocation, target = _a.target;
+        return {
+            type: exports.IntentType.SELECT,
+            bounds: regefGeometry.rectangle(startLocation, regefGeometry.dimension(0, 0)),
+            startLocation: startLocation,
+            endLocation: startLocation,
+            selection: [target.userComponent],
+        };
+    };
+    DragCapability.prototype.handleFeedback = function (lastRequest, request) {
+        var _a = this, lastTargetParent = _a.lastTargetParent, targetParent = _a.targetParent;
+        if (lastRequest !== null && lastTargetParent !== targetParent) {
+            eraseFeedback(this.engine.editPolicies, lastRequest);
+        }
+        if (request !== null) {
+            requestFeedback(this.engine.editPolicies, request);
+        }
+    };
+    DragCapability.prototype.buildDragRequest = function (e) {
+        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        this.updateParents(e, part);
+        this.updateCoordinates(e);
+        var _a = this, currentParent = _a.currentParent, targetParent = _a.targetParent;
+        if (currentParent === targetParent) {
+            return this.getMoveChildRequest();
+        }
+        else if (currentParent !== targetParent) {
+            return this.getAddChildRequest();
+        }
+        return null;
+    };
+    DragCapability.prototype.cancel = function () {
+        if (this.progress) {
+            if (this.lastRequest !== null && this.targetParent !== null) {
+                eraseFeedback(this.engine.editPolicies, this.lastRequest);
+            }
+            this.init();
+        }
+    };
+    DragCapability.prototype.onMouseDown = function (e) {
+        var _this = this;
+        if (!isLeftButton(e)) {
+            return;
+        }
+        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        if (!part) {
+            return;
+        }
+        this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.draggables));
+        if (this.target !== null) {
+            var parent_1 = part.domHelper.findClosest(this.target.dom.parentNode, function (wrapper) { return _this.config.hosts.indexOf(wrapper.component.type) >= 0; });
+            this.currentParent = parent_1 || part.registry.root;
+            this.offset = buildOffset(e, this.target.dom);
+            this.startLocation = regefGeometry.point(e.clientX, e.clientY);
+            this.mouseMoved = false;
+            this.progress = true;
+        }
+    };
+    DragCapability.prototype.onMouseMove = function (e) {
+        if (!this.progress) {
+            return;
+        }
+        this.mouseMoved = true;
+        var request = this.buildDragRequest(e);
+        if (getSelection(this.engine).indexOf(this.target.userComponent) < 0) {
+            perform(this.engine.editPolicies, this.getSelectionRequest());
+        }
+        this.handleFeedback(this.lastRequest, request);
+        if (request !== null) {
+            this.lastRequest = request;
+        }
+    };
+    DragCapability.prototype.onMouseUp = function (e) {
+        if (!this.progress) {
+            return;
+        }
+        var request = this.buildDragRequest(e);
+        if (this.targetParent !== null && this.lastRequest !== null) {
+            eraseFeedback(this.engine.editPolicies, this.lastRequest);
+        }
+        if (request !== null && this.mouseMoved) {
+            perform(this.engine.editPolicies, request);
         }
         this.init();
-      }
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      var _this3 = this;
-
-      if (!isLeftButton(e)) {
-        return;
-      }
-      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      if (!part) {
-        return;
-      }
-      this.target = part.domHelper.findClosest(e.target, typeMatches(this.config.draggables));
-      if (this.target !== null) {
-        var parent = part.domHelper.findClosest(this.target.dom.parentNode, function (wrapper) {
-          return _this3.config.hosts.indexOf(wrapper.component.type) >= 0;
-        });
-        this.currentParent = parent || part.registry.root;
-        this.offset = buildOffset(e, this.target.dom);
-        this.startLocation = regefGeometry.point(e.clientX, e.clientY);
-        this.mouseMoved = false;
-        this.progress = true;
-      }
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      if (!this.progress) {
-        return;
-      }
-      this.mouseMoved = true;
-      var request = this.buildDragRequest(e);
-      if (getSelection(this.engine).indexOf(this.target.userComponent) < 0) {
-        perform(this.engine.editPolicies, this.getSelectionRequest());
-      }
-      this.handleFeedback(this.lastRequest, request);
-      if (request !== null) {
-        this.lastRequest = request;
-      }
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      if (!this.progress) {
-        return;
-      }
-      var request = this.buildDragRequest(e);
-      if (this.targetParent !== null && this.lastRequest !== null) {
-        eraseFeedback(this.engine.editPolicies, this.lastRequest);
-      }
-      if (request !== null && this.mouseMoved) {
-        perform(this.engine.editPolicies, request);
-      }
-      this.init();
-    }
-  }]);
-  return DragCapability;
-}(Capability);
+    };
+    return DragCapability;
+}(Capability));
 
 var DEFAULT_CONFIG$1 = {
-  parts: null,
-  sourceTypes: [],
-  targetTypes: []
+    parts: null,
+    sourceTypes: [],
+    targetTypes: [],
 };
-
-var ConnectCapability = function (_Capability) {
-  inherits(ConnectCapability, _Capability);
-
-  function ConnectCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, ConnectCapability);
-
-    var _this = possibleConstructorReturn(this, (ConnectCapability.__proto__ || Object.getPrototypeOf(ConnectCapability)).call(this, engine));
-
-    _this.config = _extends({}, DEFAULT_CONFIG$1, config);
-    _this.init();
-    return _this;
-  }
-
-  createClass(ConnectCapability, [{
-    key: 'init',
-    value: function init() {
-      this.progress = false;
-      this.source = null;
-      this.target = null;
-      this.coordinates = null;
-      this.lastRequest = null;
+var ConnectCapability = /** @class */ (function (_super) {
+    __extends(ConnectCapability, _super);
+    function ConnectCapability(engine, config) {
+        if (config === void 0) { config = {}; }
+        var _this = _super.call(this, engine, __assign({}, DEFAULT_CONFIG$1, config)) || this;
+        _this.init();
+        return _this;
     }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      if (this.progress) {
+    ConnectCapability.prototype.init = function () {
+        this.progress = false;
+        this.source = null;
+        this.target = null;
+        this.coordinates = null;
+        this.lastRequest = null;
+    };
+    ConnectCapability.prototype.cancel = function () {
+        if (this.progress) {
+            if (this.lastRequest !== null) {
+                eraseFeedback(this.engine.editPolicies, this.lastRequest);
+            }
+            this.init();
+        }
+    };
+    ConnectCapability.prototype.getStartConnectionRequest = function () {
+        return {
+            type: exports.IntentType.START_CONNECTION,
+            source: this.source.userComponent,
+            location: regefGeometry.point(this.coordinates),
+        };
+    };
+    ConnectCapability.prototype.getEndConnectionRequest = function () {
+        return {
+            type: exports.IntentType.END_CONNECTION,
+            source: this.source.userComponent,
+            target: this.target.userComponent,
+            location: regefGeometry.point(this.coordinates),
+        };
+    };
+    ConnectCapability.prototype.buildEndConnectRequest = function (e) {
+        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        if (!part) {
+            return null;
+        }
+        var target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes));
+        if (!target) {
+            return null;
+        }
+        this.target = target;
+        this.coordinates = regefGeometry.point(e.clientX, e.clientY);
+        return this.getEndConnectionRequest();
+    };
+    ConnectCapability.prototype.buildStartConnectionRequest = function (e) {
+        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        if (!part) {
+            return null;
+        }
+        var source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes));
+        if (!source) {
+            return null;
+        }
+        this.source = source;
+        this.coordinates = regefGeometry.point(e.clientX, e.clientY);
+        return this.getStartConnectionRequest();
+    };
+    ConnectCapability.prototype.handleFeedback = function (lastRequest, request) {
+        if (lastRequest !== null &&
+            (request === null ||
+                request.target !== lastRequest.target)) {
+            eraseFeedback(this.engine.editPolicies, lastRequest);
+        }
+        if (request !== null) {
+            requestFeedback(this.engine.editPolicies, request);
+        }
+    };
+    ConnectCapability.prototype.onMouseDown = function (e) {
+        if (!isLeftButton(e)) {
+            return;
+        }
+        var request = this.buildStartConnectionRequest(e);
+        if (request !== null) {
+            this.progress = true;
+        }
+        this.handleFeedback(this.lastRequest, request);
+        this.lastRequest = request;
+    };
+    ConnectCapability.prototype.onMouseMove = function (e) {
+        if (!this.progress) {
+            return;
+        }
+        var request = this.buildEndConnectRequest(e);
+        this.handleFeedback(this.lastRequest, request);
+        this.lastRequest = request;
+    };
+    ConnectCapability.prototype.onMouseUp = function (e) {
+        if (!this.progress) {
+            return;
+        }
+        var request = this.buildEndConnectRequest(e);
         if (this.lastRequest !== null) {
-          eraseFeedback(this.engine.editPolicies, this.lastRequest);
+            eraseFeedback(this.engine.editPolicies, this.lastRequest);
+        }
+        if (request !== null) {
+            perform(this.engine.editPolicies, request);
         }
         this.init();
-      }
-    }
-  }, {
-    key: 'getStartConnectionRequest',
-    value: function getStartConnectionRequest() {
-      return {
-        type: START_CONNECTION,
-        source: this.source.component.userComponent,
-        location: regefGeometry.point(this.coordinates)
-      };
-    }
-  }, {
-    key: 'getEndConnectionRequest',
-    value: function getEndConnectionRequest() {
-      return {
-        type: END_CONNECTION,
-        source: this.source.component.userComponent,
-        target: this.target.component.userComponent,
-        location: regefGeometry.point(this.coordinates)
-      };
-    }
-  }, {
-    key: 'buildEndConnectRequest',
-    value: function buildEndConnectRequest(e) {
-      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      if (!part) {
-        return null;
-      }
-      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.targetTypes));
-      if (!target) {
-        return null;
-      }
-      this.target = target;
-      this.coordinates = regefGeometry.point(e.clientX, e.clientY);
-      return this.getEndConnectionRequest();
-    }
-  }, {
-    key: 'buildStartConnectionRequest',
-    value: function buildStartConnectionRequest(e) {
-      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      if (!part) {
-        return null;
-      }
-      var source = part.domHelper.findClosest(e.target, typeMatches(this.config.sourceTypes));
-      if (!source) {
-        return null;
-      }
-      this.source = source;
-      this.coordinates = regefGeometry.point(e.clientX, e.clientY);
-      return this.getStartConnectionRequest();
-    }
-  }, {
-    key: 'handleFeedback',
-    value: function handleFeedback(lastRequest, request) {
-      if (lastRequest !== null && (request === null || request.target !== lastRequest.target)) {
-        eraseFeedback(this.engine.editPolicies, lastRequest);
-      }
-      if (request !== null) {
-        requestFeedback(this.engine.editPolicies, request);
-      }
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      if (!isLeftButton(e)) {
-        return;
-      }
-      var request = this.buildStartConnectionRequest(e);
-      if (request !== null) {
-        this.progress = true;
-      }
-      this.handleFeedback(this.lastRequest, request);
-      this.lastRequest = request;
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      if (!this.progress) {
-        return;
-      }
-      var request = this.buildEndConnectRequest(e);
-      this.handleFeedback(this.lastRequest, request);
-      this.lastRequest = request;
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      if (!this.progress) {
-        return;
-      }
-      var request = this.buildEndConnectRequest(e);
-      if (this.lastRequest !== null) {
-        eraseFeedback(this.engine.editPolicies, this.lastRequest);
-      }
-      if (request !== null) {
-        perform(this.engine.editPolicies, request);
-      }
-      this.init();
-    }
-  }]);
-  return ConnectCapability;
-}(Capability);
+    };
+    return ConnectCapability;
+}(Capability));
 
-var locationOf = function locationOf(_ref, rootDom) {
-  var clientX = _ref.clientX,
-      clientY = _ref.clientY;
-
-  var _rootDom$getBoundingC = rootDom.getBoundingClientRect(),
-      x = _rootDom$getBoundingC.x,
-      y = _rootDom$getBoundingC.y;
-
-  return regefGeometry.point(clientX - x, clientY - y);
+var locationOf = function (_a, rootDom) {
+    var clientX = _a.clientX, clientY = _a.clientY;
+    var _b = rootDom.getBoundingClientRect(), top = _b.top, left = _b.left;
+    return regefGeometry.point(clientX - left, clientY - top);
 };
-
 var DEFAULT_CONFIG$2 = {
-  parts: null,
-  selectables: []
+    parts: null,
+    selectables: [],
 };
-
-var SingleSelectionCapability = function (_Capability) {
-  inherits(SingleSelectionCapability, _Capability);
-
-  function SingleSelectionCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, SingleSelectionCapability);
-
-    var _this = possibleConstructorReturn(this, (SingleSelectionCapability.__proto__ || Object.getPrototypeOf(SingleSelectionCapability)).call(this, engine));
-
-    _this.config = _extends({}, DEFAULT_CONFIG$2, config);
-    _this.init();
-    return _this;
-  }
-
-  createClass(SingleSelectionCapability, [{
-    key: 'init',
-    value: function init() {
-      this.progress = false;
-      this.location = null;
-      this.possibleSingleSelection = false;
-      this.additional = false;
-      this.selection = [];
+var SingleSelectionCapability = /** @class */ (function (_super) {
+    __extends(SingleSelectionCapability, _super);
+    function SingleSelectionCapability(engine, config) {
+        if (config === void 0) { config = {}; }
+        var _this = _super.call(this, engine, __assign({}, DEFAULT_CONFIG$2, config)) || this;
+        _this.init();
+        return _this;
     }
-  }, {
-    key: 'createSingleSelectionRequest',
-    value: function createSingleSelectionRequest() {
-      var location = this.location,
-          selection = this.selection,
-          additional = this.additional;
-
-      return {
-        type: SELECT,
-        bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
-        selection: additional ? getSelection(this.engine).concat(selection) : selection
-      };
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      if (this.progress) {
-        this.init();
-      }
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      if (!isLeftButton(e)) {
-        return;
-      }
-      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      if (!part) {
-        return;
-      }
-      var target = part.domHelper.findClosest(e.target, typeMatches(this.config.selectables));
-      if (!target) {
-        return;
-      }
-      this.location = locationOf(e, part.registry.root.dom);
-      this.selection = [target.userComponent];
-      this.possibleSingleSelection = true;
-      this.progress = true;
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove() {
-      this.possibleSingleSelection = false;
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(_ref2) {
-      var ctrlKey = _ref2.ctrlKey,
-          metaKey = _ref2.metaKey;
-
-      if (!this.progress) {
-        return;
-      }
-      if (this.possibleSingleSelection) {
-        this.additional = metaKey || ctrlKey;
-        perform(this.engine.editPolicies, this.createSingleSelectionRequest());
+    SingleSelectionCapability.prototype.init = function () {
+        this.progress = false;
+        this.location = null;
+        this.possibleSingleSelection = false;
         this.additional = false;
-      }
-      this.init();
-    }
-  }]);
-  return SingleSelectionCapability;
-}(Capability);
-
-var locationOf$1 = function locationOf(_ref) {
-  var clientX = _ref.clientX,
-      clientY = _ref.clientY;
-  return regefGeometry.point(clientX, clientY);
-};
-
-var DEFAULT_CONFIG$3 = {
-  parts: null,
-  selectables: [],
-  intersection: false,
-  containment: true
-};
-
-var MultiSelectionCapability = function (_Capability) {
-  inherits(MultiSelectionCapability, _Capability);
-
-  function MultiSelectionCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, MultiSelectionCapability);
-
-    var _this = possibleConstructorReturn(this, (MultiSelectionCapability.__proto__ || Object.getPrototypeOf(MultiSelectionCapability)).call(this, engine));
-
-    _this.config = _extends({}, DEFAULT_CONFIG$3, config);
-    _this.init();
-    return _this;
-  }
-
-  createClass(MultiSelectionCapability, [{
-    key: 'init',
-    value: function init() {
-      this.progress = false;
-      this.startLocation = null;
-      this.endLocation = null;
-      this.lastRequest = null;
-      this.startPart = null;
-      this.endPart = null;
-      this.selectionBounds = null;
-      this.selection = null;
-      this.additional = false;
-    }
-  }, {
-    key: 'createMultiSelectionRequest',
-    value: function createMultiSelectionRequest() {
-      var startLocation = this.startLocation,
-          endLocation = this.endLocation,
-          selectionBounds = this.selectionBounds,
-          selection = this.selection;
-
-      return {
-        type: SELECT,
-        bounds: selectionBounds,
-        selection: selection || [],
-        startLocation: startLocation,
-        endLocation: endLocation
-      };
-    }
-  }, {
-    key: 'buildSelectionBounds',
-    value: function buildSelectionBounds() {
-      var startLocation = this.startLocation,
-          endLocation = this.endLocation;
-
-      if (!startLocation || !endLocation) {
-        return;
-      }
-      var x1 = startLocation.x,
-          y1 = startLocation.y;
-      var x2 = endLocation.x,
-          y2 = endLocation.y;
-
-      var x = Math.min(x1, x2);
-      var y = Math.min(y1, y2);
-      var width = Math.max(x1, x2) - x;
-      var height = Math.max(y1, y2) - y;
-
-      this.selectionBounds = regefGeometry.rectangle(x, y, width, height);
-    }
-  }, {
-    key: 'buildSelection',
-    value: function buildSelection() {
-      var config = this.config,
-          engine = this.engine,
-          selectionBounds = this.selectionBounds,
-          additional = this.additional;
-
-
-      var parts = getParts(engine, config.parts).filter(function (part) {
-        var bounds = regefGeometry.rectangle(part.registry.root.dom.getBoundingClientRect());
-        return bounds.intersection(selectionBounds) !== null;
-      });
-
-      var currentSelection = getSelection(engine);
-      var newSelection = [];
-
-      var isRelevant = typeMatches(config.selectables);
-      var additionalFilter = additional ? function (_ref2) {
-        var userComponent = _ref2.userComponent;
-        return currentSelection.indexOf(userComponent) < 0;
-      } : alwaysTrue;
-      var boundsMatch = config.containment ? function (itemBounds) {
-        return selectionBounds.containsRectangle(itemBounds);
-      } : function (itemBounds) {
-        return selectionBounds.intersection(itemBounds) !== null;
-      };
-
-      parts.forEach(function (part) {
-        part.registry.all().forEach(function (wrapper) {
-          var bounds = regefGeometry.rectangle(wrapper.dom.getBoundingClientRect());
-          if (isRelevant(wrapper) && additionalFilter(wrapper) && boundsMatch(bounds)) {
-            newSelection.push(wrapper.userComponent);
-          }
-        });
-      });
-
-      this.selection = additional ? currentSelection.concat(newSelection) : newSelection;
-    }
-  }, {
-    key: 'cancel',
-    value: function cancel() {
-      if (this.progress) {
-        if (this.lastRequest !== null) {
-          eraseFeedback(this.engine.editPolicies, this.lastRequest);
+        this.selection = [];
+    };
+    SingleSelectionCapability.prototype.createSingleSelectionRequest = function () {
+        var _a = this, location = _a.location, selection = _a.selection, additional = _a.additional;
+        return {
+            type: exports.IntentType.SELECT,
+            bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
+            selection: additional ? getSelection(this.engine).concat(selection) : selection,
+            startLocation: location,
+            endLocation: location,
+        };
+    };
+    SingleSelectionCapability.prototype.cancel = function () {
+        if (this.progress) {
+            this.init();
         }
+    };
+    SingleSelectionCapability.prototype.onMouseDown = function (e) {
+        if (!isLeftButton(e)) {
+            return;
+        }
+        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        if (!part) {
+            return;
+        }
+        var target = part.domHelper.findClosest(e.target, typeMatches(this.config.selectables));
+        if (!target) {
+            return;
+        }
+        this.location = locationOf(e, part.registry.root.dom);
+        this.selection = [target.userComponent];
+        this.possibleSingleSelection = true;
+        this.progress = true;
+    };
+    SingleSelectionCapability.prototype.onMouseMove = function () {
+        this.possibleSingleSelection = false;
+    };
+    SingleSelectionCapability.prototype.onMouseUp = function (_a) {
+        var ctrlKey = _a.ctrlKey, metaKey = _a.metaKey;
+        if (!this.progress) {
+            return;
+        }
+        if (this.possibleSingleSelection) {
+            this.additional = metaKey || ctrlKey;
+            perform(this.engine.editPolicies, this.createSingleSelectionRequest());
+            this.additional = false;
+        }
+        this.init();
+    };
+    return SingleSelectionCapability;
+}(Capability));
+
+var locationOf$1 = function (_a) {
+    var clientX = _a.clientX, clientY = _a.clientY;
+    return regefGeometry.point(clientX, clientY);
+};
+var DEFAULT_CONFIG$3 = {
+    parts: null,
+    selectables: [],
+    intersection: false,
+    containment: true,
+};
+var MultiSelectionCapability = /** @class */ (function (_super) {
+    __extends(MultiSelectionCapability, _super);
+    function MultiSelectionCapability(engine, config) {
+        if (config === void 0) { config = {}; }
+        var _this = _super.call(this, engine, __assign({}, DEFAULT_CONFIG$3, config)) || this;
+        _this.init();
+        return _this;
+    }
+    MultiSelectionCapability.prototype.init = function () {
+        this.progress = false;
         this.startLocation = null;
         this.endLocation = null;
-        this.possibleSingleSelection = false;
+        this.lastRequest = null;
+        this.selectionBounds = null;
+        this.selection = null;
+        this.additional = false;
+    };
+    MultiSelectionCapability.prototype.createMultiSelectionRequest = function () {
+        var _a = this, startLocation = _a.startLocation, endLocation = _a.endLocation, selectionBounds = _a.selectionBounds, selection = _a.selection;
+        return {
+            type: exports.IntentType.SELECT,
+            bounds: selectionBounds,
+            selection: selection || [],
+            startLocation: startLocation,
+            endLocation: endLocation,
+        };
+    };
+    MultiSelectionCapability.prototype.buildSelectionBounds = function () {
+        var _a = this, startLocation = _a.startLocation, endLocation = _a.endLocation;
+        if (!startLocation || !endLocation) {
+            return;
+        }
+        var x1 = startLocation.x, y1 = startLocation.y;
+        var x2 = endLocation.x, y2 = endLocation.y;
+        var x = Math.min(x1, x2);
+        var y = Math.min(y1, y2);
+        var width = Math.max(x1, x2) - x;
+        var height = Math.max(y1, y2) - y;
+        this.selectionBounds = regefGeometry.rectangle(x, y, width, height);
+    };
+    MultiSelectionCapability.prototype.buildSelection = function () {
+        var _a = this, config = _a.config, engine = _a.engine, selectionBounds = _a.selectionBounds, additional = _a.additional;
+        var parts = getParts(engine, config.parts).filter(function (part) {
+            var _a = part.registry.root.dom.getBoundingClientRect(), top = _a.top, left = _a.left, width = _a.width, height = _a.height;
+            var bounds = regefGeometry.rectangle(left, top, width, height);
+            return bounds.intersection(selectionBounds) !== null;
+        });
+        var currentSelection = getSelection(engine);
+        var newSelection = [];
+        var isRelevant = typeMatches(config.selectables);
+        var additionalFilter = additional
+            ? function (_a) {
+                var userComponent = _a.userComponent;
+                return currentSelection.indexOf(userComponent) < 0;
+            }
+            : alwaysTrue;
+        var boundsMatch = config.containment
+            ? function (itemBounds) { return selectionBounds.containsRectangle(itemBounds); }
+            : function (itemBounds) { return selectionBounds.intersection(itemBounds) !== null; };
+        parts.forEach(function (part) {
+            part.registry.all().forEach(function (wrapper) {
+                var _a = wrapper.dom.getBoundingClientRect(), top = _a.top, left = _a.left, width = _a.width, height = _a.height;
+                var bounds = regefGeometry.rectangle(left, top, width, height);
+                if (isRelevant(wrapper) && additionalFilter(wrapper) && boundsMatch(bounds)) {
+                    newSelection.push(wrapper.userComponent);
+                }
+            });
+        });
+        this.selection = additional ? currentSelection.concat(newSelection) : newSelection;
+    };
+    MultiSelectionCapability.prototype.cancel = function () {
+        if (this.progress) {
+            if (this.lastRequest !== null) {
+                eraseFeedback(this.engine.editPolicies, this.lastRequest);
+            }
+            this.startLocation = null;
+            this.endLocation = null;
+            this.progress = false;
+            this.selection = null;
+            this.selectionBounds = null;
+        }
+    };
+    MultiSelectionCapability.prototype.onMouseDown = function (e) {
+        if (!isLeftButton(e)) {
+            return;
+        }
+        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        if (!part) {
+            return;
+        }
+        var target = part.domHelper.findClosest(e.target, typeMatches(this.engine.rootType));
+        if (target !== null) {
+            this.startLocation = locationOf$1(e);
+            this.progress = true;
+        }
+    };
+    MultiSelectionCapability.prototype.onMouseMove = function (e) {
+        if (!this.progress) {
+            return;
+        }
+        this.endLocation = locationOf$1(e);
+        this.additional = Boolean(e.shiftKey);
+        this.buildSelectionBounds();
+        this.buildSelection();
+        var request = this.createMultiSelectionRequest();
+        requestFeedback(this.engine.editPolicies, request);
+        this.lastRequest = request;
+    };
+    MultiSelectionCapability.prototype.onMouseUp = function (e) {
+        if (!this.progress) {
+            return;
+        }
+        this.endLocation = locationOf$1(e);
+        this.additional = Boolean(e.shiftKey);
+        var request = this.createMultiSelectionRequest();
+        if (this.lastRequest !== null) {
+            eraseFeedback(this.engine.editPolicies, this.lastRequest);
+        }
+        perform(this.engine.editPolicies, request);
         this.progress = false;
+        this.additional = false;
         this.selection = null;
         this.selectionBounds = null;
-      }
-    }
-  }, {
-    key: 'onMouseDown',
-    value: function onMouseDown(e) {
-      if (!isLeftButton(e)) {
-        return;
-      }
-      var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      if (!part) {
-        return;
-      }
-      var target = part.domHelper.findClosest(e.target, typeMatches(this.engine.rootType));
-      if (target !== null) {
-        this.startLocation = locationOf$1(e);
-        this.progress = true;
-        this.startPart = part;
-      }
-    }
-  }, {
-    key: 'onMouseMove',
-    value: function onMouseMove(e) {
-      if (!this.progress) {
-        return;
-      }
-      this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      this.endLocation = locationOf$1(e);
-      this.additional = Boolean(e.shiftKey);
-
-      this.buildSelectionBounds();
-      this.buildSelection();
-
-      var request = this.createMultiSelectionRequest();
-      requestFeedback(this.engine.editPolicies, request);
-      this.lastRequest = request;
-    }
-  }, {
-    key: 'onMouseUp',
-    value: function onMouseUp(e) {
-      if (!this.progress) {
-        return;
-      }
-      this.endPart = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
-      this.endLocation = locationOf$1(e);
-      this.additional = Boolean(e.shiftKey);
-
-      var request = this.createMultiSelectionRequest();
-      if (this.lastRequest !== null) {
-        eraseFeedback(this.engine.editPolicies, this.lastRequest);
-      }
-      perform(this.engine.editPolicies, request);
-      this.progress = false;
-      this.additional = false;
-      this.selection = null;
-      this.selectionBounds = null;
-    }
-  }]);
-  return MultiSelectionCapability;
-}(Capability);
+    };
+    return MultiSelectionCapability;
+}(Capability));
 
 var DEFAULT_CONFIG$4 = {
-  parts: null,
-  keys: ['Escape']
+    parts: null,
+    keys: ['Escape'],
 };
-
-var CancelCapability = function (_Capability) {
-  inherits(CancelCapability, _Capability);
-
-  function CancelCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, CancelCapability);
-
-    var _this = possibleConstructorReturn(this, (CancelCapability.__proto__ || Object.getPrototypeOf(CancelCapability)).call(this, engine));
-
-    _this.config = _extends({}, DEFAULT_CONFIG$4, config);
-    return _this;
-  }
-
-  createClass(CancelCapability, [{
-    key: 'focusOnTargetedParts',
-    value: function focusOnTargetedParts(target) {
-      return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+var CancelCapability = /** @class */ (function (_super) {
+    __extends(CancelCapability, _super);
+    function CancelCapability(engine, config) {
+        if (config === void 0) { config = {}; }
+        return _super.call(this, engine, __assign({}, DEFAULT_CONFIG$4, config)) || this;
     }
-  }, {
-    key: 'keyMatches',
-    value: function keyMatches(key) {
-      return this.config.keys.indexOf(key) >= 0;
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(_ref) {
-      var key = _ref.key,
-          target = _ref.target;
-
-      if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
-        this.engine.capabilities.forEach(function (capability) {
-          return capability.cancel();
-        });
-      }
-    }
-  }]);
-  return CancelCapability;
-}(Capability);
+    CancelCapability.prototype.focusOnTargetedParts = function (target) {
+        return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+    };
+    CancelCapability.prototype.keyMatches = function (key) {
+        return this.config.keys.indexOf(key) >= 0;
+    };
+    CancelCapability.prototype.onKeyDown = function (_a) {
+        var key = _a.key, target = _a.target;
+        if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+            this.engine.capabilities.forEach(function (capability) { return capability.cancel(); });
+        }
+    };
+    return CancelCapability;
+}(Capability));
 
 var DEFAULT_CONFIG$5 = {
-  parts: null,
-  keys: ['Backspace', 'Delete']
+    parts: null,
+    keys: ['Backspace', 'Delete'],
 };
-
-var DeleteCapability = function (_Capability) {
-  inherits(DeleteCapability, _Capability);
-
-  function DeleteCapability(engine) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    classCallCheck(this, DeleteCapability);
-
-    var _this = possibleConstructorReturn(this, (DeleteCapability.__proto__ || Object.getPrototypeOf(DeleteCapability)).call(this, engine));
-
-    _this.config = _extends({}, DEFAULT_CONFIG$5, config);
-    _this.init();
-    return _this;
-  }
-
-  createClass(DeleteCapability, [{
-    key: 'init',
-    value: function init() {
-      this.currentSelection = [];
-      this.progress = false;
+var DeleteCapability = /** @class */ (function (_super) {
+    __extends(DeleteCapability, _super);
+    function DeleteCapability(engine, config) {
+        if (config === void 0) { config = {}; }
+        var _this = _super.call(this, engine, __assign({}, DEFAULT_CONFIG$5, config)) || this;
+        _this.currentSelection = null;
+        _this.init();
+        return _this;
     }
-  }, {
-    key: 'getDeleteRequest',
-    value: function getDeleteRequest() {
-      return {
-        type: DELETE,
-        selection: this.currentSelection
-      };
-    }
-  }, {
-    key: 'focusOnTargetedParts',
-    value: function focusOnTargetedParts(target) {
-      return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
-    }
-  }, {
-    key: 'keyMatches',
-    value: function keyMatches(key) {
-      return this.config.keys.indexOf(key) >= 0;
-    }
-  }, {
-    key: 'onKeyDown',
-    value: function onKeyDown(_ref) {
-      var key = _ref.key,
-          target = _ref.target;
-
-      if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
-        this.currentSelection = getSelection(this.engine);
-        if (this.currentSelection.length > 0) {
-          perform(this.engine.editPolicies, this.getDeleteRequest());
+    DeleteCapability.prototype.init = function () {
+        this.currentSelection = [];
+        this.progress = false;
+    };
+    DeleteCapability.prototype.getDeleteRequest = function () {
+        return {
+            type: exports.IntentType.DELETE,
+            selection: this.currentSelection,
+        };
+    };
+    DeleteCapability.prototype.focusOnTargetedParts = function (target) {
+        return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
+    };
+    DeleteCapability.prototype.keyMatches = function (key) {
+        return this.config.keys.indexOf(key) >= 0;
+    };
+    DeleteCapability.prototype.onKeyDown = function (_a) {
+        var key = _a.key, target = _a.target;
+        if (this.keyMatches(key) && this.focusOnTargetedParts(target)) {
+            this.currentSelection = getSelection(this.engine);
+            if (this.currentSelection.length > 0) {
+                perform(this.engine.editPolicies, this.getDeleteRequest());
+            }
         }
-      }
-      this.init();
-    }
-  }]);
-  return DeleteCapability;
-}(Capability);
+        this.init();
+    };
+    return DeleteCapability;
+}(Capability));
 
 exports.DiagramPart = DiagramPart;
 exports.EditPolicy = EditPolicy;
@@ -2056,9 +1379,4 @@ exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
 exports.REGEF_PROP_KEY = REGEF_PROP_KEY;
-exports.ADD = ADD;
-exports.MOVE = MOVE;
-exports.SELECT = SELECT;
-exports.DELETE = DELETE;
-exports.START_CONNECTION = START_CONNECTION;
-exports.END_CONNECTION = END_CONNECTION;
+//# sourceMappingURL=index.js.map
