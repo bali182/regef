@@ -5,15 +5,7 @@ import { Engine } from './Engine';
 import { Capability } from './Capability';
 import { EditPolicy } from './EditPolicy';
 import { SelectionProvider } from './SelectionProvider';
-export declare const REGEF_PROP_KEY = "@@regef-internal-context@@";
 export declare type Id = string | Symbol;
-export declare type HasUserComponent = {
-    userComponent: React.Component;
-};
-export declare type HasType = {
-    type: Id;
-};
-export declare type RegefComponent = React.Component & HasUserComponent & HasType;
 export declare enum IntentType {
     ADD = "add",
     MOVE = "move",
@@ -71,13 +63,6 @@ export interface RegefObject {
 export interface RegefComponentProps {
     regef: RegefObject;
 }
-export declare type RegefInternalProps = {
-    engine: Engine;
-    id: Id;
-};
-export declare type RegefProps = {
-    [REGEF_PROP_KEY]: RegefInternalProps;
-};
 export interface CancelCapabilityConfig {
     parts?: Id[];
     keys?: string[];

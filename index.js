@@ -59,6 +59,7 @@ function __rest(s, e) {
     return t;
 }
 
+/** @internal */
 var REGEF_PROP_KEY = '@@regef-internal-context@@';
 (function (IntentType) {
     IntentType["ADD"] = "add";

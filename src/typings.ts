@@ -6,18 +6,22 @@ import { Capability } from './Capability'
 import { EditPolicy } from './EditPolicy'
 import { SelectionProvider } from './SelectionProvider'
 
+/** @internal */
 export const REGEF_PROP_KEY = '@@regef-internal-context@@'
 
 export type Id = string | Symbol
 
+/** @internal */
 export type HasUserComponent = {
   userComponent: React.Component
 }
 
+/** @internal */
 export type HasType = {
   type: Id
 }
 
+/** @internal */
 export type RegefComponent = React.Component & HasUserComponent & HasType
 
 export enum IntentType {
@@ -88,11 +92,13 @@ export interface RegefComponentProps {
   regef: RegefObject
 }
 
+/** @internal */
 export type RegefInternalProps = {
   engine: Engine
   id: Id
 }
 
+/** @internal */
 export type RegefProps = {
   [REGEF_PROP_KEY]: RegefInternalProps
 }
