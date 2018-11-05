@@ -15,10 +15,11 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "declarationDir": "types",
     "outDir": "dist/lib",
     "resolveJsonModule": true
   },
-  "exclude": [
-    "node_modules"
+  "include": [
+    "src"
   ]
 }
