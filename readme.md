@@ -1,4 +1,4 @@
-# regef
+# regef [![Build Status](https://travis-ci.org/bali182/regef.svg?branch=master)](https://travis-ci.org/bali182/regef)
 
 A graphical editing tool for [React](https://reactjs.org/). Provides accessible tooling for graphical editing in React apps. Was mainly design with flowcharts/diagrams in mind. Many ideas are taken from [GEF](https://www.eclipse.org/gef/).
 
