@@ -1,9 +1,24 @@
-import { Component } from 'react'
 import { ComponentRegistry } from '../src/ComponentRegistry'
 import { ComponentWrapper } from '../src/ComponentWrapper'
-import { RegefComponent } from '../src/typings'
+import { dummyComponentWrapper } from './testUtils'
 
 describe('ComponentRegistry', () => {
+  afterEach(() => jest.clearAllMocks())
+
+  function shouldHaveComponentWrapper(registry: ComponentRegistry, wrapper: ComponentWrapper) {
+    expect(registry.get(wrapper)).toBe(wrapper)
+    expect(registry.get(wrapper.dom)).toBe(wrapper)
+    expect(registry.get(wrapper.component)).toBe(wrapper)
+    expect(registry.get(wrapper.userComponent)).toBe(wrapper)
+  }
+
+  function shouldNotHaveComponentWrapper(registry: ComponentRegistry, wrapper: ComponentWrapper) {
+    expect(registry.get(wrapper)).toBe(undefined)
+    expect(registry.get(wrapper.dom)).toBe(undefined)
+    expect(registry.get(wrapper.component)).toBe(undefined)
+    expect(registry.get(wrapper.userComponent)).toBe(undefined)
+  }
+
   it('should be able to access registered ComponentWrapper by all fields', () => {
     const wrapper = dummyComponentWrapper()
     const registry = new ComponentRegistry()
@@ -73,30 +88,3 @@ describe('ComponentRegistry', () => {
     expect(unregListener).toHaveBeenCalledWith(wrapper)
   })
 })
-
-function dummyElement(): Element {
-  return { domElement: Symbol('DOM element') } as any
-}
-function dummyReactComponent(): Component {
-  return { domElement: Symbol('React component') } as any
-}
-function dummyRegefComponent(): RegefComponent {
-  return { domElement: Symbol('Regef component') } as any
-}
-function dummyComponentWrapper(): ComponentWrapper {
-  return new ComponentWrapper(dummyElement(), dummyRegefComponent(), dummyReactComponent())
-}
-
-function shouldHaveComponentWrapper(registry: ComponentRegistry, wrapper: ComponentWrapper) {
-  expect(registry.get(wrapper)).toBe(wrapper)
-  expect(registry.get(wrapper.dom)).toBe(wrapper)
-  expect(registry.get(wrapper.component)).toBe(wrapper)
-  expect(registry.get(wrapper.userComponent)).toBe(wrapper)
-}
-
-function shouldNotHaveComponentWrapper(registry: ComponentRegistry, wrapper: ComponentWrapper) {
-  expect(registry.get(wrapper)).toBe(undefined)
-  expect(registry.get(wrapper.dom)).toBe(undefined)
-  expect(registry.get(wrapper.component)).toBe(undefined)
-  expect(registry.get(wrapper.userComponent)).toBe(undefined)
-}

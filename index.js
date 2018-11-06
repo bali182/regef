@@ -105,13 +105,12 @@ var DiagramPart = /** @class */ (function (_super) {
     };
     DiagramPart.prototype.componentWillUnmount = function () {
         var _a = this.props, id = _a.id, engine = _a.engine;
-        var parts = engine.__partsMap();
-        var part = parts.get(id);
+        var part = engine.__parts.get(id);
         if (part && part.registry) {
             part.registry.setRoot(null);
         }
-        parts.delete(id);
-        if (parts.size === 0) {
+        engine.__parts.delete(id);
+        if (engine.__parts.size === 0) {
             engine.eventManager.unhookListeners();
         }
     };
@@ -306,7 +305,7 @@ var Engine = /** @class */ (function () {
         this.toolkit = new Toolkit(this);
         this.eventManager = new EventManager(this);
         this.domHelper = new DomHelper(this);
-        this._parts = new Map();
+        this.__parts = new Map();
         var _a = config(this), capabilities = _a.capabilities, editPolicies = _a.editPolicies, selectionProvider = _a.selectionProvider, rootType = _a.rootType, types = _a.types;
         this.capabilities = capabilities;
         this.editPolicies = editPolicies;
@@ -314,15 +313,11 @@ var Engine = /** @class */ (function () {
         this.types = types;
         this.rootType = rootType;
     }
-    /** @internal */
-    Engine.prototype.__partsMap = function () {
-        return this._parts;
-    };
     Engine.prototype.part = function (id) {
-        return this._parts.get(id);
+        return this.__parts.get(id);
     };
     Engine.prototype.allParts = function () {
-        return Array.from(this._parts.values());
+        return Array.from(this.__parts.values());
     };
     return Engine;
 }());
@@ -560,10 +555,11 @@ var PartDomHelper = /** @class */ (function () {
         }
         return null;
     };
+    /** @internal */
     PartDomHelper.prototype.findRelevantChildrenIntenal = function (node, children) {
         if (children === void 0) { children = []; }
         if (node !== null && node.hasChildNodes()) {
-            var childNodes = node.childNodes;
+            var childNodes = Array.from(node.childNodes);
             for (var i = 0, len = childNodes.length; i < len; i += 1) {
                 var childNode = childNodes[i];
                 if (this.registry.has(childNode)) {
@@ -574,10 +570,11 @@ var PartDomHelper = /** @class */ (function () {
                 }
             }
         }
-        return children;
     };
     PartDomHelper.prototype.findRelevantChildren = function (element) {
-        return this.findRelevantChildrenIntenal(element, []);
+        var children = [];
+        this.findRelevantChildrenIntenal(element, children);
+        return children;
     };
     PartDomHelper.prototype.partContains = function (element) {
         return this.registry.root.dom.contains(element);

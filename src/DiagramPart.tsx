@@ -17,13 +17,12 @@ export class DiagramPart extends React.PureComponent<DiagramPartProps> {
   }
   componentWillUnmount(): void {
     const { id, engine } = this.props
-    const parts = engine.__partsMap()
-    const part = parts.get(id)
+    const part = engine.__parts.get(id)
     if (part && part.registry) {
       part.registry.setRoot(null)
     }
-    parts.delete(id)
-    if (parts.size === 0) {
+    engine.__parts.delete(id)
+    if (engine.__parts.size === 0) {
       engine.eventManager.unhookListeners()
     }
   }

@@ -1,14 +1,17 @@
 import { DispatchingEditPolicy } from '../src/DispatchingEditPolicy'
-import { Intent, IntentType, AddIntent, MoveIntent, RecognizedIntent } from '../src/typings'
+import { IntentType } from '../src/typings'
+import { dummyIntent } from './testUtils'
 
 describe('DispatchingEditPolicy', () => {
-  const addIntent = createDummyIntent<AddIntent>(IntentType.ADD)
-  const moveIntent = createDummyIntent<MoveIntent>(IntentType.MOVE)
-  const delIntent = createDummyIntent<AddIntent>(IntentType.DELETE)
-  const endConnIntent = createDummyIntent<AddIntent>(IntentType.END_CONNECTION)
-  const selIntent = createDummyIntent<AddIntent>(IntentType.SELECT)
-  const startConnIntent = createDummyIntent<AddIntent>(IntentType.START_CONNECTION)
-  const unknownIntent = createDummyIntent<RecognizedIntent>('x' as IntentType)
+  afterEach(() => jest.clearAllMocks())
+
+  const addIntent = dummyIntent(IntentType.ADD)
+  const moveIntent = dummyIntent(IntentType.MOVE)
+  const delIntent = dummyIntent(IntentType.DELETE)
+  const endConnIntent = dummyIntent(IntentType.END_CONNECTION)
+  const selIntent = dummyIntent(IntentType.SELECT)
+  const startConnIntent = dummyIntent(IntentType.START_CONNECTION)
+  const unknownIntent = dummyIntent('x' as IntentType)
 
   const policy = new DispatchingEditPolicy()
 
@@ -91,7 +94,3 @@ describe('DispatchingEditPolicy', () => {
     expect(() => policy.eraseFeedback(unknownIntent)).toThrow()
   })
 })
-
-function createDummyIntent<T extends Intent>(type: IntentType): T {
-  return { type } as T
-}

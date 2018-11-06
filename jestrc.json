@@ -11,10 +11,15 @@
     "<rootDir>/test/setup.js"
   ],
   "modulePathIgnorePatterns": [
-    "<rootDir>/cypress/"
+    "<rootDir>/cypress/",
+    "/lib/",
+    "/node_modules/"
   ],
-  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  "testMatch": [
+    "**/?(*.)+(spec|test).ts?(x)"
+  ],
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
-  }
+  },
+  "verbose": false
 }

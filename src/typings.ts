@@ -2,15 +2,13 @@ import { Rectangle, Point } from 'regef-geometry'
 import { Component } from 'react'
 import { Toolkit } from './Toolkit'
 import { Engine } from './Engine'
-import { Capability } from './Capability'
 import { EditPolicy } from './EditPolicy'
 import { SelectionProvider } from './SelectionProvider'
 import { ComponentWrapper } from './ComponentWrapper'
+import { Capability } from './Capability'
 
 /** @internal */
 export const REGEF_PROP_KEY = '@@regef-internal-context@@'
-
-export type Id = string | Symbol
 
 /** @internal */
 export type HasUserComponent = {
@@ -30,6 +28,19 @@ export type RegisterListener = (wrapper: ComponentWrapper) => void
 
 /** @internal */
 export type ComponentWrapperField = ComponentWrapper | Element | Component
+
+/** @internal */
+export type RegefInternalProps = {
+  engine: Engine
+  id: Id
+}
+
+/** @internal */
+export type RegefProps = {
+  [REGEF_PROP_KEY]: RegefInternalProps
+}
+
+export type Id = string | Symbol
 
 export enum IntentType {
   ADD = 'add',
@@ -105,17 +116,6 @@ export interface RegefObject {
 
 export interface RegefComponentProps {
   regef: RegefObject
-}
-
-/** @internal */
-export type RegefInternalProps = {
-  engine: Engine
-  id: Id
-}
-
-/** @internal */
-export type RegefProps = {
-  [REGEF_PROP_KEY]: RegefInternalProps
 }
 
 export interface CancelCapabilityConfig {

@@ -2,9 +2,9 @@ import { Rectangle, Point } from 'regef-geometry';
 import { Component } from 'react';
 import { Toolkit } from './Toolkit';
 import { Engine } from './Engine';
-import { Capability } from './Capability';
 import { EditPolicy } from './EditPolicy';
 import { SelectionProvider } from './SelectionProvider';
+import { Capability } from './Capability';
 export declare type Id = string | Symbol;
 export declare enum IntentType {
     ADD = "add",

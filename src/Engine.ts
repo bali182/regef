@@ -26,13 +26,13 @@ export class Engine {
   public readonly rootType: Id
 
   /** @internal */
-  private _parts: Map<Id, DiagramPartWrapper>
+  public readonly __parts: Map<Id, DiagramPartWrapper>
 
   constructor(config: EngineConfigProvider = () => DefaultEngineConfig) {
     this.toolkit = new Toolkit(this)
     this.eventManager = new EventManager(this)
     this.domHelper = new DomHelper(this)
-    this._parts = new Map()
+    this.__parts = new Map()
 
     const { capabilities, editPolicies, selectionProvider, rootType, types } = config(this)
 
@@ -42,14 +42,10 @@ export class Engine {
     this.types = types
     this.rootType = rootType
   }
-  /** @internal */
-  __partsMap(): Map<Id, DiagramPartWrapper> {
-    return this._parts
-  }
   part(id: Id): DiagramPartWrapper {
-    return this._parts.get(id)
+    return this.__parts.get(id)
   }
   allParts(): DiagramPartWrapper[] {
-    return Array.from(this._parts.values())
+    return Array.from(this.__parts.values())
   }
 }
