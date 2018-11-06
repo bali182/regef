@@ -1,7 +1,5 @@
 import { ComponentWrapper } from './ComponentWrapper';
-import React from 'react';
-declare type WrapperField = ComponentWrapper | Element | React.Component;
-declare type RegisterListener = (c: ComponentWrapper) => void;
+import { RegisterListener, ComponentWrapperField } from './typings';
 export declare class ComponentRegistry {
     private mapping;
     private wrappers;
@@ -12,13 +10,12 @@ export declare class ComponentRegistry {
     private init;
     setRoot(root: ComponentWrapper): void;
     register(wrapper: ComponentWrapper): void;
-    unregister(input: WrapperField): void;
-    get(input: WrapperField): ComponentWrapper;
+    unregister(input: ComponentWrapperField): void;
+    get(input: ComponentWrapperField): ComponentWrapper;
     all(): ComponentWrapper[];
-    has(input: WrapperField): boolean;
+    has(input: ComponentWrapperField): boolean;
     addRegisterListener(listener: RegisterListener): void;
     addUnregisterListener(listener: RegisterListener): void;
     removeRegisterListener(listener: RegisterListener): void;
     removeUnregisterListener(listener: RegisterListener): void;
 }
-export {};

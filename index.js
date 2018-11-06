@@ -5,7 +5,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var React = _interopDefault(require('react'));
-var types = _interopDefault(require('prop-types'));
 var ReactDOM = _interopDefault(require('react-dom'));
 var regefGeometry = require('regef-geometry');
 
@@ -92,6 +91,120 @@ function withRegefContext(Wrapped) {
     }(React.Component));
     return WithRegefContext;
 }
+
+var DiagramPart = /** @class */ (function (_super) {
+    __extends(DiagramPart, _super);
+    function DiagramPart() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DiagramPart.prototype.componentDidMount = function () {
+        var engine = this.props.engine;
+        if (!engine.eventManager.hooked) {
+            engine.eventManager.hookListeners();
+        }
+    };
+    DiagramPart.prototype.componentWillUnmount = function () {
+        var _a = this.props, id = _a.id, engine = _a.engine;
+        var parts = engine.__partsMap();
+        var part = parts.get(id);
+        if (part && part.registry) {
+            part.registry.setRoot(null);
+        }
+        parts.delete(id);
+        if (parts.size === 0) {
+            engine.eventManager.unhookListeners();
+        }
+    };
+    DiagramPart.prototype.render = function () {
+        var _a = this.props, id = _a.id, engine = _a.engine;
+        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, React.Children.only(this.props.children)));
+    };
+    return DiagramPart;
+}(React.PureComponent));
+
+var EditPolicy = /** @class */ (function () {
+    function EditPolicy() {
+    }
+    EditPolicy.prototype.perform = function (intent) { };
+    EditPolicy.prototype.requestFeedback = function (intent) { };
+    EditPolicy.prototype.eraseFeedback = function (intent) { };
+    return EditPolicy;
+}());
+
+var DispatchingEditPolicy = /** @class */ (function (_super) {
+    __extends(DispatchingEditPolicy, _super);
+    function DispatchingEditPolicy() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DispatchingEditPolicy.prototype.perform = function (intent) {
+        var type = intent.type;
+        switch (intent.type) {
+            case exports.IntentType.ADD:
+                return this.add(intent);
+            case exports.IntentType.MOVE:
+                return this.move(intent);
+            case exports.IntentType.START_CONNECTION:
+                return this.startConnection(intent);
+            case exports.IntentType.END_CONNECTION:
+                return this.endConnection(intent);
+            case exports.IntentType.SELECT:
+                return this.select(intent);
+            case exports.IntentType.DELETE:
+                return this.delete(intent);
+            default:
+                throw new Error("Unknown intent type " + type);
+        }
+    };
+    DispatchingEditPolicy.prototype.requestFeedback = function (intent) {
+        switch (intent.type) {
+            case exports.IntentType.ADD:
+                return this.requestAddFeedback(intent);
+            case exports.IntentType.MOVE:
+                return this.requestMoveFeedback(intent);
+            case exports.IntentType.START_CONNECTION:
+                return this.requestStartConnectionFeedback(intent);
+            case exports.IntentType.END_CONNECTION:
+                return this.requestEndConnectionFeedback(intent);
+            case exports.IntentType.SELECT:
+                return this.requestSelectFeedback(intent);
+            default:
+                throw new Error("Unknown intent type " + intent.type);
+        }
+    };
+    DispatchingEditPolicy.prototype.eraseFeedback = function (intent) {
+        switch (intent.type) {
+            case exports.IntentType.ADD:
+                return this.eraseAddFeedback(intent);
+            case exports.IntentType.MOVE:
+                return this.eraseMoveFeedback(intent);
+            case exports.IntentType.START_CONNECTION:
+                return this.eraseStartConnectionFeedback(intent);
+            case exports.IntentType.END_CONNECTION:
+                return this.eraseEndConnectionFeedback(intent);
+            case exports.IntentType.SELECT:
+                return this.eraseSelectFeedback(intent);
+            default:
+                throw new Error("Unknown intent type " + intent.type);
+        }
+    };
+    DispatchingEditPolicy.prototype.add = function (intent) { };
+    DispatchingEditPolicy.prototype.move = function (intent) { };
+    DispatchingEditPolicy.prototype.startConnection = function (intent) { };
+    DispatchingEditPolicy.prototype.endConnection = function (intent) { };
+    DispatchingEditPolicy.prototype.select = function (intent) { };
+    DispatchingEditPolicy.prototype.delete = function (intent) { };
+    DispatchingEditPolicy.prototype.requestAddFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestMoveFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestStartConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestEndConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.requestSelectFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseAddFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseMoveFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseStartConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseEndConnectionFeedback = function (intent) { };
+    DispatchingEditPolicy.prototype.eraseSelectFeedback = function (intent) { };
+    return DispatchingEditPolicy;
+}(EditPolicy));
 
 var EventManager = /** @class */ (function () {
     function EventManager(engine) {
@@ -194,11 +307,11 @@ var Engine = /** @class */ (function () {
         this.eventManager = new EventManager(this);
         this.domHelper = new DomHelper(this);
         this._parts = new Map();
-        var _a = config(this), capabilities = _a.capabilities, editPolicies = _a.editPolicies, selectionProvider = _a.selectionProvider, rootType = _a.rootType, types$$1 = _a.types;
+        var _a = config(this), capabilities = _a.capabilities, editPolicies = _a.editPolicies, selectionProvider = _a.selectionProvider, rootType = _a.rootType, types = _a.types;
         this.capabilities = capabilities;
         this.editPolicies = editPolicies;
         this.selectionProvider = selectionProvider;
-        this.types = types$$1;
+        this.types = types;
         this.rootType = rootType;
     }
     /** @internal */
@@ -213,124 +326,6 @@ var Engine = /** @class */ (function () {
     };
     return Engine;
 }());
-
-var DiagramPart = /** @class */ (function (_super) {
-    __extends(DiagramPart, _super);
-    function DiagramPart() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    DiagramPart.prototype.componentDidMount = function () {
-        var engine = this.props.engine;
-        if (!engine.eventManager.hooked) {
-            engine.eventManager.hookListeners();
-        }
-    };
-    DiagramPart.prototype.componentWillUnmount = function () {
-        var _a = this.props, id = _a.id, engine = _a.engine;
-        var parts = engine.__partsMap();
-        var part = parts.get(id);
-        if (part && part.registry) {
-            part.registry.setRoot(null);
-        }
-        parts.delete(id);
-        if (parts.size === 0) {
-            engine.eventManager.unhookListeners();
-        }
-    };
-    DiagramPart.prototype.render = function () {
-        var _a = this.props, id = _a.id, engine = _a.engine;
-        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, React.Children.only(this.props.children)));
-    };
-    DiagramPart.propTypes = {
-        engine: types.instanceOf(Engine).isRequired,
-        id: types.oneOfType([types.string, types.symbol]).isRequired,
-    };
-    return DiagramPart;
-}(React.PureComponent));
-
-var EditPolicy = /** @class */ (function () {
-    function EditPolicy() {
-    }
-    EditPolicy.prototype.perform = function (intent) { };
-    EditPolicy.prototype.requestFeedback = function (intent) { };
-    EditPolicy.prototype.eraseFeedback = function (intent) { };
-    return EditPolicy;
-}());
-
-var DispatchingEditPolicy = /** @class */ (function (_super) {
-    __extends(DispatchingEditPolicy, _super);
-    function DispatchingEditPolicy() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    DispatchingEditPolicy.prototype.perform = function (intent) {
-        var type = intent.type;
-        switch (intent.type) {
-            case exports.IntentType.ADD:
-                return this.add(intent);
-            case exports.IntentType.MOVE:
-                return this.move(intent);
-            case exports.IntentType.START_CONNECTION:
-                return this.startConnection(intent);
-            case exports.IntentType.END_CONNECTION:
-                return this.endConnection(intent);
-            case exports.IntentType.SELECT:
-                return this.select(intent);
-            case exports.IntentType.DELETE:
-                return this.delete(intent);
-            default:
-                throw new Error("Unknown intent type " + type);
-        }
-    };
-    DispatchingEditPolicy.prototype.requestFeedback = function (intent) {
-        switch (intent.type) {
-            case exports.IntentType.ADD:
-                return this.requestAddFeedback(intent);
-            case exports.IntentType.MOVE:
-                return this.requestMoveFeedback(intent);
-            case exports.IntentType.START_CONNECTION:
-                return this.requestStartConnectionFeedback(intent);
-            case exports.IntentType.END_CONNECTION:
-                return this.requestEndConnectionFeedback(intent);
-            case exports.IntentType.SELECT:
-                return this.requestSelectFeedback(intent);
-            default:
-                throw new Error("Unknown intent type " + intent.type);
-        }
-    };
-    DispatchingEditPolicy.prototype.eraseFeedback = function (intent) {
-        switch (intent.type) {
-            case exports.IntentType.ADD:
-                return this.eraseAddFeedback(intent);
-            case exports.IntentType.MOVE:
-                return this.eraseMoveFeedback(intent);
-            case exports.IntentType.START_CONNECTION:
-                return this.eraseStartConnectionFeedback(intent);
-            case exports.IntentType.END_CONNECTION:
-                return this.eraseEndConnectionFeedback(intent);
-            case exports.IntentType.SELECT:
-                return this.eraseSelectFeedback(intent);
-            default:
-                throw new Error("Unknown intent type " + intent.type);
-        }
-    };
-    DispatchingEditPolicy.prototype.add = function (intent) { };
-    DispatchingEditPolicy.prototype.move = function (intent) { };
-    DispatchingEditPolicy.prototype.startConnection = function (intent) { };
-    DispatchingEditPolicy.prototype.endConnection = function (intent) { };
-    DispatchingEditPolicy.prototype.select = function (intent) { };
-    DispatchingEditPolicy.prototype.delete = function (intent) { };
-    DispatchingEditPolicy.prototype.requestAddFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.requestMoveFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.requestStartConnectionFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.requestEndConnectionFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.requestSelectFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.eraseAddFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.eraseMoveFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.eraseStartConnectionFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.eraseEndConnectionFeedback = function (intent) { };
-    DispatchingEditPolicy.prototype.eraseSelectFeedback = function (intent) { };
-    return DispatchingEditPolicy;
-}(EditPolicy));
 
 var Capability = /** @class */ (function () {
     function Capability(engine, config) {
@@ -554,12 +549,12 @@ var PartDomHelper = /** @class */ (function () {
     PartDomHelper.prototype.findClosest = function (dom, matcher) {
         if (matcher === void 0) { matcher = function () { return true; }; }
         var root = this.registry.root.dom;
-        for (var it = dom; it !== null; it = it.parentNode) {
-            var wrapper = this.registry.get(it);
+        for (var it_1 = dom; it_1 !== null; it_1 = it_1.parentNode) {
+            var wrapper = this.registry.get(it_1);
             if (wrapper !== undefined && wrapper !== null) {
                 return matcher(wrapper) ? wrapper : null;
             }
-            if (it === root) {
+            if (it_1 === root) {
                 return null;
             }
         }
@@ -670,9 +665,9 @@ function component(type) {
                 _this.userComponent = null;
                 _this.type = type;
                 _this.childProps = { toolkit: toolkitResolver(_this, context) };
-                var types$$1 = context.engine.types;
-                if (types$$1.indexOf(type) < 0) {
-                    var typesStr = types$$1.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
+                var types = context.engine.types;
+                if (types.indexOf(type) < 0) {
+                    var typesStr = types.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
                     throw new TypeError("Not a valid component type \"" + type + "\". Please select one from " + typesStr + ", or add \"" + type + "\" to the engine's \"types\" array.");
                 }
                 return _this;
@@ -714,10 +709,10 @@ function matchesSingleType(type) {
         return component.type === type;
     };
 }
-function matchesMultiTypes(types$$1) {
+function matchesMultiTypes(types) {
     return function (_a) {
         var component = _a.component;
-        return types$$1.indexOf(component.type) >= 0;
+        return types.indexOf(component.type) >= 0;
     };
 }
 function matchesSinglePart(partId) {
@@ -735,14 +730,14 @@ function getSelection(engine) {
     }
     return [];
 }
-function typeMatches(types$$1) {
-    if (types$$1 === null || types$$1 === undefined) {
+function typeMatches(types) {
+    if (types === null || types === undefined) {
         return alwaysTrue;
     }
-    else if (Array.isArray(types$$1)) {
-        return matchesMultiTypes(types$$1);
+    else if (Array.isArray(types)) {
+        return matchesMultiTypes(types);
     }
-    return matchesSingleType(types$$1);
+    return matchesSingleType(types);
 }
 function partMatches(ids) {
     if (ids === null || ids === undefined) {

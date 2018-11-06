@@ -1,5 +1,4 @@
 import React from 'react'
-import types from 'prop-types'
 import { RegefContext } from './RegefContext'
 import { Engine } from './Engine'
 import { Id } from './typings'
@@ -35,10 +34,5 @@ export class DiagramPart extends React.PureComponent<DiagramPartProps> {
         {React.Children.only(this.props.children)}
       </RegefContext.Provider>
     )
-  }
-
-  static propTypes = {
-    engine: types.instanceOf(Engine).isRequired,
-    id: types.oneOfType([types.string, types.symbol]).isRequired,
   }
 }

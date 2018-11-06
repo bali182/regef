@@ -17,6 +17,7 @@ export declare enum IntentType {
 export declare type Intent = {
     type: IntentType;
 };
+export declare type RecognizedIntent = AddIntent | MoveIntent | StartConnectionIntent | EndConnectionIntent | SelectionIntent | DeleteIntent;
 export declare type SelectionIntent = {
     type: IntentType.SELECT;
     bounds: Rectangle;

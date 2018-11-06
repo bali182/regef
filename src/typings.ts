@@ -5,6 +5,7 @@ import { Engine } from './Engine'
 import { Capability } from './Capability'
 import { EditPolicy } from './EditPolicy'
 import { SelectionProvider } from './SelectionProvider'
+import { ComponentWrapper } from './ComponentWrapper'
 
 /** @internal */
 export const REGEF_PROP_KEY = '@@regef-internal-context@@'
@@ -24,6 +25,12 @@ export type HasType = {
 /** @internal */
 export type RegefComponent = React.Component & HasUserComponent & HasType
 
+/** @internal */
+export type RegisterListener = (wrapper: ComponentWrapper) => void
+
+/** @internal */
+export type ComponentWrapperField = ComponentWrapper | Element | Component
+
 export enum IntentType {
   ADD = 'add',
   MOVE = 'move',
@@ -36,6 +43,14 @@ export enum IntentType {
 export type Intent = {
   type: IntentType
 }
+
+export type RecognizedIntent =
+  | AddIntent
+  | MoveIntent
+  | StartConnectionIntent
+  | EndConnectionIntent
+  | SelectionIntent
+  | DeleteIntent
 
 export type SelectionIntent = {
   type: IntentType.SELECT

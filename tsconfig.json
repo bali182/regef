@@ -10,6 +10,11 @@
       "es2017",
       "dom"
     ],
+    "types": [
+      "jest",
+      "reflect-metadata",
+      "node"
+    ],
     "sourceMap": false,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
@@ -19,7 +24,8 @@
     "outDir": "dist/lib",
     "resolveJsonModule": true,
     "noUnusedLocals": true,
-    "stripInternal": true
+    "stripInternal": true,
+    "downlevelIteration": true
   },
   "include": [
     "src"

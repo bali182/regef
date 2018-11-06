@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Rectangle } from 'regef-geometry';
 import { ComponentRegistry } from './ComponentRegistry';
 import { PartDomHelper } from './PartDomHelper';

@@ -8,15 +8,8 @@ import {
   SelectionIntent,
   DeleteIntent,
   IntentType,
+  RecognizedIntent,
 } from './typings'
-
-type RecognizedIntent =
-  | AddIntent
-  | MoveIntent
-  | StartConnectionIntent
-  | EndConnectionIntent
-  | SelectionIntent
-  | DeleteIntent
 
 export class DispatchingEditPolicy extends EditPolicy {
   perform(intent: RecognizedIntent): void {
