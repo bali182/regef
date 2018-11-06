@@ -596,7 +596,7 @@ var DiagramPartWrapper = /** @class */ (function () {
 /** @internal */
 function registryFrom(_a) {
     var engine = _a.engine, id = _a.id;
-    if (engine.__partsMap().has(id)) {
+    if (engine.__parts.has(id)) {
         return engine.part(id).registry;
     }
     return null;
@@ -604,14 +604,13 @@ function registryFrom(_a) {
 /** @internal */
 function toolkitFrom(_a) {
     var engine = _a.engine, id = _a.id;
-    return engine.__partsMap().has(id) ? engine.toolkit : null;
+    return engine.__parts.has(id) ? engine.toolkit : null;
 }
 /** @internal */
 function ensurePartRegistered(_a) {
     var engine = _a.engine, id = _a.id;
-    var parts = engine.__partsMap();
-    if (!parts.has(id)) {
-        parts.set(id, new DiagramPartWrapper(id, engine));
+    if (!engine.__parts.has(id)) {
+        engine.__parts.set(id, new DiagramPartWrapper(id, engine));
     }
 }
 /** @internal */

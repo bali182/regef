@@ -25,7 +25,8 @@
     "resolveJsonModule": true,
     "noUnusedLocals": true,
     "stripInternal": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "esModuleInterop": true
   },
   "include": [
     "src"

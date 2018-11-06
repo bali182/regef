@@ -1,32 +1,26 @@
 import { PartDomHelper } from '../src/PartDomHelper'
 import { ComponentWrapper } from '../src/ComponentWrapper'
 import { ComponentRegistry } from '../src/ComponentRegistry'
-import { JSDOM, ConstructorOptions } from 'jsdom'
-import { registerDummyTree } from './testUtils'
+import { registerDummyTree, mockDocument } from './testUtils'
 
 describe('PartDomHelper', () => {
   afterEach(() => jest.clearAllMocks())
 
-  const jsdomConfig: ConstructorOptions = {
-    contentType: 'text/xml',
-  }
-
   describe('#findClosest', () => {
     const registry = new ComponentRegistry()
     const helper = new PartDomHelper(registry)
-    const html = `<div data-root="true" id="root">
+    const doc = mockDocument(`<div data-root="true" id="root">
       <div id="wrapper">
         <div data-component="true" id="hello-component">
           <div id="hello-component-child"></div>
         </div>
       </div>
-    </div>`
-    const tree = new JSDOM(html, jsdomConfig)
+    </div>`)
 
-    const root = tree.window.document.getElementById('root')
-    const wrapper = tree.window.document.getElementById('wrapper')
-    const helloComponent = tree.window.document.getElementById('hello-component')
-    const helloComponentChild = tree.window.document.getElementById('hello-component-child')
+    const root = doc.getElementById('root')
+    const wrapper = doc.getElementById('wrapper')
+    const helloComponent = doc.getElementById('hello-component')
+    const helloComponentChild = doc.getElementById('hello-component-child')
 
     registerDummyTree(root, registry)
 
@@ -49,7 +43,7 @@ describe('PartDomHelper', () => {
   describe('#findRelevantChildren', () => {
     const registry = new ComponentRegistry()
     const helper = new PartDomHelper(registry)
-    const html = `<div data-root="true" id="root">
+    const doc = mockDocument(`<div data-root="true" id="root">
       <div id="wrapper">
         <div data-component="true" id="nested-component">
           <div data-component="true" id="deeply-nested-component-1"></div>
@@ -60,15 +54,14 @@ describe('PartDomHelper', () => {
       </div>
       <div data-component="true" id="non-nested-component-1"></div>
       <div data-component="true" id="non-nested-component-2"></div>
-    </div>`
-    const tree = new JSDOM(html, jsdomConfig)
+    </div>`)
 
-    const root = tree.window.document.getElementById('root')
-    const nested = tree.window.document.getElementById('nested-component')
-    const deeplyNested1 = tree.window.document.getElementById('deeply-nested-component-1')
-    const deeplyNested2 = tree.window.document.getElementById('deeply-nested-component-2')
-    const nonNested1 = tree.window.document.getElementById('non-nested-component-1')
-    const nonNested2 = tree.window.document.getElementById('non-nested-component-2')
+    const root = doc.getElementById('root')
+    const nested = doc.getElementById('nested-component')
+    const deeplyNested1 = doc.getElementById('deeply-nested-component-1')
+    const deeplyNested2 = doc.getElementById('deeply-nested-component-2')
+    const nonNested1 = doc.getElementById('non-nested-component-1')
+    const nonNested2 = doc.getElementById('non-nested-component-2')
 
     registerDummyTree(root, registry)
 
@@ -86,7 +79,7 @@ describe('PartDomHelper', () => {
   describe('#partContains', () => {
     const registry = new ComponentRegistry()
     const helper = new PartDomHelper(registry)
-    const html = `<div id="root">
+    const doc = mockDocument(`<div id="root">
       <div data-root="true" id="part-root">
         <div id="wrapper">
           <div data-component="true" id="nested-component"></div>
@@ -94,15 +87,14 @@ describe('PartDomHelper', () => {
         <div data-component="true" id="non-nested-component"></div>
       </div>
       <div id="external"></div>
-    </div>`
-    const tree = new JSDOM(html, jsdomConfig)
+    </div>`)
 
-    const root = tree.window.document.getElementById('root')
-    const partRoot = tree.window.document.getElementById('part-root')
-    const wrapper = tree.window.document.getElementById('wrapper')
-    const nested = tree.window.document.getElementById('nested-component')
-    const nonNested = tree.window.document.getElementById('non-nested-component')
-    const external = tree.window.document.getElementById('external')
+    const root = doc.getElementById('root')
+    const partRoot = doc.getElementById('part-root')
+    const wrapper = doc.getElementById('wrapper')
+    const nested = doc.getElementById('nested-component')
+    const nonNested = doc.getElementById('non-nested-component')
+    const external = doc.getElementById('external')
 
     registerDummyTree(partRoot, registry)
 
