@@ -116,7 +116,7 @@ var DiagramPart = /** @class */ (function (_super) {
     };
     DiagramPart.prototype.render = function () {
         var _a = this.props, id = _a.id, engine = _a.engine;
-        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, React.Children.only(this.props.children)));
+        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, this.props.children));
     };
     return DiagramPart;
 }(React.PureComponent));

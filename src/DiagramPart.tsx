@@ -29,9 +29,7 @@ export class DiagramPart extends React.PureComponent<DiagramPartProps> {
   render(): React.ReactNode {
     const { id, engine } = this.props
     return (
-      <RegefContext.Provider value={{ id, engine }}>
-        {React.Children.only(this.props.children)}
-      </RegefContext.Provider>
+      <RegefContext.Provider value={{ id, engine }}>{this.props.children}</RegefContext.Provider>
     )
   }
 }
