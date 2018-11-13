@@ -17,15 +17,15 @@ const DEFAULT_ENGINE_CONFIG: EngineConfig = {
 }
 
 export class Engine {
-  public readonly toolkit: Toolkit
-  public readonly eventManager: EventManager
-  public readonly domHelper: DomHelper
-  public readonly capabilities: Capability[]
-  public readonly editPolicies: EditPolicy[]
-  public readonly selectionProvider: SelectionProvider
-  public readonly types: Id[]
-  public readonly rootType: Id
-  public readonly htmlDocument: Document
+  public readonly toolkit: Toolkit = null
+  public readonly eventManager: EventManager = null
+  public readonly domHelper: DomHelper = null
+  public readonly capabilities: Capability[] = []
+  public readonly editPolicies: EditPolicy[] = []
+  public readonly selectionProvider: SelectionProvider = null
+  public readonly types: Id[] = []
+  public readonly rootType: Id = null
+  public readonly htmlDocument: Document = document
 
   /** @internal */
   public readonly __parts: Map<Id, DiagramPartWrapper>

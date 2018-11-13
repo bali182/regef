@@ -4,32 +4,33 @@ import { ComponentWrapper } from '../src/ComponentWrapper'
 import { ComponentRegistry } from '../src/ComponentRegistry'
 import { JSDOM } from 'jsdom'
 import nanoid from 'nanoid'
+import { Capability } from '../src'
 
 const DEFAULT_EVENT_CONFIG: EventInit = {}
 
 export type IEventCreator = {
-  mouseDown(init?: MouseEventInit)
-  mouseUp(init?: MouseEventInit)
-  mouseMove(init?: MouseEventInit)
-  keyDown(init?: KeyboardEventInit)
-  keyUp(init?: MouseEventInit)
+  mouseDown(init?: MouseEventInit): MouseEvent
+  mouseUp(init?: MouseEventInit): MouseEvent
+  mouseMove(init?: MouseEventInit): MouseEvent
+  keyDown(init?: KeyboardEventInit): KeyboardEvent
+  keyUp(init?: MouseEventInit): KeyboardEvent
 }
 
 export class EventCreator implements IEventCreator {
-  private readonly doc: Document
-  constructor(doc: Document) {
-    this.doc = doc
-  }
-  createEventCreator = <T extends EventInit>(type: string) => (config: T = null): Event => {
-    const EventCtr = (this.doc.defaultView as any).Event
+  constructor(private readonly doc: Document) {}
+  createKeyEventCreator = (type: string) => (config: KeyboardEventInit = null): KeyboardEvent => {
+    const EventCtr = (this.doc.defaultView as any).KeyboardEvent
     return new EventCtr(type, { ...DEFAULT_EVENT_CONFIG, ...(config || ({} as any)) })
   }
-
-  mouseDown = this.createEventCreator<MouseEventInit>('mousedown')
-  mouseUp = this.createEventCreator<MouseEventInit>('mouseup')
-  mouseMove = this.createEventCreator<MouseEventInit>('mousemove')
-  keyDown = this.createEventCreator<KeyboardEventInit>('keydown')
-  keyUp = this.createEventCreator<KeyboardEventInit>('keyup')
+  createMouseEventCreator = (type: string) => (config: MouseEventInit = null): MouseEvent => {
+    const EventCtr = (this.doc.defaultView as any).MouseEvent
+    return new EventCtr(type, { ...DEFAULT_EVENT_CONFIG, ...(config || ({} as any)) })
+  }
+  mouseDown = this.createMouseEventCreator('mousedown')
+  mouseUp = this.createMouseEventCreator('mouseup')
+  mouseMove = this.createMouseEventCreator('mousemove')
+  keyDown = this.createKeyEventCreator('keydown')
+  keyUp = this.createKeyEventCreator('keyup')
 }
 
 export function dummyElement(type: Id = null): Element {
@@ -90,4 +91,15 @@ export function registerDummyTree(node: Node, registry: ComponentRegistry): void
 
 export function mockDocument(html: string): Document {
   return new JSDOM(html, { contentType: 'text/xml' }).window.document
+}
+
+export function mockCapability(): Capability {
+  return {
+    cancel: jest.fn(),
+    onKeyDown: jest.fn(),
+    onKeyUp: jest.fn(),
+    onMouseDown: jest.fn(),
+    onMouseMove: jest.fn(),
+    onMouseUp: jest.fn(),
+  } as any
 }

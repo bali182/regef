@@ -42,7 +42,7 @@ export function typeMatches(types: Id | Id[]): (wrapper: ComponentWrapper) => bo
   return matchesSingleType(types)
 }
 
-export function partMatches(ids: Id[]): (part: DiagramPartWrapper) => boolean {
+export function partMatches(ids: Id | Id[]): (part: DiagramPartWrapper) => boolean {
   if (ids === null || ids === undefined) {
     return alwaysTrue
   } else if (Array.isArray(ids)) {

@@ -305,6 +305,15 @@ var DEFAULT_ENGINE_CONFIG = {
 var Engine = /** @class */ (function () {
     function Engine(config) {
         if (config === void 0) { config = function () { return DEFAULT_ENGINE_CONFIG; }; }
+        this.toolkit = null;
+        this.eventManager = null;
+        this.domHelper = null;
+        this.capabilities = [];
+        this.editPolicies = [];
+        this.selectionProvider = null;
+        this.types = [];
+        this.rootType = null;
+        this.htmlDocument = document;
         this.toolkit = new Toolkit(this);
         this.eventManager = new EventManager(this);
         this.domHelper = new DomHelper(this);
@@ -1303,6 +1312,7 @@ var CancelCapability = /** @class */ (function (_super) {
         if (config === void 0) { config = {}; }
         return _super.call(this, engine, __assign({}, DEFAULT_CONFIG$4, config)) || this;
     }
+    /** @internal */
     CancelCapability.prototype.focusOnTargetedParts = function (target) {
         return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
     };

@@ -11,7 +11,7 @@ export declare function matchesMultiParts(partIds: Id[]): (part: DiagramPartWrap
 export declare function alwaysTrue(): true;
 export declare function getSelection(engine: Engine): Component[];
 export declare function typeMatches(types: Id | Id[]): (wrapper: ComponentWrapper) => boolean;
-export declare function partMatches(ids: Id[]): (part: DiagramPartWrapper) => boolean;
+export declare function partMatches(ids: Id | Id[]): (part: DiagramPartWrapper) => boolean;
 export declare const perform: (policies: EditPolicy[], intent: Intent) => void;
 export declare const requestFeedback: (policies: EditPolicy[], intent: Intent) => void;
 export declare const eraseFeedback: (policies: EditPolicy[], intent: Intent) => void;
