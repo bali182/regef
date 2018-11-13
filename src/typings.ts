@@ -158,6 +158,7 @@ export interface EngineConfig {
   selectionProvider: SelectionProvider
   rootType: Id
   types: Id[]
+  htmlDocument: Document
 }
 
-export type EngineConfigProvider = (engine: Engine) => EngineConfig
+export type EngineConfigProvider = (engine: Engine) => Partial<EngineConfig>

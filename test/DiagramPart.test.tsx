@@ -4,6 +4,7 @@ import { mount } from 'enzyme'
 import { Engine } from '../src/Engine'
 import { RegefInternalProps } from '../src'
 import { RegefContext } from '../src/RegefContext'
+import { mockDocument } from './testUtils'
 
 describe('DiagramPart', () => {
   afterEach(() => jest.clearAllMocks())
@@ -14,7 +15,7 @@ describe('DiagramPart', () => {
 
   it('should pass along the regef context to child consumers', () => {
     const id = '__TEST__'
-    const engine = new Engine()
+    const engine = new Engine(() => ({ htmlDocument: mockDocument('<div />') }))
     const ChildComponent = jest.fn((props: RegefInternalProps) => {
       expect(props).not.toBe(null)
       expect(props.id).toBe(id)

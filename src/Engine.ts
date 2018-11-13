@@ -7,12 +7,13 @@ import { SelectionProvider } from './SelectionProvider'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
 import { Id, EngineConfig, EngineConfigProvider } from './typings'
 
-const DefaultEngineConfig: EngineConfig = {
+const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   capabilities: [],
   editPolicies: [],
   selectionProvider: null,
   rootType: null,
   types: [],
+  htmlDocument: document,
 }
 
 export class Engine {
@@ -24,23 +25,25 @@ export class Engine {
   public readonly selectionProvider: SelectionProvider
   public readonly types: Id[]
   public readonly rootType: Id
+  public readonly htmlDocument: Document
 
   /** @internal */
   public readonly __parts: Map<Id, DiagramPartWrapper>
 
-  constructor(config: EngineConfigProvider = () => DefaultEngineConfig) {
+  constructor(config: EngineConfigProvider = () => DEFAULT_ENGINE_CONFIG) {
     this.toolkit = new Toolkit(this)
     this.eventManager = new EventManager(this)
     this.domHelper = new DomHelper(this)
     this.__parts = new Map()
 
-    const { capabilities, editPolicies, selectionProvider, rootType, types } = config(this)
+    const evaluatedConfig = { ...DEFAULT_ENGINE_CONFIG, ...config(this) }
 
-    this.capabilities = capabilities
-    this.editPolicies = editPolicies
-    this.selectionProvider = selectionProvider
-    this.types = types
-    this.rootType = rootType
+    this.capabilities = evaluatedConfig.capabilities
+    this.editPolicies = evaluatedConfig.editPolicies
+    this.selectionProvider = evaluatedConfig.selectionProvider
+    this.types = evaluatedConfig.types
+    this.rootType = evaluatedConfig.rootType
+    this.htmlDocument = evaluatedConfig.htmlDocument || document
   }
   part(id: Id): DiagramPartWrapper {
     return this.__parts.get(id)

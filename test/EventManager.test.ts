@@ -1,15 +1,16 @@
 import { Capability } from '../src/Capability'
 import { Engine } from '../src/Engine'
 import { EventManager } from '../src/EventManager'
-import { mouseDownEvent, mouseMoveEvent, mouseUpEvent, keyDownEvent, keyUpEvent } from './testUtils'
+import { EventCreator, mockDocument } from './testUtils'
 
 describe('EventManager', () => {
   afterEach(() => jest.clearAllMocks())
 
   it('should hook/unhook the 5 document listeners when EventManager#hookListeners is called', () => {
-    const eventManager = new EventManager(null)
-    const addEventListenerSpy = jest.spyOn(document, 'addEventListener')
-    const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener')
+    const mockEngine = { htmlDocument: mockDocument(`<div />`) } as Engine
+    const eventManager = new EventManager(mockEngine)
+    const addEventListenerSpy = jest.spyOn(mockEngine.htmlDocument, 'addEventListener')
+    const removeEventListenerSpy = jest.spyOn(mockEngine.htmlDocument, 'removeEventListener')
 
     expect(eventManager.hooked).toBe(false)
 
@@ -26,7 +27,10 @@ describe('EventManager', () => {
 
   it('should dispatch events to the registered Capability', () => {
     const dummyCapability = new Capability<void>(null, null)
-    const dummyEngine = { capabilities: [dummyCapability] } as Engine
+    const dummyEngine = {
+      capabilities: [dummyCapability],
+      htmlDocument: mockDocument(`<div />`),
+    } as Engine
     const eventManager = new EventManager(dummyEngine)
 
     eventManager.hookListeners()
@@ -37,19 +41,21 @@ describe('EventManager', () => {
     const keyDownSpy = jest.spyOn(dummyCapability, 'onKeyDown')
     const keyUpSpy = jest.spyOn(dummyCapability, 'onKeyUp')
 
-    document.dispatchEvent(mouseDownEvent())
+    const ec = new EventCreator(dummyEngine.htmlDocument)
+
+    dummyEngine.htmlDocument.dispatchEvent(ec.mouseDown())
     expect(mouseDownSpy).toHaveBeenCalledTimes(1)
 
-    document.dispatchEvent(mouseMoveEvent())
+    dummyEngine.htmlDocument.dispatchEvent(ec.mouseMove())
     expect(mouseMoveSpy).toHaveBeenCalledTimes(1)
 
-    document.dispatchEvent(mouseUpEvent())
+    dummyEngine.htmlDocument.dispatchEvent(ec.mouseUp())
     expect(mouseUpSpy).toHaveBeenCalledTimes(1)
 
-    document.dispatchEvent(keyDownEvent())
+    dummyEngine.htmlDocument.dispatchEvent(ec.keyDown())
     expect(keyDownSpy).toHaveBeenCalledTimes(1)
 
-    document.dispatchEvent(keyUpEvent())
+    dummyEngine.htmlDocument.dispatchEvent(ec.keyUp())
     expect(keyUpSpy).toHaveBeenCalledTimes(1)
 
     eventManager.unhookListeners()

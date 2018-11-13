@@ -15,6 +15,7 @@ export declare class Engine {
     readonly selectionProvider: SelectionProvider;
     readonly types: Id[];
     readonly rootType: Id;
+    readonly htmlDocument: Document;
     constructor(config?: EngineConfigProvider);
     part(id: Id): DiagramPartWrapper;
     allParts(): DiagramPartWrapper[];

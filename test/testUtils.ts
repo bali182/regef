@@ -5,23 +5,39 @@ import { ComponentRegistry } from '../src/ComponentRegistry'
 import { JSDOM } from 'jsdom'
 import nanoid from 'nanoid'
 
-export function mouseDownEvent(config: Partial<MouseEventInit> = {}) {
-  return new MouseEvent('mousedown', config)
+const DEFAULT_EVENT_CONFIG: EventInit = {}
+
+export type IEventCreator = {
+  mouseDown(init?: MouseEventInit)
+  mouseUp(init?: MouseEventInit)
+  mouseMove(init?: MouseEventInit)
+  keyDown(init?: KeyboardEventInit)
+  keyUp(init?: MouseEventInit)
 }
-export function mouseUpEvent(config: Partial<MouseEventInit> = {}) {
-  return new MouseEvent('mouseup', config)
+
+export class EventCreator implements IEventCreator {
+  private readonly doc: Document
+  constructor(doc: Document) {
+    this.doc = doc
+  }
+  createEventCreator = <T extends EventInit>(type: string) => (config: T = null): Event => {
+    const EventCtr = (this.doc.defaultView as any).Event
+    return new EventCtr(type, { ...DEFAULT_EVENT_CONFIG, ...(config || ({} as any)) })
+  }
+
+  mouseDown = this.createEventCreator<MouseEventInit>('mousedown')
+  mouseUp = this.createEventCreator<MouseEventInit>('mouseup')
+  mouseMove = this.createEventCreator<MouseEventInit>('mousemove')
+  keyDown = this.createEventCreator<KeyboardEventInit>('keydown')
+  keyUp = this.createEventCreator<KeyboardEventInit>('keyup')
 }
-export function mouseMoveEvent(config: MouseEventInit = {}) {
-  return new MouseEvent('mousemove', config)
-}
-export function keyDownEvent(config: KeyboardEventInit = {}) {
-  return new KeyboardEvent('keydown', config)
-}
-export function keyUpEvent(config: KeyboardEventInit = {}) {
-  return new KeyboardEvent('keyup', config)
-}
-export function dummyElement(): Element {
-  return { domElement: Symbol('DOM element') } as any
+
+export function dummyElement(type: Id = null): Element {
+  return {
+    id: nanoid(8),
+    __type: 'Dummy Dom Element',
+    ...(type ? { type } : {}),
+  } as any
 }
 export function dummyUserComponent(type: Id = null): Component {
   return {

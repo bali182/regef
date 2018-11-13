@@ -16,22 +16,22 @@ export class EventManager {
   }
 
   hookListeners(): void {
-    document.addEventListener('mousedown', this.onMouseDown)
-    document.addEventListener('mousemove', this.onMouseMove)
-    document.addEventListener('mouseup', this.onMouseUp)
-    document.addEventListener('keydown', this.onKeyDown)
-    document.addEventListener('keyup', this.onKeyUp)
-
+    const { htmlDocument } = this.engine
+    htmlDocument.addEventListener('mousedown', this.onMouseDown)
+    htmlDocument.addEventListener('mousemove', this.onMouseMove)
+    htmlDocument.addEventListener('mouseup', this.onMouseUp)
+    htmlDocument.addEventListener('keydown', this.onKeyDown)
+    htmlDocument.addEventListener('keyup', this.onKeyUp)
     this.hooked = true
   }
 
   unhookListeners(): void {
-    document.removeEventListener('mousedown', this.onMouseDown)
-    document.removeEventListener('mousemove', this.onMouseMove)
-    document.removeEventListener('mouseup', this.onMouseUp)
-    document.removeEventListener('keydown', this.onKeyDown)
-    document.removeEventListener('keyup', this.onKeyUp)
-
+    const { htmlDocument } = this.engine
+    htmlDocument.removeEventListener('mousedown', this.onMouseDown)
+    htmlDocument.removeEventListener('mousemove', this.onMouseMove)
+    htmlDocument.removeEventListener('mouseup', this.onMouseUp)
+    htmlDocument.removeEventListener('keydown', this.onKeyDown)
+    htmlDocument.removeEventListener('keyup', this.onKeyUp)
     this.hooked = false
   }
 

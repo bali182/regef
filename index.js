@@ -217,19 +217,21 @@ var EventManager = /** @class */ (function () {
         this.onKeyUp = this.onKeyUp.bind(this);
     }
     EventManager.prototype.hookListeners = function () {
-        document.addEventListener('mousedown', this.onMouseDown);
-        document.addEventListener('mousemove', this.onMouseMove);
-        document.addEventListener('mouseup', this.onMouseUp);
-        document.addEventListener('keydown', this.onKeyDown);
-        document.addEventListener('keyup', this.onKeyUp);
+        var htmlDocument = this.engine.htmlDocument;
+        htmlDocument.addEventListener('mousedown', this.onMouseDown);
+        htmlDocument.addEventListener('mousemove', this.onMouseMove);
+        htmlDocument.addEventListener('mouseup', this.onMouseUp);
+        htmlDocument.addEventListener('keydown', this.onKeyDown);
+        htmlDocument.addEventListener('keyup', this.onKeyUp);
         this.hooked = true;
     };
     EventManager.prototype.unhookListeners = function () {
-        document.removeEventListener('mousedown', this.onMouseDown);
-        document.removeEventListener('mousemove', this.onMouseMove);
-        document.removeEventListener('mouseup', this.onMouseUp);
-        document.removeEventListener('keydown', this.onKeyDown);
-        document.removeEventListener('keyup', this.onKeyUp);
+        var htmlDocument = this.engine.htmlDocument;
+        htmlDocument.removeEventListener('mousedown', this.onMouseDown);
+        htmlDocument.removeEventListener('mousemove', this.onMouseMove);
+        htmlDocument.removeEventListener('mouseup', this.onMouseUp);
+        htmlDocument.removeEventListener('keydown', this.onKeyDown);
+        htmlDocument.removeEventListener('keyup', this.onKeyUp);
         this.hooked = false;
     };
     EventManager.prototype.onKeyUp = function (e) {
@@ -292,26 +294,28 @@ var DomHelper = /** @class */ (function () {
     return DomHelper;
 }());
 
-var DefaultEngineConfig = {
+var DEFAULT_ENGINE_CONFIG = {
     capabilities: [],
     editPolicies: [],
     selectionProvider: null,
     rootType: null,
     types: [],
+    htmlDocument: document,
 };
 var Engine = /** @class */ (function () {
     function Engine(config) {
-        if (config === void 0) { config = function () { return DefaultEngineConfig; }; }
+        if (config === void 0) { config = function () { return DEFAULT_ENGINE_CONFIG; }; }
         this.toolkit = new Toolkit(this);
         this.eventManager = new EventManager(this);
         this.domHelper = new DomHelper(this);
         this.__parts = new Map();
-        var _a = config(this), capabilities = _a.capabilities, editPolicies = _a.editPolicies, selectionProvider = _a.selectionProvider, rootType = _a.rootType, types = _a.types;
-        this.capabilities = capabilities;
-        this.editPolicies = editPolicies;
-        this.selectionProvider = selectionProvider;
-        this.types = types;
-        this.rootType = rootType;
+        var evaluatedConfig = __assign({}, DEFAULT_ENGINE_CONFIG, config(this));
+        this.capabilities = evaluatedConfig.capabilities;
+        this.editPolicies = evaluatedConfig.editPolicies;
+        this.selectionProvider = evaluatedConfig.selectionProvider;
+        this.types = evaluatedConfig.types;
+        this.rootType = evaluatedConfig.rootType;
+        this.htmlDocument = evaluatedConfig.htmlDocument || document;
     }
     Engine.prototype.part = function (id) {
         return this.__parts.get(id);
