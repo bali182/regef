@@ -16,4 +16,4 @@ export declare const perform: (policies: EditPolicy[], intent: Intent) => void;
 export declare const requestFeedback: (policies: EditPolicy[], intent: Intent) => void;
 export declare const eraseFeedback: (policies: EditPolicy[], intent: Intent) => void;
 export declare function getParts(engine: Engine, ids?: Id[]): DiagramPartWrapper[];
-export declare function isLeftButton(e: MouseEvent & any): boolean;
+export declare function isLeftButton(e: MouseEvent): boolean;

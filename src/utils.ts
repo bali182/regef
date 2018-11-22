@@ -75,11 +75,11 @@ export function getParts(engine: Engine, ids: Id[] = null): DiagramPartWrapper[]
 }
 
 // https://stackoverflow.com/a/12737882/1126273
-export function isLeftButton(e: MouseEvent & any): boolean {
+export function isLeftButton(e: MouseEvent): boolean {
   if ('buttons' in e) {
     return e.buttons === 1
   } else if ('which' in e) {
-    return e.which === 1
+    return (e as any).which === 1
   }
-  return e.button === 1
+  return (e as any).button === 1
 }

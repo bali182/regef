@@ -4,27 +4,45 @@ import { ComponentWrapper } from '../src/ComponentWrapper'
 import { ComponentRegistry } from '../src/ComponentRegistry'
 import { JSDOM } from 'jsdom'
 import nanoid from 'nanoid'
-import { Capability } from '../src'
+import { Capability, EditPolicy } from '../src'
 
 const DEFAULT_EVENT_CONFIG: EventInit = {}
 
+interface EventConfigExtra {
+  target?: EventTarget
+}
+
 export type IEventCreator = {
-  mouseDown(init?: MouseEventInit): MouseEvent
-  mouseUp(init?: MouseEventInit): MouseEvent
-  mouseMove(init?: MouseEventInit): MouseEvent
-  keyDown(init?: KeyboardEventInit): KeyboardEvent
-  keyUp(init?: MouseEventInit): KeyboardEvent
+  mouseDown(init?: MouseEventInit & EventConfigExtra): MouseEvent
+  mouseUp(init?: MouseEventInit & EventConfigExtra): MouseEvent
+  mouseMove(init?: MouseEventInit & EventConfigExtra): MouseEvent
+  keyDown(init?: KeyboardEventInit & EventConfigExtra): KeyboardEvent
+  keyUp(init?: KeyboardEventInit & EventConfigExtra): KeyboardEvent
 }
 
 export class EventCreator implements IEventCreator {
   constructor(private readonly doc: Document) {}
-  createKeyEventCreator = (type: string) => (config: KeyboardEventInit = null): KeyboardEvent => {
+  private createKeyEventCreator = (type: string) => (
+    config: KeyboardEventInit & EventConfigExtra = null,
+  ): KeyboardEvent => {
     const EventCtr = (this.doc.defaultView as any).KeyboardEvent
-    return new EventCtr(type, { ...DEFAULT_EVENT_CONFIG, ...(config || ({} as any)) })
+    const eventConfig = { ...DEFAULT_EVENT_CONFIG, ...config }
+    const event = new EventCtr(type, eventConfig)
+    if (eventConfig.target) {
+      Object.defineProperty(event, 'target', { value: config.target, enumerable: true })
+    }
+    return event
   }
-  createMouseEventCreator = (type: string) => (config: MouseEventInit = null): MouseEvent => {
+  private createMouseEventCreator = (type: string) => (
+    config: MouseEventInit & EventConfigExtra = null,
+  ): MouseEvent => {
     const EventCtr = (this.doc.defaultView as any).MouseEvent
-    return new EventCtr(type, { ...DEFAULT_EVENT_CONFIG, ...(config || ({} as any)) })
+    const eventConfig = { ...DEFAULT_EVENT_CONFIG, ...config }
+    const event = new EventCtr(type, eventConfig)
+    if (eventConfig.target) {
+      Object.defineProperty(event, 'target', { value: config.target, enumerable: true })
+    }
+    return event
   }
   mouseDown = this.createMouseEventCreator('mousedown')
   mouseUp = this.createMouseEventCreator('mouseup')
@@ -90,7 +108,7 @@ export function registerDummyTree(node: Node, registry: ComponentRegistry): void
 }
 
 export function mockDocument(html: string): Document {
-  return new JSDOM(html, { contentType: 'text/xml' }).window.document
+  return new JSDOM(html, { contentType: 'text/xml', pretendToBeVisual: true }).window.document
 }
 
 export function mockCapability(): Capability {
@@ -102,4 +120,12 @@ export function mockCapability(): Capability {
     onMouseMove: jest.fn(),
     onMouseUp: jest.fn(),
   } as any
+}
+
+export function mockEditPolicy(): EditPolicy {
+  return {
+    perform: jest.fn(),
+    requestFeedback: jest.fn(),
+    eraseFeedback: jest.fn(),
+  }
 }
