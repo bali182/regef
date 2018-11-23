@@ -13,5 +13,7 @@ export { SingleSelectionCapability } from './SingleSelectionCapability'
 export { MultiSelectionCapability } from './MultiSelectionCapability'
 export { CancelCapability } from './CancelCapability'
 export { DeleteCapability } from './DeleteCapability'
+export { Toolkit } from './Toolkit'
+export { PartToolkit } from './PartToolkit'
 
 export * from './typings'

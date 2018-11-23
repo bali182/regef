@@ -1383,5 +1383,7 @@ exports.SingleSelectionCapability = SingleSelectionCapability;
 exports.MultiSelectionCapability = MultiSelectionCapability;
 exports.CancelCapability = CancelCapability;
 exports.DeleteCapability = DeleteCapability;
+exports.Toolkit = Toolkit;
+exports.PartToolkit = PartToolkit;
 exports.REGEF_PROP_KEY = REGEF_PROP_KEY;
 //# sourceMappingURL=index.js.map
