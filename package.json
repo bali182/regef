@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "precommit": "npm run build && git add index.js types",
+    "precommit": "npm test && npm run build && git add index.js types",
     "start": "webpack-dev-server",
     "build": "rollup -c",
     "test": "jest --config jestrc.json",
