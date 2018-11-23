@@ -1,11 +1,8 @@
 import { ComponentWrapper } from './ComponentWrapper'
-import React from 'react'
-
-type WrapperField = ComponentWrapper | Element | React.Component
-type RegisterListener = (c: ComponentWrapper) => void
+import { RegisterListener, ComponentWrapperField } from './typings'
 
 export class ComponentRegistry {
-  private mapping: Map<WrapperField, ComponentWrapper>
+  private mapping: Map<ComponentWrapperField, ComponentWrapper>
   private wrappers: Set<ComponentWrapper>
   private registerListeners: RegisterListener[] = []
   private unregisterListeners: RegisterListener[] = []
@@ -42,7 +39,7 @@ export class ComponentRegistry {
     this.wrappers.add(wrapper)
     this.registerListeners.forEach((listener) => listener(wrapper))
   }
-  unregister(input: WrapperField): void {
+  unregister(input: ComponentWrapperField): void {
     const wrapper = this.get(input)
     if (wrapper !== undefined) {
       this.mapping.delete(wrapper)
@@ -53,13 +50,13 @@ export class ComponentRegistry {
       this.unregisterListeners.forEach((listener) => listener(wrapper))
     }
   }
-  get(input: WrapperField): ComponentWrapper {
+  get(input: ComponentWrapperField): ComponentWrapper {
     return this.mapping.get(input)
   }
   all(): ComponentWrapper[] {
     return Array.from(this.wrappers)
   }
-  has(input: WrapperField): boolean {
+  has(input: ComponentWrapperField): boolean {
     return this.mapping.has(input)
   }
   addRegisterListener(listener: RegisterListener): void {

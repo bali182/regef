@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Engine } from './Engine';
 import { PartToolkit } from './PartToolkit';
 export declare class Toolkit {

@@ -5,7 +5,6 @@ export declare class PartDomHelper {
     private registry;
     constructor(registry: ComponentRegistry);
     findClosest(dom: Element, matcher?: WrapperPredicate): ComponentWrapper;
-    findRelevantChildrenIntenal(node: Element, children?: Element[]): Element[];
     findRelevantChildren(element: Element): Element[];
     partContains(element: Element): boolean;
 }

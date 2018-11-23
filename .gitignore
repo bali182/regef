@@ -3,5 +3,5 @@ npm-debug.log
 yarn-error.log
 package-lock.json
 dist
-.vscode
+index.js.map
 .rpt2_cache

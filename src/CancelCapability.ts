@@ -13,11 +13,12 @@ export class CancelCapability extends Capability<CancelCapabilityConfig> {
     super(engine, { ...DEFAULT_CONFIG, ...config })
   }
 
-  private focusOnTargetedParts(target: Element): boolean {
+  /** @internal */
+  focusOnTargetedParts(target: Element): boolean {
     return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)))
   }
 
-  private keyMatches(key: string): boolean {
+  protected keyMatches(key: string): boolean {
     return this.config.keys.indexOf(key) >= 0
   }
 

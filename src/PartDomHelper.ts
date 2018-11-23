@@ -23,9 +23,10 @@ export class PartDomHelper {
     return null
   }
 
-  findRelevantChildrenIntenal(node: Element, children: Element[] = []): Element[] {
+  /** @internal */
+  private findRelevantChildrenIntenal(node: Element, children: Element[] = []): void {
     if (node !== null && node.hasChildNodes()) {
-      const childNodes = node.childNodes as NodeListOf<Element>
+      const childNodes = Array.from(node.childNodes as NodeListOf<Element>)
       for (let i = 0, len = childNodes.length; i < len; i += 1) {
         const childNode = childNodes[i]
         if (this.registry.has(childNode)) {
@@ -35,11 +36,12 @@ export class PartDomHelper {
         }
       }
     }
-    return children
   }
 
   findRelevantChildren(element: Element): Element[] {
-    return this.findRelevantChildrenIntenal(element, [])
+    const children: Element[] = []
+    this.findRelevantChildrenIntenal(element, children)
+    return children
   }
 
   partContains(element: Element): boolean {

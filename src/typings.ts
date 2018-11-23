@@ -2,14 +2,13 @@ import { Rectangle, Point } from 'regef-geometry'
 import { Component } from 'react'
 import { Toolkit } from './Toolkit'
 import { Engine } from './Engine'
-import { Capability } from './Capability'
 import { EditPolicy } from './EditPolicy'
 import { SelectionProvider } from './SelectionProvider'
+import { ComponentWrapper } from './ComponentWrapper'
+import { Capability } from './Capability'
 
 /** @internal */
 export const REGEF_PROP_KEY = '@@regef-internal-context@@'
-
-export type Id = string | Symbol
 
 /** @internal */
 export type HasUserComponent = {
@@ -24,6 +23,25 @@ export type HasType = {
 /** @internal */
 export type RegefComponent = React.Component & HasUserComponent & HasType
 
+/** @internal */
+export type RegisterListener = (wrapper: ComponentWrapper) => void
+
+/** @internal */
+export type ComponentWrapperField = ComponentWrapper | Element | Component
+
+/** @internal */
+export type RegefInternalProps = {
+  engine: Engine
+  id: Id
+}
+
+/** @internal */
+export type RegefProps = {
+  [REGEF_PROP_KEY]: RegefInternalProps
+}
+
+export type Id = string | Symbol
+
 export enum IntentType {
   ADD = 'add',
   MOVE = 'move',
@@ -36,6 +54,14 @@ export enum IntentType {
 export type Intent = {
   type: IntentType
 }
+
+export type RecognizedIntent =
+  | AddIntent
+  | MoveIntent
+  | StartConnectionIntent
+  | EndConnectionIntent
+  | SelectionIntent
+  | DeleteIntent
 
 export type SelectionIntent = {
   type: IntentType.SELECT
@@ -92,17 +118,6 @@ export interface RegefComponentProps {
   regef: RegefObject
 }
 
-/** @internal */
-export type RegefInternalProps = {
-  engine: Engine
-  id: Id
-}
-
-/** @internal */
-export type RegefProps = {
-  [REGEF_PROP_KEY]: RegefInternalProps
-}
-
 export interface CancelCapabilityConfig {
   parts?: Id[]
   keys?: string[]
@@ -143,6 +158,7 @@ export interface EngineConfig {
   selectionProvider: SelectionProvider
   rootType: Id
   types: Id[]
+  htmlDocument: Document
 }
 
-export type EngineConfigProvider = (engine: Engine) => EngineConfig
+export type EngineConfigProvider = (engine: Engine) => Partial<EngineConfig>

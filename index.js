@@ -5,7 +5,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var React = _interopDefault(require('react'));
-var types = _interopDefault(require('prop-types'));
 var ReactDOM = _interopDefault(require('react-dom'));
 var regefGeometry = require('regef-geometry');
 
@@ -93,127 +92,6 @@ function withRegefContext(Wrapped) {
     return WithRegefContext;
 }
 
-var EventManager = /** @class */ (function () {
-    function EventManager(engine) {
-        this.engine = engine;
-        this.hooked = false;
-        // binding methods
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseMove = this.onMouseMove.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
-        this.onKeyUp = this.onKeyUp.bind(this);
-    }
-    EventManager.prototype.hookListeners = function () {
-        document.addEventListener('mousedown', this.onMouseDown);
-        document.addEventListener('mousemove', this.onMouseMove);
-        document.addEventListener('mouseup', this.onMouseUp);
-        document.addEventListener('keydown', this.onKeyDown);
-        document.addEventListener('keyup', this.onKeyUp);
-        this.hooked = true;
-    };
-    EventManager.prototype.unhookListeners = function () {
-        document.removeEventListener('mousedown', this.onMouseDown);
-        document.removeEventListener('mousemove', this.onMouseMove);
-        document.removeEventListener('mouseup', this.onMouseUp);
-        document.removeEventListener('keydown', this.onKeyDown);
-        document.removeEventListener('keyup', this.onKeyUp);
-        this.hooked = false;
-    };
-    EventManager.prototype.onKeyUp = function (e) {
-        this.engine.capabilities.forEach(function (capability) { return capability.onKeyUp(e); });
-    };
-    EventManager.prototype.onKeyDown = function (e) {
-        this.engine.capabilities.forEach(function (capability) { return capability.onKeyDown(e); });
-    };
-    EventManager.prototype.onMouseDown = function (e) {
-        this.engine.capabilities.forEach(function (capability) { return capability.onMouseDown(e); });
-    };
-    EventManager.prototype.onMouseMove = function (e) {
-        this.engine.capabilities.forEach(function (capability) { return capability.onMouseMove(e); });
-    };
-    EventManager.prototype.onMouseUp = function (e) {
-        this.engine.capabilities.forEach(function (capability) { return capability.onMouseUp(e); });
-    };
-    return EventManager;
-}());
-
-var Toolkit = /** @class */ (function () {
-    function Toolkit(engine) {
-        this.engine = engine;
-    }
-    Toolkit.prototype.forPart = function (id) {
-        var part = this.engine.part(id);
-        if (part === null) {
-            throw new Error("DiagramPart " + id + " hasn't been registered.");
-        }
-        return part ? part.toolkit : null;
-    };
-    Toolkit.prototype.forComponent = function (component) {
-        var parts = this.engine.allParts();
-        for (var i = 0, length_1 = parts.length; i < length_1; i += 1) {
-            var part = parts[i];
-            if (part && part.registry.has(component)) {
-                return part.toolkit;
-            }
-        }
-        throw new Error("Component " + component + " is not registered in any DiagramParts.");
-    };
-    return Toolkit;
-}());
-
-var DomHelper = /** @class */ (function () {
-    function DomHelper(engine) {
-        this.engine = engine;
-    }
-    DomHelper.prototype.findPart = function (dom, matcher) {
-        if (matcher === void 0) { matcher = function () { return true; }; }
-        var parts = this.engine.allParts();
-        for (var i = 0; i < parts.length; i += 1) {
-            var part = parts[i];
-            if (part.domHelper.partContains(dom)) {
-                return matcher(part) ? part : null;
-            }
-        }
-        return null;
-    };
-    return DomHelper;
-}());
-
-var DefaultEngineConfig = {
-    capabilities: [],
-    editPolicies: [],
-    selectionProvider: null,
-    rootType: null,
-    types: [],
-};
-var Engine = /** @class */ (function () {
-    function Engine(config) {
-        if (config === void 0) { config = function () { return DefaultEngineConfig; }; }
-        this.toolkit = new Toolkit(this);
-        this.eventManager = new EventManager(this);
-        this.domHelper = new DomHelper(this);
-        this._parts = new Map();
-        var _a = config(this), capabilities = _a.capabilities, editPolicies = _a.editPolicies, selectionProvider = _a.selectionProvider, rootType = _a.rootType, types$$1 = _a.types;
-        this.capabilities = capabilities;
-        this.editPolicies = editPolicies;
-        this.selectionProvider = selectionProvider;
-        this.types = types$$1;
-        this.rootType = rootType;
-    }
-    /** @internal */
-    Engine.prototype.__partsMap = function () {
-        return this._parts;
-    };
-    Engine.prototype.part = function (id) {
-        return this._parts.get(id);
-    };
-    Engine.prototype.allParts = function () {
-        return Array.from(this._parts.values());
-    };
-    return Engine;
-}());
-
 var DiagramPart = /** @class */ (function (_super) {
     __extends(DiagramPart, _super);
     function DiagramPart() {
@@ -227,23 +105,18 @@ var DiagramPart = /** @class */ (function (_super) {
     };
     DiagramPart.prototype.componentWillUnmount = function () {
         var _a = this.props, id = _a.id, engine = _a.engine;
-        var parts = engine.__partsMap();
-        var part = parts.get(id);
+        var part = engine.__parts.get(id);
         if (part && part.registry) {
             part.registry.setRoot(null);
         }
-        parts.delete(id);
-        if (parts.size === 0) {
+        engine.__parts.delete(id);
+        if (engine.__parts.size === 0) {
             engine.eventManager.unhookListeners();
         }
     };
     DiagramPart.prototype.render = function () {
         var _a = this.props, id = _a.id, engine = _a.engine;
-        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, React.Children.only(this.props.children)));
-    };
-    DiagramPart.propTypes = {
-        engine: types.instanceOf(Engine).isRequired,
-        id: types.oneOfType([types.string, types.symbol]).isRequired,
+        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, this.props.children));
     };
     return DiagramPart;
 }(React.PureComponent));
@@ -331,6 +204,136 @@ var DispatchingEditPolicy = /** @class */ (function (_super) {
     DispatchingEditPolicy.prototype.eraseSelectFeedback = function (intent) { };
     return DispatchingEditPolicy;
 }(EditPolicy));
+
+var EventManager = /** @class */ (function () {
+    function EventManager(engine) {
+        this.engine = engine;
+        this.hooked = false;
+        // binding methods
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
+    }
+    EventManager.prototype.hookListeners = function () {
+        var htmlDocument = this.engine.htmlDocument;
+        htmlDocument.addEventListener('mousedown', this.onMouseDown);
+        htmlDocument.addEventListener('mousemove', this.onMouseMove);
+        htmlDocument.addEventListener('mouseup', this.onMouseUp);
+        htmlDocument.addEventListener('keydown', this.onKeyDown);
+        htmlDocument.addEventListener('keyup', this.onKeyUp);
+        this.hooked = true;
+    };
+    EventManager.prototype.unhookListeners = function () {
+        var htmlDocument = this.engine.htmlDocument;
+        htmlDocument.removeEventListener('mousedown', this.onMouseDown);
+        htmlDocument.removeEventListener('mousemove', this.onMouseMove);
+        htmlDocument.removeEventListener('mouseup', this.onMouseUp);
+        htmlDocument.removeEventListener('keydown', this.onKeyDown);
+        htmlDocument.removeEventListener('keyup', this.onKeyUp);
+        this.hooked = false;
+    };
+    EventManager.prototype.onKeyUp = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onKeyUp(e); });
+    };
+    EventManager.prototype.onKeyDown = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onKeyDown(e); });
+    };
+    EventManager.prototype.onMouseDown = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onMouseDown(e); });
+    };
+    EventManager.prototype.onMouseMove = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onMouseMove(e); });
+    };
+    EventManager.prototype.onMouseUp = function (e) {
+        this.engine.capabilities.forEach(function (capability) { return capability.onMouseUp(e); });
+    };
+    return EventManager;
+}());
+
+var Toolkit = /** @class */ (function () {
+    function Toolkit(engine) {
+        this.engine = engine;
+    }
+    Toolkit.prototype.forPart = function (id) {
+        var part = this.engine.part(id);
+        if (part === null) {
+            throw new Error("DiagramPart " + id + " hasn't been registered.");
+        }
+        return part ? part.toolkit : null;
+    };
+    Toolkit.prototype.forComponent = function (component) {
+        var parts = this.engine.allParts();
+        for (var i = 0, length_1 = parts.length; i < length_1; i += 1) {
+            var part = parts[i];
+            if (part && part.registry.has(component)) {
+                return part.toolkit;
+            }
+        }
+        throw new Error("Component " + component + " is not registered in any DiagramParts.");
+    };
+    return Toolkit;
+}());
+
+var DomHelper = /** @class */ (function () {
+    function DomHelper(engine) {
+        this.engine = engine;
+    }
+    DomHelper.prototype.findPart = function (dom, matcher) {
+        if (matcher === void 0) { matcher = function () { return true; }; }
+        var parts = this.engine.allParts();
+        for (var i = 0; i < parts.length; i += 1) {
+            var part = parts[i];
+            if (part.domHelper.partContains(dom)) {
+                return matcher(part) ? part : null;
+            }
+        }
+        return null;
+    };
+    return DomHelper;
+}());
+
+var DEFAULT_ENGINE_CONFIG = {
+    capabilities: [],
+    editPolicies: [],
+    selectionProvider: null,
+    rootType: null,
+    types: [],
+    htmlDocument: document,
+};
+var Engine = /** @class */ (function () {
+    function Engine(config) {
+        if (config === void 0) { config = function () { return DEFAULT_ENGINE_CONFIG; }; }
+        this.toolkit = null;
+        this.eventManager = null;
+        this.domHelper = null;
+        this.capabilities = [];
+        this.editPolicies = [];
+        this.selectionProvider = null;
+        this.types = [];
+        this.rootType = null;
+        this.htmlDocument = document;
+        this.toolkit = new Toolkit(this);
+        this.eventManager = new EventManager(this);
+        this.domHelper = new DomHelper(this);
+        this.__parts = new Map();
+        var evaluatedConfig = __assign({}, DEFAULT_ENGINE_CONFIG, config(this));
+        this.capabilities = evaluatedConfig.capabilities;
+        this.editPolicies = evaluatedConfig.editPolicies;
+        this.selectionProvider = evaluatedConfig.selectionProvider;
+        this.types = evaluatedConfig.types;
+        this.rootType = evaluatedConfig.rootType;
+        this.htmlDocument = evaluatedConfig.htmlDocument || document;
+    }
+    Engine.prototype.part = function (id) {
+        return this.__parts.get(id);
+    };
+    Engine.prototype.allParts = function () {
+        return Array.from(this.__parts.values());
+    };
+    return Engine;
+}());
 
 var Capability = /** @class */ (function () {
     function Capability(engine, config) {
@@ -554,21 +557,22 @@ var PartDomHelper = /** @class */ (function () {
     PartDomHelper.prototype.findClosest = function (dom, matcher) {
         if (matcher === void 0) { matcher = function () { return true; }; }
         var root = this.registry.root.dom;
-        for (var it = dom; it !== null; it = it.parentNode) {
-            var wrapper = this.registry.get(it);
+        for (var it_1 = dom; it_1 !== null; it_1 = it_1.parentNode) {
+            var wrapper = this.registry.get(it_1);
             if (wrapper !== undefined && wrapper !== null) {
                 return matcher(wrapper) ? wrapper : null;
             }
-            if (it === root) {
+            if (it_1 === root) {
                 return null;
             }
         }
         return null;
     };
+    /** @internal */
     PartDomHelper.prototype.findRelevantChildrenIntenal = function (node, children) {
         if (children === void 0) { children = []; }
         if (node !== null && node.hasChildNodes()) {
-            var childNodes = node.childNodes;
+            var childNodes = Array.from(node.childNodes);
             for (var i = 0, len = childNodes.length; i < len; i += 1) {
                 var childNode = childNodes[i];
                 if (this.registry.has(childNode)) {
@@ -579,10 +583,11 @@ var PartDomHelper = /** @class */ (function () {
                 }
             }
         }
-        return children;
     };
     PartDomHelper.prototype.findRelevantChildren = function (element) {
-        return this.findRelevantChildrenIntenal(element, []);
+        var children = [];
+        this.findRelevantChildrenIntenal(element, children);
+        return children;
     };
     PartDomHelper.prototype.partContains = function (element) {
         return this.registry.root.dom.contains(element);
@@ -604,7 +609,7 @@ var DiagramPartWrapper = /** @class */ (function () {
 /** @internal */
 function registryFrom(_a) {
     var engine = _a.engine, id = _a.id;
-    if (engine.__partsMap().has(id)) {
+    if (engine.__parts.has(id)) {
         return engine.part(id).registry;
     }
     return null;
@@ -612,14 +617,13 @@ function registryFrom(_a) {
 /** @internal */
 function toolkitFrom(_a) {
     var engine = _a.engine, id = _a.id;
-    return engine.__partsMap().has(id) ? engine.toolkit : null;
+    return engine.__parts.has(id) ? engine.toolkit : null;
 }
 /** @internal */
 function ensurePartRegistered(_a) {
     var engine = _a.engine, id = _a.id;
-    var parts = engine.__partsMap();
-    if (!parts.has(id)) {
-        parts.set(id, new DiagramPartWrapper(id, engine));
+    if (!engine.__parts.has(id)) {
+        engine.__parts.set(id, new DiagramPartWrapper(id, engine));
     }
 }
 /** @internal */
@@ -670,9 +674,9 @@ function component(type) {
                 _this.userComponent = null;
                 _this.type = type;
                 _this.childProps = { toolkit: toolkitResolver(_this, context) };
-                var types$$1 = context.engine.types;
-                if (types$$1.indexOf(type) < 0) {
-                    var typesStr = types$$1.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
+                var types = context.engine.types;
+                if (types.indexOf(type) < 0) {
+                    var typesStr = types.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
                     throw new TypeError("Not a valid component type \"" + type + "\". Please select one from " + typesStr + ", or add \"" + type + "\" to the engine's \"types\" array.");
                 }
                 return _this;
@@ -714,10 +718,10 @@ function matchesSingleType(type) {
         return component.type === type;
     };
 }
-function matchesMultiTypes(types$$1) {
+function matchesMultiTypes(types) {
     return function (_a) {
         var component = _a.component;
-        return types$$1.indexOf(component.type) >= 0;
+        return types.indexOf(component.type) >= 0;
     };
 }
 function matchesSinglePart(partId) {
@@ -735,14 +739,14 @@ function getSelection(engine) {
     }
     return [];
 }
-function typeMatches(types$$1) {
-    if (types$$1 === null || types$$1 === undefined) {
+function typeMatches(types) {
+    if (types === null || types === undefined) {
         return alwaysTrue;
     }
-    else if (Array.isArray(types$$1)) {
-        return matchesMultiTypes(types$$1);
+    else if (Array.isArray(types)) {
+        return matchesMultiTypes(types);
     }
-    return matchesSingleType(types$$1);
+    return matchesSingleType(types);
 }
 function partMatches(ids) {
     if (ids === null || ids === undefined) {
@@ -1308,6 +1312,7 @@ var CancelCapability = /** @class */ (function (_super) {
         if (config === void 0) { config = {}; }
         return _super.call(this, engine, __assign({}, DEFAULT_CONFIG$4, config)) || this;
     }
+    /** @internal */
     CancelCapability.prototype.focusOnTargetedParts = function (target) {
         return Boolean(this.engine.domHelper.findPart(target, partMatches(this.config.parts)));
     };

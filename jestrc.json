@@ -1,0 +1,25 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "jsx",
+    "ts",
+    "tsx",
+    "json"
+  ],
+  "setupFiles": [
+    "raf/polyfill",
+    "<rootDir>/test/setup.js"
+  ],
+  "modulePathIgnorePatterns": [
+    "<rootDir>/cypress/",
+    "/lib/",
+    "/node_modules/"
+  ],
+  "testMatch": [
+    "**/?(*.)+(spec|test).ts?(x)"
+  ],
+  "transform": {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  "verbose": false
+}

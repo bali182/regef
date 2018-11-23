@@ -2,9 +2,9 @@ import { Rectangle, Point } from 'regef-geometry';
 import { Component } from 'react';
 import { Toolkit } from './Toolkit';
 import { Engine } from './Engine';
-import { Capability } from './Capability';
 import { EditPolicy } from './EditPolicy';
 import { SelectionProvider } from './SelectionProvider';
+import { Capability } from './Capability';
 export declare type Id = string | Symbol;
 export declare enum IntentType {
     ADD = "add",
@@ -17,6 +17,7 @@ export declare enum IntentType {
 export declare type Intent = {
     type: IntentType;
 };
+export declare type RecognizedIntent = AddIntent | MoveIntent | StartConnectionIntent | EndConnectionIntent | SelectionIntent | DeleteIntent;
 export declare type SelectionIntent = {
     type: IntentType.SELECT;
     bounds: Rectangle;
@@ -97,5 +98,6 @@ export interface EngineConfig {
     selectionProvider: SelectionProvider;
     rootType: Id;
     types: Id[];
+    htmlDocument: Document;
 }
-export declare type EngineConfigProvider = (engine: Engine) => EngineConfig;
+export declare type EngineConfigProvider = (engine: Engine) => Partial<EngineConfig>;

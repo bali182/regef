@@ -18,7 +18,7 @@ import { Toolkit } from './Toolkit'
 
 /** @internal */
 function registryFrom({ engine, id }: RegefInternalProps): ComponentRegistry {
-  if (engine.__partsMap().has(id)) {
+  if (engine.__parts.has(id)) {
     return engine.part(id).registry
   }
   return null
@@ -26,14 +26,13 @@ function registryFrom({ engine, id }: RegefInternalProps): ComponentRegistry {
 
 /** @internal */
 function toolkitFrom({ engine, id }: RegefInternalProps): Toolkit {
-  return engine.__partsMap().has(id) ? engine.toolkit : null
+  return engine.__parts.has(id) ? engine.toolkit : null
 }
 
 /** @internal */
 function ensurePartRegistered({ engine, id }: RegefInternalProps): void {
-  const parts = engine.__partsMap()
-  if (!parts.has(id)) {
-    parts.set(id, new DiagramPartWrapper(id, engine))
+  if (!engine.__parts.has(id)) {
+    engine.__parts.set(id, new DiagramPartWrapper(id, engine))
   }
 }
 
@@ -83,7 +82,9 @@ function getEngine(comp: React.Component<RegefProps>): Engine {
 
 export function component<P extends Partial<RegefComponentProps>>(type: Id) {
   type WrappedPropsType = Pick<P, Exclude<keyof P, keyof RegefComponentProps>>
-  return function componentDecorator(Wrapped: React.ComponentClass<P>): React.ComponentClass<WrappedPropsType> {
+  return function componentDecorator(
+    Wrapped: React.ComponentClass<P>,
+  ): React.ComponentClass<WrappedPropsType> {
     class DecoratedComponent extends React.PureComponent<RegefProps> {
       /** @internal */
       public userComponent: React.Component

@@ -7,49 +7,48 @@ import { SelectionProvider } from './SelectionProvider'
 import { DiagramPartWrapper } from './DiagramPartWrapper'
 import { Id, EngineConfig, EngineConfigProvider } from './typings'
 
-const DefaultEngineConfig: EngineConfig = {
+const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   capabilities: [],
   editPolicies: [],
   selectionProvider: null,
   rootType: null,
   types: [],
+  htmlDocument: document,
 }
 
 export class Engine {
-  public readonly toolkit: Toolkit
-  public readonly eventManager: EventManager
-  public readonly domHelper: DomHelper
-  public readonly capabilities: Capability[]
-  public readonly editPolicies: EditPolicy[]
-  public readonly selectionProvider: SelectionProvider
-  public readonly types: Id[]
-  public readonly rootType: Id
+  public readonly toolkit: Toolkit = null
+  public readonly eventManager: EventManager = null
+  public readonly domHelper: DomHelper = null
+  public readonly capabilities: Capability[] = []
+  public readonly editPolicies: EditPolicy[] = []
+  public readonly selectionProvider: SelectionProvider = null
+  public readonly types: Id[] = []
+  public readonly rootType: Id = null
+  public readonly htmlDocument: Document = document
 
   /** @internal */
-  private _parts: Map<Id, DiagramPartWrapper>
+  public readonly __parts: Map<Id, DiagramPartWrapper>
 
-  constructor(config: EngineConfigProvider = () => DefaultEngineConfig) {
+  constructor(config: EngineConfigProvider = () => DEFAULT_ENGINE_CONFIG) {
     this.toolkit = new Toolkit(this)
     this.eventManager = new EventManager(this)
     this.domHelper = new DomHelper(this)
-    this._parts = new Map()
+    this.__parts = new Map()
 
-    const { capabilities, editPolicies, selectionProvider, rootType, types } = config(this)
+    const evaluatedConfig = { ...DEFAULT_ENGINE_CONFIG, ...config(this) }
 
-    this.capabilities = capabilities
-    this.editPolicies = editPolicies
-    this.selectionProvider = selectionProvider
-    this.types = types
-    this.rootType = rootType
-  }
-  /** @internal */
-  __partsMap(): Map<Id, DiagramPartWrapper> {
-    return this._parts
+    this.capabilities = evaluatedConfig.capabilities
+    this.editPolicies = evaluatedConfig.editPolicies
+    this.selectionProvider = evaluatedConfig.selectionProvider
+    this.types = evaluatedConfig.types
+    this.rootType = evaluatedConfig.rootType
+    this.htmlDocument = evaluatedConfig.htmlDocument || document
   }
   part(id: Id): DiagramPartWrapper {
-    return this._parts.get(id)
+    return this.__parts.get(id)
   }
   allParts(): DiagramPartWrapper[] {
-    return Array.from(this._parts.values())
+    return Array.from(this.__parts.values())
   }
 }

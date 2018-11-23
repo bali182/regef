@@ -1,6 +1,5 @@
 import { EditPolicy } from './EditPolicy';
-import { AddIntent, MoveIntent, StartConnectionIntent, EndConnectionIntent, SelectionIntent, DeleteIntent } from './typings';
-declare type RecognizedIntent = AddIntent | MoveIntent | StartConnectionIntent | EndConnectionIntent | SelectionIntent | DeleteIntent;
+import { AddIntent, MoveIntent, StartConnectionIntent, EndConnectionIntent, SelectionIntent, DeleteIntent, RecognizedIntent } from './typings';
 export declare class DispatchingEditPolicy extends EditPolicy {
     perform(intent: RecognizedIntent): void;
     requestFeedback(intent: RecognizedIntent): void;
@@ -22,4 +21,3 @@ export declare class DispatchingEditPolicy extends EditPolicy {
     eraseEndConnectionFeedback(intent: EndConnectionIntent): void;
     eraseSelectFeedback(intent: SelectionIntent): void;
 }
-export {};
