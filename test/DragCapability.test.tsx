@@ -5,11 +5,12 @@ import {
   _TestContainer,
   TestContainer,
   _TestRoot,
+  TestNode,
+  _TestNode,
   TEST_CONTAINER_TYPE,
   TEST_ROOT_TYPE,
   TEST_PART_ID,
-  TestNode,
-  _TestNode,
+  TEST_NODE_TYPE,
 } from './testComponents'
 import { DiagramPart, Engine, DragCapability, IntentType, Intent } from '../src'
 import { mockDocument, mockEditPolicy, EventCreator } from './testUtils'
@@ -31,13 +32,13 @@ describe('DragCapability', () => {
     htmlDocument,
     capabilities: [
       new DragCapability(e, {
-        draggables: [TEST_CONTAINER_TYPE],
+        draggables: [TEST_NODE_TYPE, TEST_CONTAINER_TYPE],
         hosts: [TEST_CONTAINER_TYPE],
         parts: [TEST_PART_ID],
       }),
     ],
     editPolicies: [editPolicy],
-    types: [TEST_CONTAINER_TYPE, TEST_ROOT_TYPE],
+    types: [TEST_NODE_TYPE, TEST_CONTAINER_TYPE, TEST_ROOT_TYPE],
     rootType: TEST_ROOT_TYPE,
   }))
   const vDom = mount(

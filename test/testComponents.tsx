@@ -45,5 +45,5 @@ export class _TestNode extends React.Component<IdProps> {
 }
 
 export const TestContainer = component<IdProps>(TEST_CONTAINER_TYPE)(_TestContainer)
-export const TestNode = component<IdProps>(TEST_CONTAINER_TYPE)(_TestNode)
+export const TestNode = component<IdProps>(TEST_NODE_TYPE)(_TestNode)
 export const TestRoot = component<IdProps>(TEST_ROOT_TYPE)(_TestRoot)
