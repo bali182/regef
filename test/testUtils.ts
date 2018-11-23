@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { RegefComponent, IntentType, RecognizedIntent, Id } from '../src/typings'
+import { RegefComponent, IntentType, RecognizedIntent, Id, Intent } from '../src/typings'
 import { ComponentWrapper } from '../src/ComponentWrapper'
 import { ComponentRegistry } from '../src/ComponentRegistry'
 import { JSDOM } from 'jsdom'
@@ -108,7 +108,7 @@ export function registerDummyTree(node: Node, registry: ComponentRegistry): void
 }
 
 export function mockDocument(html: string): Document {
-  return new JSDOM(html, { contentType: 'text/xml', pretendToBeVisual: true }).window.document
+  return new JSDOM(html, { contentType: 'text/xml' }).window.document
 }
 
 export function mockCapability(): Capability {
@@ -122,10 +122,28 @@ export function mockCapability(): Capability {
   } as any
 }
 
-export function mockEditPolicy(): EditPolicy {
-  return {
-    perform: jest.fn(),
-    requestFeedback: jest.fn(),
-    eraseFeedback: jest.fn(),
+export class IntentCollectorEditPolicy extends EditPolicy {
+  performed: Intent[] = []
+  feedbackRequested: Intent[] = []
+  feedbackErased: Intent[] = []
+
+  perform = jest.fn((intent: Intent) => {
+    this.performed.push(intent)
+  })
+  requestFeedback = jest.fn((intent: Intent) => {
+    this.feedbackRequested.push(intent)
+  })
+  eraseFeedback = jest.fn((intent: Intent) => {
+    this.feedbackErased.push(intent)
+  })
+
+  clear(): void {
+    this.performed = []
+    this.feedbackRequested = []
+    this.feedbackErased = []
   }
+}
+
+export function mockEditPolicy(): IntentCollectorEditPolicy {
+  return new IntentCollectorEditPolicy()
 }
