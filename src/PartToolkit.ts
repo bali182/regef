@@ -19,6 +19,10 @@ export class PartToolkit {
     return this.registry.root.userComponent
   }
 
+  all(): React.Component[] {
+    return this.registry.all().map(({ userComponent }) => userComponent)
+  }
+
   parent(component: React.Component): React.Component {
     const domHelper = this.domHelper
     const registry = this.registry

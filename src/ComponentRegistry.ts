@@ -3,7 +3,7 @@ import { RegisterListener, ComponentWrapperField } from './typings'
 
 export class ComponentRegistry {
   private mapping: Map<ComponentWrapperField, ComponentWrapper>
-  private wrappers: Set<ComponentWrapper>
+  public wrappers: Set<ComponentWrapper>
   private registerListeners: RegisterListener[] = []
   private unregisterListeners: RegisterListener[] = []
   public root: ComponentWrapper

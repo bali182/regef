@@ -6,6 +6,7 @@ export declare class PartToolkit {
     private domHelper;
     constructor(registry: ComponentRegistry, domHelper: PartDomHelper);
     root(): React.Component;
+    all(): React.Component[];
     parent(component: React.Component): React.Component;
     children(component: React.Component): React.Component[];
     ofType(type: string | Symbol): React.Component[];

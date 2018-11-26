@@ -128,10 +128,7 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(
-      e.target as Element,
-      typeMatches(this.engine.rootType),
-    )
+    const target = part.domHelper.findClosest(e.target as Element, typeMatches(part.rootType))
     if (target !== null) {
       this.startLocation = locationOf(e)
       this.progress = true

@@ -4,7 +4,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var React = _interopDefault(require('react'));
+var React = require('react');
+var React__default = _interopDefault(React);
 var ReactDOM = _interopDefault(require('react-dom'));
 var regefGeometry = require('regef-geometry');
 
@@ -69,9 +70,10 @@ var REGEF_PROP_KEY = '@@regef-internal-context@@';
     IntentType["END_CONNECTION"] = "end-connection";
 })(exports.IntentType || (exports.IntentType = {}));
 
-var RegefContext = React.createContext({
+var RegefContext = React__default.createContext({
     id: null,
     engine: null,
+    rootType: null,
 });
 function withRegefContext(Wrapped) {
     var WithRegefContext = /** @class */ (function (_super) {
@@ -81,14 +83,14 @@ function withRegefContext(Wrapped) {
         }
         WithRegefContext.prototype.render = function () {
             var _this = this;
-            return (React.createElement(RegefContext.Consumer, null, function (context) {
+            return (React__default.createElement(RegefContext.Consumer, null, function (context) {
                 var _a;
                 var allProps = __assign({}, _this.props, (_a = {}, _a[REGEF_PROP_KEY] = context, _a));
-                return React.createElement(Wrapped, __assign({}, allProps));
+                return React__default.createElement(Wrapped, __assign({}, allProps));
             }));
         };
         return WithRegefContext;
-    }(React.Component));
+    }(React__default.Component));
     return WithRegefContext;
 }
 
@@ -105,18 +107,16 @@ var DiagramPart = /** @class */ (function (_super) {
     };
     DiagramPart.prototype.componentWillUnmount = function () {
         var _a = this.props, id = _a.id, engine = _a.engine;
-        var part = engine.__parts.get(id);
-        if (part && part.registry) {
-            part.registry.setRoot(null);
+        var part = engine.part(id);
+        if (part && part.registry && part.registry.wrappers.size === 0) {
+            engine.__parts.delete(id);
         }
-        engine.__parts.delete(id);
         if (engine.__parts.size === 0) {
             engine.eventManager.unhookListeners();
         }
     };
     DiagramPart.prototype.render = function () {
-        var _a = this.props, id = _a.id, engine = _a.engine;
-        return (React.createElement(RegefContext.Provider, { value: { id: id, engine: engine } }, this.props.children));
+        return React__default.createElement(RegefContext.Provider, { value: this.props }, this.props.children);
     };
     return DiagramPart;
 }(React.PureComponent));
@@ -298,32 +298,20 @@ var DEFAULT_ENGINE_CONFIG = {
     capabilities: [],
     editPolicies: [],
     selectionProvider: null,
-    rootType: null,
-    types: [],
     htmlDocument: document,
 };
 var Engine = /** @class */ (function () {
     function Engine(config) {
         if (config === void 0) { config = function () { return DEFAULT_ENGINE_CONFIG; }; }
-        this.toolkit = null;
-        this.eventManager = null;
-        this.domHelper = null;
-        this.capabilities = [];
-        this.editPolicies = [];
-        this.selectionProvider = null;
-        this.types = [];
-        this.rootType = null;
-        this.htmlDocument = document;
+        /** @internal */
+        this.__parts = new Map();
         this.toolkit = new Toolkit(this);
         this.eventManager = new EventManager(this);
         this.domHelper = new DomHelper(this);
-        this.__parts = new Map();
         var evaluatedConfig = __assign({}, DEFAULT_ENGINE_CONFIG, config(this));
         this.capabilities = evaluatedConfig.capabilities;
         this.editPolicies = evaluatedConfig.editPolicies;
         this.selectionProvider = evaluatedConfig.selectionProvider;
-        this.types = evaluatedConfig.types;
-        this.rootType = evaluatedConfig.rootType;
         this.htmlDocument = evaluatedConfig.htmlDocument || document;
     }
     Engine.prototype.part = function (id) {
@@ -497,6 +485,12 @@ var PartToolkit = /** @class */ (function () {
         }
         return this.registry.root.userComponent;
     };
+    PartToolkit.prototype.all = function () {
+        return this.registry.all().map(function (_a) {
+            var userComponent = _a.userComponent;
+            return userComponent;
+        });
+    };
     PartToolkit.prototype.parent = function (component) {
         var domHelper = this.domHelper;
         var registry = this.registry;
@@ -596,9 +590,10 @@ var PartDomHelper = /** @class */ (function () {
 }());
 
 var DiagramPartWrapper = /** @class */ (function () {
-    function DiagramPartWrapper(id, engine) {
+    function DiagramPartWrapper(id, rootType, engine) {
         this.id = id;
         this.engine = engine;
+        this.rootType = rootType;
         this.registry = new ComponentRegistry();
         this.domHelper = new PartDomHelper(this.registry);
         this.toolkit = new PartToolkit(this.registry, this.domHelper);
@@ -621,9 +616,9 @@ function toolkitFrom(_a) {
 }
 /** @internal */
 function ensurePartRegistered(_a) {
-    var engine = _a.engine, id = _a.id;
+    var engine = _a.engine, id = _a.id, rootType = _a.rootType;
     if (!engine.__parts.has(id)) {
-        engine.__parts.set(id, new DiagramPartWrapper(id, engine));
+        engine.__parts.set(id, new DiagramPartWrapper(id, rootType, engine));
     }
 }
 /** @internal */
@@ -632,34 +627,35 @@ function toolkitResolver(comp, context) {
     return function () { return watchRegister(registryFrom(context), comp).then(function () { return toolkitFrom(context); }); };
 }
 /** @internal */
-function defaultActivate(comp, context) {
+function activate(comp, context) {
     ensurePartRegistered(context);
-    registryFrom(context).register(fromComponent(comp));
+    var id = context.id, engine = context.engine;
+    var registry = registryFrom(context);
+    var wrapper = fromComponent(comp);
+    registry.register(wrapper);
+    var part = engine.part(id);
+    if (part.rootType === comp.type) {
+        registry.setRoot(wrapper);
+    }
 }
 /** @internal */
-function defaultDecativate(comp, context) {
+function deactivate(comp, context) {
     var registry = registryFrom(context);
+    var engine = context.engine, id = context.id;
     if (registry) {
+        var wrapper = registry.get(comp);
+        if (wrapper === registry.root) {
+            registry.setRoot(null);
+        }
         registry.unregister(comp);
+        if (registry.wrappers.size === 0) {
+            engine.__parts.delete(id);
+        }
     }
 }
 /** @internal */
-function rootActivate(comp, context) {
-    defaultActivate(comp, context);
-    var registry = registryFrom(context);
-    registry.setRoot(registry.get(comp));
-}
-/** @internal */
-function rootDeactivate(comp, context) {
-    defaultDecativate(comp, context);
-    var registry = registryFrom(context);
-    if (registry) {
-        registry.setRoot(null);
-    }
-}
-/** @internal */
-function getEngine(comp) {
-    return comp.props[REGEF_PROP_KEY].engine;
+function getRegefContext(comp) {
+    return comp.props[REGEF_PROP_KEY];
 }
 function component(type) {
     return function componentDecorator(Wrapped) {
@@ -670,41 +666,23 @@ function component(type) {
                 _this.setUserComponent = function (ref) {
                     _this.userComponent = ref;
                 };
-                var context = _this.getRegefContext();
+                var context = getRegefContext(_this);
                 _this.userComponent = null;
                 _this.type = type;
                 _this.childProps = { toolkit: toolkitResolver(_this, context) };
-                var types = context.engine.types;
-                if (types.indexOf(type) < 0) {
-                    var typesStr = types.map(function (tpe) { return "\"" + tpe + "\""; }).join(',');
-                    throw new TypeError("Not a valid component type \"" + type + "\". Please select one from " + typesStr + ", or add \"" + type + "\" to the engine's \"types\" array.");
-                }
                 return _this;
             }
             DecoratedComponent.prototype.componentDidMount = function () {
-                var engine = getEngine(this);
-                if (this.type === engine.rootType) {
-                    rootActivate(this, this.getRegefContext());
-                }
-                else {
-                    defaultActivate(this, this.getRegefContext());
-                }
+                var ctx = getRegefContext(this);
+                activate(this, ctx);
             };
             DecoratedComponent.prototype.componentWillUnmount = function () {
-                var engine = getEngine(this);
-                if (this.type === engine.rootType) {
-                    rootDeactivate(this, this.getRegefContext());
-                }
-                else {
-                    defaultDecativate(this, this.getRegefContext());
-                }
-            };
-            DecoratedComponent.prototype.getRegefContext = function () {
-                return this.props[REGEF_PROP_KEY];
+                var ctx = getRegefContext(this);
+                deactivate(this, ctx);
             };
             DecoratedComponent.prototype.render = function () {
                 var _a = this.props, children = _a.children, rest = __rest(_a, ["children"]);
-                return (React.createElement(Wrapped, __assign({}, rest, { ref: this.setUserComponent, regef: this.childProps }), children));
+                return (React__default.createElement(Wrapped, __assign({}, rest, { ref: this.setUserComponent, regef: this.childProps }), children));
             };
             return DecoratedComponent;
         }(React.PureComponent));
@@ -1265,7 +1243,7 @@ var MultiSelectionCapability = /** @class */ (function (_super) {
         if (!part) {
             return;
         }
-        var target = part.domHelper.findClosest(e.target, typeMatches(this.engine.rootType));
+        var target = part.domHelper.findClosest(e.target, typeMatches(part.rootType));
         if (target !== null) {
             this.startLocation = locationOf$1(e);
             this.progress = true;

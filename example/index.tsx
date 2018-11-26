@@ -6,7 +6,7 @@ import { DiagramPart } from '../src/DiagramPart'
 import createStore from './state'
 import createEngine from './diagram'
 import { Root } from './components/Root'
-import { DIAGRAM } from './diagram/constants'
+import { DIAGRAM, ROOT } from './diagram/constants'
 
 const rootContainerStyle = {
   margin: '10vh',
@@ -30,7 +30,7 @@ class Wrapper extends React.Component<object, WrapperState> {
   renderDiagram() {
     if (this.state.mounted) {
       return (
-        <DiagramPart engine={engine} id={DIAGRAM}>
+        <DiagramPart engine={engine} id={DIAGRAM} rootType={ROOT}>
           <Root />
         </DiagramPart>
       )

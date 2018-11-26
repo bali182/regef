@@ -42,7 +42,7 @@ describe('DragCapability', () => {
     rootType: TEST_ROOT_TYPE,
   }))
   const vDom = mount(
-    <DiagramPart id={TEST_PART_ID} engine={engine}>
+    <DiagramPart id={TEST_PART_ID} engine={engine} rootType={TEST_ROOT_TYPE}>
       <TestRoot id="@root">
         <TestContainer id="@container">
           <TestNode id="@node" />

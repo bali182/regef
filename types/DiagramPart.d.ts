@@ -1,13 +1,7 @@
-import React from 'react';
-import { Engine } from './Engine';
-import { Id } from './typings';
-declare type DiagramPartProps = {
-    engine: Engine;
-    id: Id;
-};
-export declare class DiagramPart extends React.PureComponent<DiagramPartProps> {
+import { PureComponent, ReactNode } from 'react';
+import { DiagramPartProps } from './typings';
+export declare class DiagramPart extends PureComponent<DiagramPartProps> {
     componentDidMount(): void;
     componentWillUnmount(): void;
-    render(): React.ReactNode;
+    render(): ReactNode;
 }
-export {};

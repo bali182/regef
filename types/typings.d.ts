@@ -5,6 +5,11 @@ import { Engine } from './Engine';
 import { EditPolicy } from './EditPolicy';
 import { SelectionProvider } from './SelectionProvider';
 import { Capability } from './Capability';
+export declare type DiagramPartProps = {
+    engine: Engine;
+    id: Id;
+    rootType: Id;
+};
 export declare type Id = string | Symbol;
 export declare enum IntentType {
     ADD = "add",
@@ -96,8 +101,6 @@ export interface EngineConfig {
     capabilities: Capability<any>[];
     editPolicies: EditPolicy[];
     selectionProvider: SelectionProvider;
-    rootType: Id;
-    types: Id[];
     htmlDocument: Document;
 }
 export declare type EngineConfigProvider = (engine: Engine) => Partial<EngineConfig>;

@@ -42,7 +42,7 @@ describe('ConnectCapability', () => {
     rootType: TEST_ROOT_TYPE,
   }))
   const vDom = mount(
-    <DiagramPart id={TEST_PART_ID} engine={engine}>
+    <DiagramPart id={TEST_PART_ID} engine={engine} rootType={TEST_ROOT_TYPE}>
       <TestRoot id="@root">
         <TestNode id="@node" />
         <TestNode id="@node2" />
