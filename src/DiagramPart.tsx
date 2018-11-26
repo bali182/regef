@@ -1,14 +1,8 @@
-import React from 'react'
+import React, { PureComponent, ReactNode } from 'react'
 import { RegefContext } from './RegefContext'
-import { Engine } from './Engine'
-import { Id } from './typings'
+import { DiagramPartProps } from './typings'
 
-type DiagramPartProps = {
-  engine: Engine
-  id: Id
-}
-
-export class DiagramPart extends React.PureComponent<DiagramPartProps> {
+export class DiagramPart extends PureComponent<DiagramPartProps> {
   componentDidMount(): void {
     const { engine } = this.props
     if (!engine.eventManager.hooked) {
@@ -17,19 +11,15 @@ export class DiagramPart extends React.PureComponent<DiagramPartProps> {
   }
   componentWillUnmount(): void {
     const { id, engine } = this.props
-    const part = engine.__parts.get(id)
-    if (part && part.registry) {
-      part.registry.setRoot(null)
+    const part = engine.part(id)
+    if (part && part.registry && part.registry.wrappers.size === 0) {
+      engine.__parts.delete(id)
     }
-    engine.__parts.delete(id)
     if (engine.__parts.size === 0) {
       engine.eventManager.unhookListeners()
     }
   }
-  render(): React.ReactNode {
-    const { id, engine } = this.props
-    return (
-      <RegefContext.Provider value={{ id, engine }}>{this.props.children}</RegefContext.Provider>
-    )
+  render(): ReactNode {
+    return <RegefContext.Provider value={this.props}>{this.props.children}</RegefContext.Provider>
   }
 }

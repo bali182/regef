@@ -9,5 +9,6 @@ export declare class DiagramPartWrapper {
     readonly registry: ComponentRegistry;
     readonly domHelper: PartDomHelper;
     readonly toolkit: PartToolkit;
-    constructor(id: Id, engine: Engine);
+    readonly rootType: Id;
+    constructor(id: Id, rootType: Id, engine: Engine);
 }

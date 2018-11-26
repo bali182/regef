@@ -2,7 +2,7 @@ import { ComponentWrapper } from './ComponentWrapper';
 import { RegisterListener, ComponentWrapperField } from './typings';
 export declare class ComponentRegistry {
     private mapping;
-    private wrappers;
+    wrappers: Set<ComponentWrapper>;
     private registerListeners;
     private unregisterListeners;
     root: ComponentWrapper;

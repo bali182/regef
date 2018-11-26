@@ -10,10 +10,12 @@ export class DiagramPartWrapper {
   public readonly registry: ComponentRegistry
   public readonly domHelper: PartDomHelper
   public readonly toolkit: PartToolkit
+  public readonly rootType: Id
 
-  constructor(id: Id, engine: Engine) {
+  constructor(id: Id, rootType: Id, engine: Engine) {
     this.id = id
     this.engine = engine
+    this.rootType = rootType
     this.registry = new ComponentRegistry()
     this.domHelper = new PartDomHelper(this.registry)
     this.toolkit = new PartToolkit(this.registry, this.domHelper)

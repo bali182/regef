@@ -1,9 +1,10 @@
 import React from 'react'
-import { REGEF_PROP_KEY, RegefInternalProps } from './typings'
+import { REGEF_PROP_KEY, DiagramPartProps } from './typings'
 
-export const RegefContext = React.createContext<RegefInternalProps>({
+export const RegefContext = React.createContext<DiagramPartProps>({
   id: null,
   engine: null,
+  rootType: null,
 })
 
 export function withRegefContext(Wrapped: React.ComponentClass<any>) {
@@ -11,7 +12,7 @@ export function withRegefContext(Wrapped: React.ComponentClass<any>) {
     render() {
       return (
         <RegefContext.Consumer>
-          {(context: RegefInternalProps) => {
+          {(context: DiagramPartProps) => {
             const allProps: any = {
               ...this.props,
               [REGEF_PROP_KEY]: context,
@@ -25,4 +26,4 @@ export function withRegefContext(Wrapped: React.ComponentClass<any>) {
   return WithRegefContext as any
 }
 
-export default RegefInternalProps
+export default DiagramPartProps

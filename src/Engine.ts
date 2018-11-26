@@ -11,38 +11,34 @@ const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   capabilities: [],
   editPolicies: [],
   selectionProvider: null,
-  rootType: null,
-  types: [],
   htmlDocument: document,
 }
 
 export class Engine {
-  public readonly toolkit: Toolkit = null
-  public readonly eventManager: EventManager = null
-  public readonly domHelper: DomHelper = null
-  public readonly capabilities: Capability[] = []
-  public readonly editPolicies: EditPolicy[] = []
-  public readonly selectionProvider: SelectionProvider = null
-  public readonly types: Id[] = []
-  public readonly rootType: Id = null
-  public readonly htmlDocument: Document = document
+  // From config
+  public readonly capabilities: Capability[]
+  public readonly editPolicies: EditPolicy[]
+  public readonly selectionProvider: SelectionProvider
+  public readonly htmlDocument: Document
+  // Extra properties
+  public readonly toolkit: Toolkit
+  public readonly eventManager: EventManager
+  public readonly domHelper: DomHelper
+  public readonly rootType: Id
 
   /** @internal */
-  public readonly __parts: Map<Id, DiagramPartWrapper>
+  public readonly __parts: Map<Id, DiagramPartWrapper> = new Map()
 
   constructor(config: EngineConfigProvider = () => DEFAULT_ENGINE_CONFIG) {
     this.toolkit = new Toolkit(this)
     this.eventManager = new EventManager(this)
     this.domHelper = new DomHelper(this)
-    this.__parts = new Map()
 
     const evaluatedConfig = { ...DEFAULT_ENGINE_CONFIG, ...config(this) }
 
     this.capabilities = evaluatedConfig.capabilities
     this.editPolicies = evaluatedConfig.editPolicies
     this.selectionProvider = evaluatedConfig.selectionProvider
-    this.types = evaluatedConfig.types
-    this.rootType = evaluatedConfig.rootType
     this.htmlDocument = evaluatedConfig.htmlDocument || document
   }
   part(id: Id): DiagramPartWrapper {

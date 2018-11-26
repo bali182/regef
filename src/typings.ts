@@ -30,14 +30,14 @@ export type RegisterListener = (wrapper: ComponentWrapper) => void
 export type ComponentWrapperField = ComponentWrapper | Element | Component
 
 /** @internal */
-export type RegefInternalProps = {
-  engine: Engine
-  id: Id
+export type RegefProps = {
+  [REGEF_PROP_KEY]: DiagramPartProps
 }
 
-/** @internal */
-export type RegefProps = {
-  [REGEF_PROP_KEY]: RegefInternalProps
+export type DiagramPartProps = {
+  engine: Engine
+  id: Id
+  rootType: Id
 }
 
 export type Id = string | Symbol
@@ -156,8 +156,6 @@ export interface EngineConfig {
   capabilities: Capability<any>[]
   editPolicies: EditPolicy[]
   selectionProvider: SelectionProvider
-  rootType: Id
-  types: Id[]
   htmlDocument: Document
 }
 
