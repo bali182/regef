@@ -4,7 +4,7 @@ import { ComponentWrapper } from '../src/ComponentWrapper'
 import { ComponentRegistry } from '../src/ComponentRegistry'
 import { JSDOM } from 'jsdom'
 import nanoid from 'nanoid'
-import { Capability, EditPolicy } from '../src'
+import { Capability, EditPolicy, SelectionProvider } from '../src'
 
 const DEFAULT_EVENT_CONFIG: EventInit = {}
 
@@ -108,7 +108,8 @@ export function registerDummyTree(node: Node, registry: ComponentRegistry): void
 }
 
 export function mockDocument(html: string): Document {
-  return new JSDOM(html, { contentType: 'text/xml' }).window.document
+  const jsdom = new JSDOM(html, { contentType: 'text/xml', url: 'http://localhost' })
+  return jsdom.window.document
 }
 
 export function mockCapability(): Capability {
@@ -146,4 +147,29 @@ export class IntentCollectorEditPolicy extends EditPolicy {
 
 export function mockEditPolicy(): IntentCollectorEditPolicy {
   return new IntentCollectorEditPolicy()
+}
+
+export class ConstantSelectionProvider extends SelectionProvider {
+  private __selection: React.Component[] = []
+  constructor() {
+    super()
+  }
+
+  selection(): React.Component[] {
+    return this.__selection
+  }
+
+  setSelection(components: React.Component[]) {
+    this.__selection = components
+  }
+}
+
+export function mockSelectionProvider(...components: React.Component[]) {
+  const provider = new ConstantSelectionProvider()
+  provider.setSelection(components)
+  return provider
+}
+
+export function typeOf(intent: Intent): IntentType {
+  return intent.type
 }

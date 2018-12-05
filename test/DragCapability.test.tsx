@@ -12,15 +12,11 @@ import {
   TEST_PART_ID,
   TEST_NODE_TYPE,
 } from './testComponents'
-import { DiagramPart, Engine, DragCapability, IntentType, Intent } from '../src'
-import { mockDocument, mockEditPolicy, EventCreator } from './testUtils'
+import { DiagramPart, Engine, DragCapability, IntentType } from '../src'
+import { mockDocument, mockEditPolicy, EventCreator, typeOf } from './testUtils'
 
 describe('DragCapability', () => {
   const editPolicy = mockEditPolicy()
-
-  function typeOf(intent: Intent): IntentType {
-    return intent.type
-  }
 
   afterEach(() => {
     jest.clearAllMocks()

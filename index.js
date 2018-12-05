@@ -1095,10 +1095,12 @@ var SingleSelectionCapability = /** @class */ (function (_super) {
     };
     SingleSelectionCapability.prototype.createSingleSelectionRequest = function () {
         var _a = this, location = _a.location, selection = _a.selection, additional = _a.additional;
+        var currentSelection = getSelection(this.engine);
+        var newSelection = additional ? currentSelection.concat(selection) : selection;
         return {
             type: exports.IntentType.SELECT,
             bounds: regefGeometry.rectangle(location, regefGeometry.dimension(0, 0)),
-            selection: additional ? getSelection(this.engine).concat(selection) : selection,
+            selection: newSelection,
             startLocation: location,
             endLocation: location,
         };

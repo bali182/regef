@@ -12,25 +12,33 @@ import {
   TEST_PART_ID,
   TEST_NODE_TYPE,
 } from './testComponents'
-import { DiagramPart, Engine, IntentType, ConnectCapability } from '../src'
-import { mockDocument, mockEditPolicy, EventCreator, typeOf } from './testUtils'
+import { DiagramPart, Engine, IntentType, SingleSelectionCapability, SelectionIntent } from '../src'
+import {
+  mockDocument,
+  mockEditPolicy,
+  EventCreator,
+  typeOf,
+  mockSelectionProvider,
+} from './testUtils'
 
-describe('ConnectCapability', () => {
+describe('SingleSelectionCapability', () => {
   const editPolicy = mockEditPolicy()
+  const selectionProvider = mockSelectionProvider()
 
   afterEach(() => {
     jest.clearAllMocks()
     editPolicy.clear()
+    selectionProvider.setSelection([])
   })
 
   const htmlDocument = mockDocument('<div id="app" />')
   const engine = new Engine((e) => ({
+    selectionProvider,
     htmlDocument,
     capabilities: [
-      new ConnectCapability(e, {
+      new SingleSelectionCapability(e, {
         parts: [TEST_PART_ID],
-        sourceTypes: [TEST_NODE_TYPE],
-        targetTypes: [TEST_CONTAINER_TYPE],
+        selectables: [TEST_NODE_TYPE],
       }),
     ],
     editPolicies: [editPolicy],
@@ -61,7 +69,7 @@ describe('ConnectCapability', () => {
   const nodeDom = htmlDocument.getElementById('@node')
   const node2Dom = htmlDocument.getElementById('@node2')
 
-  const connectCapability = engine.capabilities[0] as ConnectCapability
+  const selectionCapability = engine.capabilities[0] as SingleSelectionCapability
   const eventCreator = new EventCreator(htmlDocument)
 
   it('should have rendered the correct structures (sanity checks)', () => {
@@ -90,41 +98,59 @@ describe('ConnectCapability', () => {
     expect(containerWrapperVDom.getDOMNode()).toBe(containerDom)
   })
 
-  it('should not fire a ConnectionIntent when connecting 2 TestNodes', () => {
-    connectCapability.onMouseDown(eventCreator.mouseDown({ buttons: 1, target: nodeDom }))
-    connectCapability.onMouseMove(eventCreator.mouseMove({ buttons: 1, target: node2Dom }))
-    connectCapability.onMouseUp(eventCreator.mouseUp({ buttons: 1, target: node2Dom }))
+  xit('should fire selection Intent when clicking on a node type component', () => {
+    selectionCapability.onMouseDown(eventCreator.mouseDown({ buttons: 1, target: nodeDom }))
+    selectionCapability.onMouseUp(eventCreator.mouseUp({ buttons: 1, target: nodeDom }))
 
-    expect(editPolicy.requestFeedback).toHaveBeenCalled()
-    expect(editPolicy.eraseFeedback).toHaveBeenCalled()
-    expect(editPolicy.perform).not.toHaveBeenCalled()
-
-    const { performed, feedbackRequested, feedbackErased } = editPolicy
-
-    expect(performed.map(typeOf)).toMatchObject([])
-    expect(feedbackRequested.map(typeOf)).toMatchObject([IntentType.START_CONNECTION])
-    expect(feedbackErased.map(typeOf)).toMatchObject([IntentType.START_CONNECTION])
-  })
-
-  it('should not fire a ConnectionIntent when connecting TestNode to TestContainer', () => {
-    connectCapability.onMouseDown(eventCreator.mouseDown({ buttons: 1, target: nodeDom }))
-    connectCapability.onMouseMove(eventCreator.mouseMove({ buttons: 1, target: containerDom }))
-    connectCapability.onMouseUp(eventCreator.mouseUp({ buttons: 1, target: containerDom }))
-
-    expect(editPolicy.requestFeedback).toHaveBeenCalled()
-    expect(editPolicy.eraseFeedback).toHaveBeenCalled()
+    expect(editPolicy.requestFeedback).not.toHaveBeenCalled()
+    expect(editPolicy.eraseFeedback).not.toHaveBeenCalled()
     expect(editPolicy.perform).toHaveBeenCalled()
 
     const { performed, feedbackRequested, feedbackErased } = editPolicy
 
-    expect(performed.map(typeOf)).toMatchObject([IntentType.END_CONNECTION])
-    expect(feedbackRequested.map(typeOf)).toMatchObject([
-      IntentType.START_CONNECTION,
-      IntentType.END_CONNECTION,
-    ])
-    expect(feedbackErased.map(typeOf)).toMatchObject([
-      IntentType.START_CONNECTION,
-      IntentType.END_CONNECTION,
-    ])
+    expect(feedbackRequested).toMatchObject([])
+    expect(feedbackErased).toMatchObject([])
+    expect(performed.map(typeOf)).toMatchObject([IntentType.SELECT])
+  })
+
+  it('should fire additive selection Intent when clicking on a node type component. while another on is selected', () => {
+    selectionProvider.setSelection([nodeVDom.instance()])
+    selectionCapability.onMouseDown(
+      eventCreator.mouseDown({ buttons: 1, target: node2Dom, ctrlKey: true, metaKey: true }),
+    )
+    selectionCapability.onMouseUp(
+      eventCreator.mouseUp({ buttons: 1, target: node2Dom, ctrlKey: true, metaKey: true }),
+    )
+
+    expect(editPolicy.requestFeedback).not.toHaveBeenCalled()
+    expect(editPolicy.eraseFeedback).not.toHaveBeenCalled()
+    expect(editPolicy.perform).toHaveBeenCalled()
+
+    const { performed, feedbackRequested, feedbackErased } = editPolicy
+
+    expect(feedbackRequested).toMatchObject([])
+    expect(feedbackErased).toMatchObject([])
+    expect(performed.map(typeOf)).toMatchObject([IntentType.SELECT])
+
+    const selection = (performed[0] as SelectionIntent).selection
+
+    expect(selection).toHaveLength(2)
+    expect(selection).toContain(node2VDom.instance())
+    expect(selection).toContain(nodeVDom.instance())
+  })
+
+  it('should not fire selection Intent when clicking on a container type component', () => {
+    selectionCapability.onMouseDown(eventCreator.mouseDown({ buttons: 1, target: containerDom }))
+    selectionCapability.onMouseUp(eventCreator.mouseUp({ buttons: 1, target: containerDom }))
+
+    expect(editPolicy.requestFeedback).not.toHaveBeenCalled()
+    expect(editPolicy.eraseFeedback).not.toHaveBeenCalled()
+    expect(editPolicy.perform).not.toHaveBeenCalled()
+
+    const { performed, feedbackRequested, feedbackErased } = editPolicy
+
+    expect(feedbackRequested).toMatchObject([])
+    expect(feedbackErased).toMatchObject([])
+    expect(performed).toMatchObject([])
   })
 })

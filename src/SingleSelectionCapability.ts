@@ -36,10 +36,12 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
 
   private createSingleSelectionRequest(): SelectionIntent {
     const { location, selection, additional } = this
+    const currentSelection = getSelection(this.engine)
+    const newSelection = additional ? currentSelection.concat(selection) : selection
     return {
       type: IntentType.SELECT,
       bounds: rectangle(location, dimension(0, 0)),
-      selection: additional ? getSelection(this.engine).concat(selection) : selection,
+      selection: newSelection,
       startLocation: location,
       endLocation: location,
     }
