@@ -98,7 +98,7 @@ describe('SingleSelectionCapability', () => {
     expect(containerWrapperVDom.getDOMNode()).toBe(containerDom)
   })
 
-  xit('should fire selection Intent when clicking on a node type component', () => {
+  it('should fire selection Intent when clicking on a node type component', () => {
     selectionCapability.onMouseDown(eventCreator.mouseDown({ buttons: 1, target: nodeDom }))
     selectionCapability.onMouseUp(eventCreator.mouseUp({ buttons: 1, target: nodeDom }))
 

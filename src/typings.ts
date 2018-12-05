@@ -10,12 +10,10 @@ import { Capability } from './Capability'
 /** @internal */
 export const REGEF_PROP_KEY = '@@regef-internal-context@@'
 
-/** @internal */
 export type HasUserComponent = {
   userComponent: React.Component
 }
 
-/** @internal */
 export type HasType = {
   type: Id
 }
@@ -23,10 +21,8 @@ export type HasType = {
 /** @internal */
 export type RegefComponent = React.Component & HasUserComponent & HasType
 
-/** @internal */
 export type RegisterListener = (wrapper: ComponentWrapper) => void
 
-/** @internal */
 export type ComponentWrapperField = ComponentWrapper | Element | Component
 
 /** @internal */

@@ -4,7 +4,16 @@ import { Toolkit } from './Toolkit';
 import { Engine } from './Engine';
 import { EditPolicy } from './EditPolicy';
 import { SelectionProvider } from './SelectionProvider';
+import { ComponentWrapper } from './ComponentWrapper';
 import { Capability } from './Capability';
+export declare type HasUserComponent = {
+    userComponent: React.Component;
+};
+export declare type HasType = {
+    type: Id;
+};
+export declare type RegisterListener = (wrapper: ComponentWrapper) => void;
+export declare type ComponentWrapperField = ComponentWrapper | Element | Component;
 export declare type DiagramPartProps = {
     engine: Engine;
     id: Id;
