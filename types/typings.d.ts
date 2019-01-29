@@ -90,6 +90,7 @@ export interface DragCapabilityConfig {
 export interface MultiSelectionCapabilityConfig {
     parts: Id[];
     selectables: Id[];
+    selectionHosts: Id[];
     intersection: boolean;
     containment: boolean;
 }

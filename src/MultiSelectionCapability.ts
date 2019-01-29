@@ -21,6 +21,7 @@ const locationOf = ({ clientX, clientY }: MouseEvent) => point(clientX, clientY)
 const DEFAULT_CONFIG: MultiSelectionCapabilityConfig = {
   parts: null,
   selectables: [],
+  selectionHosts: [],
   intersection: false,
   containment: true,
 }
@@ -124,11 +125,15 @@ export class MultiSelectionCapability extends Capability<MultiSelectionCapabilit
     if (!isLeftButton(e)) {
       return
     }
-    const part = this.engine.domHelper.findPart(e.target as Element, partMatches(this.config.parts))
+    const { parts, selectionHosts } = this.config
+    const part = this.engine.domHelper.findPart(e.target as Element, partMatches(parts))
     if (!part) {
       return
     }
-    const target = part.domHelper.findClosest(e.target as Element, typeMatches(part.rootType))
+    const target = part.domHelper.findClosest(
+      e.target as Element,
+      typeMatches(selectionHosts && selectionHosts.length > 0 ? selectionHosts : part.rootType),
+    )
     if (target !== null) {
       this.startLocation = locationOf(e)
       this.progress = true

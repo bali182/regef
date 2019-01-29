@@ -1150,6 +1150,7 @@ var locationOf$1 = function (_a) {
 var DEFAULT_CONFIG$3 = {
     parts: null,
     selectables: [],
+    selectionHosts: [],
     intersection: false,
     containment: true,
 };
@@ -1239,11 +1240,12 @@ var MultiSelectionCapability = /** @class */ (function (_super) {
         if (!isLeftButton(e)) {
             return;
         }
-        var part = this.engine.domHelper.findPart(e.target, partMatches(this.config.parts));
+        var _a = this.config, parts = _a.parts, selectionHosts = _a.selectionHosts;
+        var part = this.engine.domHelper.findPart(e.target, partMatches(parts));
         if (!part) {
             return;
         }
-        var target = part.domHelper.findClosest(e.target, typeMatches(part.rootType));
+        var target = part.domHelper.findClosest(e.target, typeMatches(selectionHosts && selectionHosts.length > 0 ? selectionHosts : part.rootType));
         if (target !== null) {
             this.startLocation = locationOf$1(e);
             this.progress = true;
