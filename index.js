@@ -860,11 +860,16 @@ var DragCapability = /** @class */ (function (_super) {
         return [target];
     };
     DragCapability.prototype.getMoveChildRequest = function () {
-        return __assign({ type: exports.IntentType.MOVE, components: this.getMovedComponents(), container: this.currentParent.component.userComponent }, this.coordinates);
+        var _a = this, currentParent = _a.currentParent, target = _a.target, coordinates = _a.coordinates;
+        var components = this.getMovedComponents();
+        return __assign({ type: exports.IntentType.MOVE, components: components, targetComponent: target.userComponent, container: currentParent.component.userComponent }, coordinates);
     };
     DragCapability.prototype.getAddChildRequest = function () {
-        var _a = this, targetParent = _a.targetParent, currentParent = _a.currentParent;
-        return __assign({ type: exports.IntentType.ADD, components: this.getMovedComponents(), targetContainer: targetParent === null ? null : targetParent.component.userComponent, container: currentParent.component.userComponent }, this.coordinates);
+        var _a = this, targetParent = _a.targetParent, currentParent = _a.currentParent, target = _a.target, coordinates = _a.coordinates;
+        var components = this.getMovedComponents();
+        var targetContainer = targetParent === null ? null : targetParent.component.userComponent;
+        return __assign({ type: exports.IntentType.ADD, components: components,
+            targetContainer: targetContainer, targetComponent: target.userComponent, container: currentParent.component.userComponent }, coordinates);
     };
     DragCapability.prototype.getSelectionRequest = function () {
         var _a = this, startLocation = _a.startLocation, target = _a.target;

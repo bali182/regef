@@ -132,22 +132,28 @@ export class DragCapability extends Capability<DragCapabilityConfig> {
   }
 
   private getMoveChildRequest(): MoveIntent {
+    const { currentParent, target, coordinates } = this
+    const components = this.getMovedComponents()
     return {
       type: IntentType.MOVE,
-      components: this.getMovedComponents(),
-      container: this.currentParent.component.userComponent,
-      ...this.coordinates,
+      components,
+      targetComponent: target.userComponent,
+      container: currentParent.component.userComponent,
+      ...coordinates,
     }
   }
 
   private getAddChildRequest(): AddIntent {
-    const { targetParent, currentParent } = this
+    const { targetParent, currentParent, target, coordinates } = this
+    const components = this.getMovedComponents()
+    const targetContainer = targetParent === null ? null : targetParent.component.userComponent
     return {
       type: IntentType.ADD,
-      components: this.getMovedComponents(),
-      targetContainer: targetParent === null ? null : targetParent.component.userComponent,
+      components,
+      targetContainer,
+      targetComponent: target.userComponent,
       container: currentParent.component.userComponent,
-      ...this.coordinates,
+      ...coordinates,
     }
   }
 

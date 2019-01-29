@@ -74,6 +74,7 @@ export type SelectionIntent = {
 export type MoveIntent = {
   type: IntentType.MOVE
   components: Component[]
+  targetComponent: Component
   container: Component
   location: Point
   offset: Point
@@ -88,6 +89,7 @@ export type DeleteIntent = {
 export type AddIntent = {
   type: IntentType.ADD
   components: Component[]
+  targetComponent: Component
   targetContainer: Component
   container: Component
   location: Point
