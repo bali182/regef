@@ -76,12 +76,12 @@ export class SingleSelectionCapability extends Capability<SingleSelectionCapabil
     this.possibleSingleSelection = false
   }
 
-  onMouseUp({ ctrlKey, metaKey }: MouseEvent): void {
+  onMouseUp({ ctrlKey, metaKey, shiftKey }: MouseEvent): void {
     if (!this.progress) {
       return
     }
     if (this.possibleSingleSelection) {
-      this.additional = metaKey || ctrlKey
+      this.additional = metaKey || ctrlKey || shiftKey
       perform(this.engine.editPolicies, this.createSingleSelectionRequest())
       this.additional = false
     }

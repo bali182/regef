@@ -1134,12 +1134,12 @@ var SingleSelectionCapability = /** @class */ (function (_super) {
         this.possibleSingleSelection = false;
     };
     SingleSelectionCapability.prototype.onMouseUp = function (_a) {
-        var ctrlKey = _a.ctrlKey, metaKey = _a.metaKey;
+        var ctrlKey = _a.ctrlKey, metaKey = _a.metaKey, shiftKey = _a.shiftKey;
         if (!this.progress) {
             return;
         }
         if (this.possibleSingleSelection) {
-            this.additional = metaKey || ctrlKey;
+            this.additional = metaKey || ctrlKey || shiftKey;
             perform(this.engine.editPolicies, this.createSingleSelectionRequest());
             this.additional = false;
         }

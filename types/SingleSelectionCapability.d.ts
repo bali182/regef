@@ -12,5 +12,5 @@ export declare class SingleSelectionCapability extends Capability<SingleSelectio
     cancel(): void;
     onMouseDown(e: MouseEvent): void;
     onMouseMove(): void;
-    onMouseUp({ ctrlKey, metaKey }: MouseEvent): void;
+    onMouseUp({ ctrlKey, metaKey, shiftKey }: MouseEvent): void;
 }
