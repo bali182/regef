@@ -5,3 +5,4 @@ package-lock.json
 dist
 index.js.map
 .rpt2_cache
+coverage

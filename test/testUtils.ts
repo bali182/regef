@@ -108,7 +108,7 @@ export function registerDummyTree(node: Node, registry: ComponentRegistry): void
 }
 
 export function mockDocument(html: string): Document {
-  return new JSDOM(html, { contentType: 'text/xml' }).window.document
+  return new JSDOM(html, { contentType: 'text/xml', url: 'http://dummy.com' }).window.document
 }
 
 export function mockCapability(): Capability {

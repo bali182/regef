@@ -21,5 +21,13 @@
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "verbose": false
+  "verbose": false,
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "**/*.ts",
+    "!**/node_modules/**",
+    "!example/**",
+    "!dist/**",
+    "!types/**"
+  ]
 }

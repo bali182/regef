@@ -2,6 +2,8 @@ import React from 'react'
 import { component, RegefComponentProps } from '../src/index'
 
 export const TEST_PART_ID = 'PART'
+export const TEST_PART_ID_2 = 'PART2'
+export const TEST_NODE_ID = 'NODE'
 
 export const TEST_CONTAINER_TYPE = 'CONTAINER'
 export const TEST_NODE_TYPE = 'NODE'

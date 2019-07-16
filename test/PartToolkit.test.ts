@@ -3,8 +3,9 @@ import { registerDummyTree, mockDocument } from './testUtils'
 import { PartDomHelper } from '../src/PartDomHelper'
 import { ComponentRegistry } from '../src/ComponentRegistry'
 import { PartToolkit } from '../src/PartToolkit'
+import { Rectangle, rectangle } from 'regef-geometry'
 
-describe('PartDomHelper', () => {
+describe('PartToolkit', () => {
   afterEach(() => jest.clearAllMocks())
 
   const registry = new ComponentRegistry()
@@ -88,5 +89,12 @@ describe('PartDomHelper', () => {
     expect(new Set(actualRootComponents)).toEqual(new Set(expectedRootComponents))
     expect(new Set(actualT1Components)).toEqual(new Set(expectedT1Components))
     expect(new Set(actualT2Components)).toEqual(new Set(expectedT2Components))
+  })
+
+  it('should find return the elements bounds', () => {
+    const [t1Comp] = toolkit.ofType('t1')
+    const bounds = toolkit.bounds(t1Comp)
+    expect(bounds).toBeInstanceOf(Rectangle)
+    expect(bounds).toEqual(rectangle(0, 0, 0, 0))
   })
 })
